@@ -1,4 +1,4 @@
-// actions/auth.actions.ts
+// actions/auth.actions.ts (excerpt)
 'use server'
 
 import { redirect } from 'next/navigation'
@@ -6,8 +6,32 @@ import { createClient } from '@/lib/supabase/server'
 import { registerSchema, loginSchema } from '@/lib/validations/user.schema'
 import type { RegisterInput, LoginInput } from '@/lib/validations/user.schema'
 
-// -------------------- registerUser --------------------
-export async function registerUser(formData: FormData) {
+// Define return types for useActionState
+export type RegisterState = {
+  errors?: {
+    email?: string[]
+    password?: string[]
+    full_name?: string[]
+    role?: string[]
+    department?: string[]
+    form?: string[]
+  }
+  success?: boolean
+}
+
+export type LoginState = {
+  errors?: {
+    email?: string[]
+    password?: string[]
+    form?: string[]
+  }
+  success?: boolean
+}
+
+export async function registerUser(
+  prevState: RegisterState,
+  formData: FormData
+): Promise<RegisterState> {
   const raw = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
@@ -19,7 +43,7 @@ export async function registerUser(formData: FormData) {
   // Validate with Zod
   const result = registerSchema.safeParse(raw)
   if (!result.success) {
-    return { error: result.error.flatten().fieldErrors }
+    return { errors: result.error.flatten().fieldErrors }
   }
 
   const supabase = await createClient()
@@ -37,15 +61,25 @@ export async function registerUser(formData: FormData) {
   })
 
   if (error) {
-    return { error: { form: [error.message] } }
+    return { errors: { form: [error.message] } }
   }
 
-  // Redirect to pending approval page – user cannot access system yet
+  // Success – we redirect, but useActionState expects a return.
+  // However, redirect throws an error, so we need to handle it.
+  // We'll use a try-catch or simply return success and handle redirect in the component?
+  // Better: After success, we redirect, so the function never returns.
+  // But useActionState expects a return. We'll redirect inside the action,
+  // and TypeScript will complain that not all code paths return a value.
+  // We can add a return after redirect (which never executes) to satisfy TypeScript.
   redirect('/pending-approval')
+  // This line never runs, but needed for TypeScript
+  return { success: true }
 }
 
-// -------------------- loginUser --------------------
-export async function loginUser(formData: FormData) {
+export async function loginUser(
+  prevState: LoginState,
+  formData: FormData
+): Promise<LoginState> {
   const raw = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
@@ -53,7 +87,7 @@ export async function loginUser(formData: FormData) {
 
   const result = loginSchema.safeParse(raw)
   if (!result.success) {
-    return { error: result.error.flatten().fieldErrors }
+    return { errors: result.error.flatten().fieldErrors }
   }
 
   const supabase = await createClient()
@@ -64,10 +98,10 @@ export async function loginUser(formData: FormData) {
   })
 
   if (authError || !authData.user) {
-    return { error: { form: ['Invalid email or password'] } }
+    return { errors: { form: ['Invalid email or password'] } }
   }
 
-  // Fetch user record to check signup_status and role
+  // Fetch user record
   const { data: user, error: userError } = await supabase
     .from('users')
     .select('role, signup_status, is_active')
@@ -76,12 +110,12 @@ export async function loginUser(formData: FormData) {
 
   if (userError || !user) {
     await supabase.auth.signOut()
-    return { error: { form: ['Account setup incomplete. Contact admin.'] } }
+    return { errors: { form: ['Account setup incomplete. Contact admin.'] } }
   }
 
   if (!user.is_active) {
     await supabase.auth.signOut()
-    return { error: { form: ['Your account has been deactivated.'] } }
+    return { errors: { form: ['Your account has been deactivated.'] } }
   }
 
   if (user.signup_status === 'pending') {
@@ -90,10 +124,10 @@ export async function loginUser(formData: FormData) {
 
   if (user.signup_status === 'rejected') {
     await supabase.auth.signOut()
-    return { error: { form: ['Your registration was rejected. Contact admin.'] } }
+    return { errors: { form: ['Your registration was rejected. Contact admin.'] } }
   }
 
-  // Route approved users to their role dashboard
+  // Route to dashboard
   const roleDashboards: Record<string, string> = {
     student: '/requester',
     staff: '/requester',
@@ -102,11 +136,11 @@ export async function loginUser(formData: FormData) {
     supervisor: '/supervisor',
     admin: '/admin',
   }
-
   redirect(roleDashboards[user.role] ?? '/requester')
+  // TypeScript satisfaction
+  return { success: true }
 }
 
-// -------------------- logoutUser --------------------
 export async function logoutUser() {
   const supabase = await createClient()
   await supabase.auth.signOut()

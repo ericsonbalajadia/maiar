@@ -1,30 +1,23 @@
+// app/(auth)/login/page.tsx
 'use client'
 
-import { loginUser } from '@/actions/auth.actions'
+import { useActionState } from 'react'
+import { loginUser, type LoginState } from '@/actions/auth.actions'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
-import { useFormState } from 'react-dom'
+import { useSearchParams } from 'next/navigation'
 
-type FormState = {
-  error: {
-    email?: string[]
-    password?: string[]
-    form?: string[]
-  } | null
+const initialState: LoginState = {
+  errors: {},
 }
 
-export default function LoginPage({
-  searchParams,
-}: {
-  searchParams: { error?: string }
-}) {
-  const initialState: FormState = {
-    error: null,
-  }
+export default function LoginPage() {
+  const searchParams = useSearchParams()
+  const [state, formAction, pending] = useActionState(loginUser, initialState)
 
-  
+  const errorParam = searchParams.get('error')
 
   return (
     <Card>
@@ -32,28 +25,35 @@ export default function LoginPage({
         <CardTitle>Sign In</CardTitle>
       </CardHeader>
       <CardContent>
-        {searchParams.error === 'account_inactive' && (
+        {errorParam === 'account_inactive' && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">
             Your account has been deactivated. Contact IT support.
           </div>
         )}
-
-        <form action={loginUser} className="space-y-4">
+        {state.errors?.form && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">
+            {state.errors.form.join(', ')}
+          </div>
+        )}
+        <form action={formAction} className="space-y-4">
           <div>
             <label className="text-sm font-medium">Email</label>
-            <Input name="email" type="email" required />
+            <Input name="email" type="email" required placeholder="you@vsu.edu.ph" />
+            {state.errors?.email && (
+              <p className="text-sm text-red-600 mt-1">{state.errors.email[0]}</p>
+            )}
           </div>
-
           <div>
             <label className="text-sm font-medium">Password</label>
             <Input name="password" type="password" required />
+            {state.errors?.password && (
+              <p className="text-sm text-red-600 mt-1">{state.errors.password[0]}</p>
+            )}
           </div>
-
-          <Button type="submit" className="w-full">
-            Sign In
+          <Button type="submit" className="w-full" disabled={pending}>
+            {pending ? 'Signing in...' : 'Sign In'}
           </Button>
         </form>
-
         <div className="mt-4 text-center text-sm space-y-2">
           <p>
             Don't have an account?{' '}
@@ -61,11 +61,7 @@ export default function LoginPage({
               Register
             </Link>
           </p>
-
-          <Link
-            href="/forgot-password"
-            className="text-slate-500 hover:underline block"
-          >
+          <Link href="/forgot-password" className="text-slate-500 hover:underline block">
             Forgot password?
           </Link>
         </div>
