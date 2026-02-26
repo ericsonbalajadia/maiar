@@ -1,23 +1,19 @@
-// app/(auth)/login/page.tsx
 'use client'
 
-import { useActionState } from 'react'
+import { Suspense, useActionState } from 'react'
 import { loginUser, type LoginState } from '@/actions/auth.actions'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { ErrorMessage } from './error-message'
 
 const initialState: LoginState = {
   errors: {},
 }
 
 export default function LoginPage() {
-  const searchParams = useSearchParams()
   const [state, formAction, pending] = useActionState(loginUser, initialState)
-
-  const errorParam = searchParams.get('error')
 
   return (
     <Card>
@@ -25,16 +21,16 @@ export default function LoginPage() {
         <CardTitle>Sign In</CardTitle>
       </CardHeader>
       <CardContent>
-        {errorParam === 'account_inactive' && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">
-            Your account has been deactivated. Contact IT support.
-          </div>
-        )}
+        <Suspense fallback={<p className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-sm text-yellow-700">Checking your session...</p>}>
+          <ErrorMessage />
+        </Suspense>
+
         {state.errors?.form && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">
             {state.errors.form.join(', ')}
           </div>
         )}
+
         <form action={formAction} className="space-y-4">
           <div>
             <label className="text-sm font-medium">Email</label>
@@ -54,6 +50,7 @@ export default function LoginPage() {
             {pending ? 'Signing in...' : 'Sign In'}
           </Button>
         </form>
+        
         <div className="mt-4 text-center text-sm space-y-2">
           <p>
             Don't have an account?{' '}
