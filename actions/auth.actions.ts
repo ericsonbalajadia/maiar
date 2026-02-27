@@ -1,12 +1,21 @@
-// actions/auth.actions.ts (excerpt)
+// actions/auth.actions.ts
 'use server'
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { registerSchema, loginSchema } from '@/lib/validations/user.schema'
 import type { RegisterInput, LoginInput } from '@/lib/validations/user.schema'
 
-// Define return types for useActionState
+export type LoginState = {
+  errors?: {
+    email?: string[]
+    password?: string[]
+    form?: string[]
+  }
+  success?: boolean
+}
+
 export type RegisterState = {
   errors?: {
     email?: string[]
@@ -14,15 +23,6 @@ export type RegisterState = {
     full_name?: string[]
     role?: string[]
     department?: string[]
-    form?: string[]
-  }
-  success?: boolean
-}
-
-export type LoginState = {
-  errors?: {
-    email?: string[]
-    password?: string[]
     form?: string[]
   }
   success?: boolean
@@ -40,7 +40,6 @@ export async function registerUser(
     department: formData.get('department') as string | undefined,
   }
 
-  // Validate with Zod
   const result = registerSchema.safeParse(raw)
   if (!result.success) {
     return { errors: result.error.flatten().fieldErrors }
@@ -64,22 +63,16 @@ export async function registerUser(
     return { errors: { form: [error.message] } }
   }
 
-  // Success – we redirect, but useActionState expects a return.
-  // However, redirect throws an error, so we need to handle it.
-  // We'll use a try-catch or simply return success and handle redirect in the component?
-  // Better: After success, we redirect, so the function never returns.
-  // But useActionState expects a return. We'll redirect inside the action,
-  // and TypeScript will complain that not all code paths return a value.
-  // We can add a return after redirect (which never executes) to satisfy TypeScript.
   redirect('/pending-approval')
-  // This line never runs, but needed for TypeScript
-  return { success: true }
 }
 
 export async function loginUser(
   prevState: LoginState,
   formData: FormData
 ): Promise<LoginState> {
+  console.log('=== loginUser started ===')
+  console.log('Email from form:', formData.get('email'))
+
   const raw = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
@@ -91,24 +84,33 @@ export async function loginUser(
   }
 
   const supabase = await createClient()
+  console.log('Supabase client created')
 
   const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
     email: result.data.email,
     password: result.data.password,
   })
 
+  console.log('signInWithPassword result:', { authData, authError })
+
   if (authError || !authData.user) {
     return { errors: { form: ['Invalid email or password'] } }
   }
 
-  // Fetch user record
-  const { data: user, error: userError } = await supabase
+  console.log('Fetching user record from public.users for auth_id:', authData.user.id)
+
+  // Use admin client to bypass RLS
+  const admin = createAdminClient()
+  const { data: user, error: userError } = await admin
     .from('users')
     .select('role, signup_status, is_active')
     .eq('auth_id', authData.user.id)
     .single()
 
+  console.log('User fetch result:', { user, userError })
+
   if (userError || !user) {
+    console.log('User fetch failed, signing out')
     await supabase.auth.signOut()
     return { errors: { form: ['Account setup incomplete. Contact admin.'] } }
   }
@@ -119,6 +121,7 @@ export async function loginUser(
   }
 
   if (user.signup_status === 'pending') {
+    console.log('User is pending, redirecting to /pending-approval')
     redirect('/pending-approval')
   }
 
@@ -127,7 +130,7 @@ export async function loginUser(
     return { errors: { form: ['Your registration was rejected. Contact admin.'] } }
   }
 
-  // Route to dashboard
+  console.log('User is approved, redirecting to role dashboard. Role:', user.role)
   const roleDashboards: Record<string, string> = {
     student: '/requester',
     staff: '/requester',
@@ -137,8 +140,6 @@ export async function loginUser(
     admin: '/admin',
   }
   redirect(roleDashboards[user.role] ?? '/requester')
-  // TypeScript satisfaction
-  return { success: true }
 }
 
 export async function logoutUser() {
