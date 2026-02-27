@@ -4,34 +4,34 @@ iTrack is a web-based application that streamlines the submission, tracking, and
 
 | Internal Release Code | Date Released |
 | --- | --- |
+| [MA.010.000](#ma010000-release-notes) | 2026-02-23 |
 | [MA.010.001](#ma010001-release-notes) | 2026-02-27 |
 
 ### MA.010.001 Release Notes
-- fix: correct env var from publishable_key to anon_key
-- chore(landing): replace template landing with iTrack welcome page
-- fix(admin): use admin client in pending approvals page to bypass RLS
-- fix(auth): use admin client to fetch user record during login, bypass RLS recursion
-- refactor(validation): move schemas to dedicated file, keep server actions separate
-- fix(auth): properly exchange code and redirect after email confirmation
-- fix(proxy): correct env var from publishable_key to anon_key
-- feat(dashboard): add dashboard layout with role-based sidebar
-- fix(supabase): correct env variable name from PUBLISHABLE_KEY to ANON_KEY
-- feat(auth): add AuthProvider and role hooks
-- feat(admin): add user approval actions and pending approvals page
-- fix(auth): implement useActionState and resolve Suspense warnings
-- fix(auth): implement useActionState for form handling and error display
-- fix: migrate middleware to proxy
-- feat(auth): add login, register, and pending-approval pages with server actions
-- feat(auth): add server actions for register, login, logout
-- feat(validation): add Zod schemas for user registration, login, and updates
-- feat(constants): add role constants and navigation config
-- feat(supabase): add typed client factories for browser, server, middleware, admin
-- feat(types): add DBUser types alias based on the database schema
-- feat(types): define UserRole and role dashboard mapping
-- feat(types): add auto-generated types from Supabase schema
-- build: add zod, zustand, react-query, date-fns
-- chore: clean up template files and restructure folders for iTrack
-- NOTES: No known bugs at this time.
+- Fix proxy environment variable 
+- Replace template landing page with iTrack welcome page
+- Use admin client in pending approvals page and login action to bypass RLS recursion
+- Move Zod schemas to dedicated file (separate from server actions)
+- Fix email confirmation callback to properly exchange code and redirect
+- Add dashboard layout with role-based sidebar
+- Add AuthProvider and useUserRole hook for global session/role access
+- Add admin approval actions and pending approvals UI
+- Migrate middleware to custom proxy client
+- Add auth pages (login, register, pending-approval) with server actions
+- Add server actions
+- Add Zod schemas for user registration, login, and admin updates
+- Add role constants and navigation configuration
+- Add typed Supabase client factories (browser, server, middleware, admin)
+- Generate TypeScript types from Supabase schema; define user role and dashboard route mapping
+- Install dependencies: `zod`, `zustand`, `@tanstack/react-query`, `date-fns`
+- Clean up template files and restructure folders for iTrack
+
+
+## 📦 MA.010.000 Release Notes
+- Database schema integration
+- Folder structure established
+- Implemented initial UI of starter pages
+- Configured platform‑specific dependencies for web
 
 ### Important Links
 - Design Specs: https://github.com/ericsonbalajadia/Maiar-docportal.git
