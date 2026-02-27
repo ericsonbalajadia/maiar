@@ -1,17 +1,22 @@
 // app/(dashboard)/admin/users/pending/page.tsx
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin' // ← use admin client
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { UserActionButtons } from './user-action-button'
 
 export default async function PendingApprovalsPage() {
-  const supabase = await createClient()
+  const admin = createAdminClient() // bypasses RLS
 
-  const { data: pendingUsers } = await supabase
+  const { data: pendingUsers, error } = await admin
     .from('users')
     .select('id, email, full_name, role, department, created_at')
     .eq('signup_status', 'pending')
     .order('created_at', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching pending users:', error)
+    return <div>Error loading pending users</div>
+  }
 
   return (
     <div className="space-y-6">
