@@ -27,7 +27,6 @@ export const registerSchema = z.object({
     .optional(),
 })
 
-
 // Login form schema
 export const loginSchema = z.object({
   email: z
