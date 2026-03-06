@@ -11,6 +11,7 @@ const PUBLIC_ROUTES = [
   '/forgot-password',
   '/reset-password',
   '/error',
+  '/check-email',
   '/api/auth/callback',
 ]
 

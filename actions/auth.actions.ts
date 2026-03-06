@@ -47,23 +47,35 @@ export async function registerUser(
 
   const supabase = await createClient()
 
+  // const { error } = await supabase.auth.signUp({
+  //   email: result.data.email,
+  //   password: result.data.password,
+  //   options: {
+  //     data: {
+  //       full_name: result.data.full_name,
+  //       role: result.data.role,
+  //       department: result.data.department ?? null,
+  //     },
+  //   },
+  // })
   const { error } = await supabase.auth.signUp({
-    email: result.data.email,
-    password: result.data.password,
-    options: {
-      data: {
-        full_name: result.data.full_name,
-        role: result.data.role,
-        department: result.data.department ?? null,
-      },
+  email: result.data.email,
+  password: result.data.password,
+  options: {
+    data: {
+      full_name: result.data.full_name,
+      role: result.data.role,
+      department: result.data.department ?? null,
     },
-  })
+    emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`
+  },
+})
 
   if (error) {
     return { errors: { form: [error.message] } }
   }
 
-  redirect('/pending-approval')
+  redirect('/check-email')
 }
 
 export async function loginUser(
