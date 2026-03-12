@@ -1,33 +1,47 @@
 // app/(dashboard)/admin/users/pending/page.tsx
-import { createAdminClient } from '@/lib/supabase/admin' // ← use admin client
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
-import { UserActionButtons } from './user-action-button'
+'use client';
 
-export default async function PendingApprovalsPage() {
-  const admin = createAdminClient() // bypasses RLS
+import { useEffect, useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { UserActionButtons } from './user-action-button';
 
-  const { data: pendingUsers, error } = await admin
-    .from('users')
-    .select('id, email, full_name, role, department, created_at')
-    .eq('signup_status', 'pending')
-    .order('created_at', { ascending: true })
+type PendingUser = {
+  id: string;
+  email: string;
+  full_name: string;
+  role: string;
+  department: string | null;
+  created_at: string;
+};
 
-  if (error) {
-    console.error('Error fetching pending users:', error)
-    return <div>Error loading pending users</div>
-  }
+export default function PendingApprovalsPage() {
+  const [users, setUsers] = useState<PendingUser[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/admin/pending-users')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) throw new Error(data.error);
+        setUsers(data);
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Pending Approvals</h1>
-        <p className="text-slate-500">
-          {pendingUsers?.length || 0} users awaiting approval
-        </p>
+        <p className="text-slate-500">{users.length} users awaiting approval</p>
       </div>
 
-      {!pendingUsers?.length ? (
+      {users.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-slate-400">
             No pending users. All registrations have been reviewed.
@@ -35,7 +49,7 @@ export default async function PendingApprovalsPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {pendingUsers.map((user) => (
+          {users.map((user) => (
             <Card key={user.id}>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
@@ -44,9 +58,7 @@ export default async function PendingApprovalsPage() {
                     <p className="text-sm text-slate-500">{user.email}</p>
                     <div className="flex gap-2 mt-2">
                       <Badge variant="outline">{user.role}</Badge>
-                      {user.department && (
-                        <Badge variant="secondary">{user.department}</Badge>
-                      )}
+                      {user.department && <Badge variant="secondary">{user.department}</Badge>}
                     </div>
                     <p className="text-xs text-slate-400 mt-2">
                       Registered: {new Date(user.created_at).toLocaleDateString()}
@@ -60,5 +72,5 @@ export default async function PendingApprovalsPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
