@@ -56,3 +56,8 @@ export type RequestSummary = Pick<
   status: Pick<DbStatus, 'status_name'>;
   priority: Pick<DbPriority, 'level'>;
 };
+
+export type FeedbackTwoRating = Omit<DbFeedback, 'rating'> & {
+  service_satisfaction: number;
+  overall_rating: number;
+};
