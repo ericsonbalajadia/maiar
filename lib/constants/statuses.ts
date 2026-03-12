@@ -11,3 +11,13 @@ export const STATUS_NAMES = {
 export type StatusName = typeof STATUS_NAMES[keyof typeof STATUS_NAMES];
 
 export const TERMINAL_STATUSES: StatusName[] = ['completed', 'cancelled'];
+
+export const STATUS_TRANSITIONS: Record<StatusName, StatusName[]> = { 
+  pending:      ['under_review', 'cancelled'], 
+  under_review: ['approved', 'cancelled'], 
+  approved:     ['assigned', 'cancelled'], 
+  assigned:     ['in_progress', 'cancelled'], 
+  in_progress:  ['completed'], 
+  completed:    [], 
+  cancelled:    [], 
+};
