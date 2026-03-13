@@ -17,8 +17,8 @@ import type { Json } from "@/types/database.types";
 
 export async function createRequest(
   prevState: ActionResult,
-  formData: FormData,
-): Promise<ActionResult<{ requestId: string; ticketNumber: string }>> {
+  formData: FormData
+): Promise<ActionResult> { 
   const supabase = await createClient();
   const admin = createAdminClient();
 

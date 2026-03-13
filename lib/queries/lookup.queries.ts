@@ -4,29 +4,29 @@ import { createClient } from "@/lib/supabase/server";
 export async function getActiveLocations() {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("locations")
-    .select("id, building_name, room_number, floor_level")
-    .eq("is_active", true)
-    .order("building_name");
+    .from('locations')
+    .select('*')  // ← select all columns
+    .eq('is_active', true)
+    .order('building_name');
   return { data, error };
 }
 
 export async function getActiveCategories() {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("categories")
-    .select("id, category_name, description")
-    .eq("is_active", true)
-    .order("category_name");
+    .from('categories')
+    .select('*')  // ← select all columns
+    .eq('is_active', true)
+    .order('category_name');
   return { data, error };
 }
 
 export async function getPriorities() {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("priorities")
-    .select("id, level, response_time_hours, description")
-    .order("response_time_hours");
+    .from('priorities')
+    .select('*')  // ← select all columns
+    .order('response_time_hours');
   return { data, error };
 }
 
