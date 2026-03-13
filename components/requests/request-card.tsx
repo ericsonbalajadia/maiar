@@ -1,7 +1,7 @@
 // components/ui/RequestCard.tsx
 import Link from 'next/link';
-import { StatusBadge } from '../ui/statusBadge';
-import { PriorityBadge } from '../ui/priority-badge';
+import { StatusBadge } from './statusBadge';
+import { PriorityBadge } from './priority-badge';
 import type { RequestSummary } from '@/types/models';
 
 interface Props {
