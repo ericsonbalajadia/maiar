@@ -129,3 +129,15 @@ export async function getRequestsForTechnician(technicianId: string) {
     .order("created_at", { ascending: true });
   return { data, error };
 }
+
+export async function getCurrentAssignment(requestId: string, technicianId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('request_assignments')
+    .select('id, acceptance_status, notes')
+    .eq('request_id', requestId)
+    .eq('assigned_user_id', technicianId)
+    .eq('is_current_assignment', true)
+    .maybeSingle(); // returns null if not found
+  return { data, error };
+}
