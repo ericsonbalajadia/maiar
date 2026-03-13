@@ -55,6 +55,7 @@ export type RequestSummary = Pick<
 > & {
   status: Pick<DbStatus, 'status_name'>;
   priority: Pick<DbPriority, 'level'>;
+  location: Pick<DbLocation, 'building_name'>;
 };
 
 export type FeedbackTwoRating = Omit<DbFeedback, 'rating'> & {
