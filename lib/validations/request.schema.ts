@@ -1,107 +1,110 @@
-// lib/validation/request.schema.ts (merged)
-import { z } from 'zod';
+// lib/validations/request.schema.ts
+import { z } from 'zod'
 import {
   PPSR_SERVICE_TYPES,
   PPSR_SERVICE_FIELDS,
   type PpsrServiceType,
-} from '@/lib/constants/ppsr-service-types';
+} from '@/lib/constants/ppsr-service-types'
+import { REQUEST_TYPES } from '@/lib/constants/request-types'
 
-// ─── RMR Schema (your version) ───────────────────────────────────────────────
-export const createRmrSchema = z.object({
+// ─── Required fields per service type ───────────────────────────
+const REQUIRED_PPSR_FIELDS: Partial<Record<PpsrServiceType, string[]>> = {
+  audio_system:      ['setup_location', 'date_time_needed'],
+  hauling:           ['from_location', 'to_location'],
+  tent_installation: ['setup_location', 'number_of_tents'],
+  others:            ['specify'],
+}
+
+// ─── Helper: build Zod schema for a given service type ──────────
+function buildServiceSchema(serviceType: PpsrServiceType) {
+  const fields = PPSR_SERVICE_FIELDS[serviceType]
+  const required = new Set(REQUIRED_PPSR_FIELDS[serviceType] ?? [])
+
+  const shape: Record<string, z.ZodTypeAny> = {}
+
+  for (const field of fields) {
+    // Determine field type based on naming conventions
+    let fieldSchema: z.ZodTypeAny
+    if (field === 'with_lights') {
+      fieldSchema = z.boolean()
+    } else if (field.includes('date') || field === 'date_time_needed') {
+      fieldSchema = z.string().datetime({ message: 'Invalid date/time format' })
+    } else if (
+      field.includes('duration') ||
+      field.includes('trips') ||
+      field.includes('tents') ||
+      field === 'estimated_passing_trips' ||
+      field === 'number_of_tents' ||
+      field === 'estimated_duration_hrs'
+    ) {
+      fieldSchema = z.number().positive()
+    } else {
+      // Default to string
+      fieldSchema = z.string()
+    }
+
+    // Apply required/optional
+    if (required.has(field)) {
+      if (fieldSchema instanceof z.ZodString) {
+        shape[field] = fieldSchema.min(1, `${field.replace(/_/g, ' ')} is required`)
+      } else {
+        shape[field] = fieldSchema
+      }
+    } else {
+      shape[field] = fieldSchema.optional()
+    }
+  }
+
+  return z.object(shape)
+}
+
+// ─── Build discriminated union for PPSR service data ────────────
+const ppsrUnionOptions = PPSR_SERVICE_TYPES.map((type) =>
+  z.object({
+    service_type: z.literal(type),
+    service_data: buildServiceSchema(type),
+  })
+)
+
+// Cast to the expected tuple type – safe because PPSR_SERVICE_TYPES is non‑empty.
+export const ppsrServiceDataSchema = z.discriminatedUnion(
+  'service_type',
+  ppsrUnionOptions as [z.ZodObject<any>, ...z.ZodObject<any>[]]
+)
+export type PpsrServiceData = z.infer<typeof ppsrServiceDataSchema>
+
+// ─── RMR schema (FM-GSO-09) ─────────────────────────────────────
+export const rmrSchema = z.object({
   request_type: z.literal('rmr'),
-  title: z.string().min(5, 'Title must be at least 5 characters').max(200),
-  description: z.string().min(10, 'Description must be at least 10 characters'),
-  location_id: z.string().uuid('Please select a valid location'),
-  priority_id: z.string().uuid('Please select a priority level'),
-  category_id: z.string().uuid('Please select a nature of work'),
-});
-
-// ─── PPSR Schema (your version, extended with service_data) ──────────────────
-export const createPpsrSchema = z.object({
-  request_type: z.literal('ppsr'),
-  title: z.string().min(5).max(200),
-  description: z.string().min(10),
-  location_id: z.string().uuid('Please select a valid location'),
-  priority_id: z.string().uuid('Please select a priority level'),
-  service_type: z.enum(PPSR_SERVICE_TYPES, {
-    error: () => ({ message: 'Please select a service type' }),
-  }),
-  service_data: z.record(z.string(), z.unknown()).optional(),
-});
-
-// ─── Discriminated union for server actions (your version) ───────────────────
-export const createRequestSchema = z.discriminatedUnion('request_type', [
-  createRmrSchema,
-  createPpsrSchema,
-]);
-
-export type CreateRmrInput = z.infer<typeof createRmrSchema>;
-export type CreatePpsrInput = z.infer<typeof createPpsrSchema>;
-export type CreateRequestInput = z.infer<typeof createRequestSchema>;
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  Per‑service validation (from develop) – useful for deep checking service_data
-// ─────────────────────────────────────────────────────────────────────────────
-
-// Base PPSR schema for forms (without request_type)
-export const ppsrBaseSchema = z.object({
   title:        z.string().min(3, 'Title must be at least 3 characters'),
   description:  z.string().optional(),
   location_id:  z.string().uuid('Invalid location'),
+  priority_id:  z.string().uuid('Invalid priority'),
+  category_id:  z.string().uuid('Invalid category'),
+})
+
+export type RmrFormValues = z.infer<typeof rmrSchema>
+
+// ─── PPSR base schema (without service_data) ───────────────────
+export const ppsrBaseSchema = z.object({
+  request_type: z.literal('ppsr'),
+  title:        z.string().min(3, 'Title must be at least 3 characters'),
+  description:  z.string().optional(),
+  location_id:  z.string().uuid('Invalid location'),
+  priority_id:  z.string().uuid('Invalid priority'),
   service_type: z.enum(PPSR_SERVICE_TYPES, { message: 'Service type is required' }),
-  service_data: z.record(z.string(), z.unknown()).default({}),
-});
+})
 
-export type PpsrFormValues = z.infer<typeof ppsrBaseSchema>;
+export type PpsrBaseValues = z.infer<typeof ppsrBaseSchema>
 
-// Helper to generate per‑service schemas
-function makeServiceSchema(serviceType: PpsrServiceType) {
-  const fields = PPSR_SERVICE_FIELDS[serviceType];
+// ─── Combined request schema (used by the form) ─────────────────
+export const requestSchema = z.discriminatedUnion('request_type', [
+  rmrSchema,
+  ppsrBaseSchema,
+])
 
-  const requiredFields: Partial<Record<PpsrServiceType, string[]>> = {
-    audio_system:      ['setup_location', 'date_time_needed'],
-    hauling:           ['from_location', 'to_location'],
-    tent_installation: ['setup_location', 'number_of_tents'],
-    others:            ['specify'],
-  };
-  const requiredSet = new Set(requiredFields[serviceType] ?? []);
+export type RequestFormValues = z.infer<typeof requestSchema>
 
-  const optionalShape: Record<string, z.ZodOptional<z.ZodString>> = {};
-  const requiredShape: Record<string, z.ZodString> = {};
-
-  fields.forEach((field) => {
-    if (requiredSet.has(field)) {
-      requiredShape[field] = z.string().min(1, field.replace(/_/g, ' ') + ' is required');
-    } else {
-      optionalShape[field] = z.string().optional();
-    }
-  });
-
-  return z.object({ ...optionalShape, ...requiredShape });
-}
-
-export const PPSR_SERVICE_SCHEMAS = Object.fromEntries(
-  PPSR_SERVICE_TYPES.map((type) => [type, makeServiceSchema(type)])
-) as Record<PpsrServiceType, ReturnType<typeof makeServiceSchema>>;
-
-export function validateServiceData(
-  serviceType: PpsrServiceType,
-  data: Record<string, unknown>
-): { success: true } | { success: false; errors: Record<string, string> } {
-  const schema = PPSR_SERVICE_SCHEMAS[serviceType];
-  if (!schema) return { success: true };
-
-  const result = schema.safeParse(data);
-  if (result.success) return { success: true };
-
-  const errors: Record<string, string> = {};
-  result.error.issues.forEach((issue) => {
-    const key = issue.path[0]?.toString() ?? 'form';
-    errors[key] = issue.message;
-  });
-  return { success: false, errors };
-}
-
-// Re‑export constants for convenience
-export { PPSR_SERVICE_TYPES, PPSR_SERVICE_FIELDS };
-export type { PpsrServiceType };
+// ─── Re-exports for convenience ─────────────────────────────────
+export { PPSR_SERVICE_TYPES, PPSR_SERVICE_FIELDS }
+export type { PpsrServiceType }

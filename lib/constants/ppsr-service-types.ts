@@ -44,3 +44,12 @@ export const PPSR_SERVICE_FIELDS: Record<PpsrServiceType, string[]> = {
   plans_layouts_estimates: ['plan_type'],
   others: ['specify'],
 };
+
+// Required fields per service type – used for validation
+export const PPSR_REQUIRED_FIELDS: Partial<Record<PpsrServiceType, string[]>> = {
+  audio_system: ['setup_location', 'date_time_needed'],
+  hauling: ['from_location', 'to_location'],
+  tent_installation: ['setup_location', 'number_of_tents'],
+  others: ['specify'],
+  // All others have no required fields or are optional
+};
