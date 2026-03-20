@@ -294,6 +294,7 @@ export type RmrFormInput = {
   title: string
   description: string
   location_id: string
+  priority_id: string     
   designation: string
   contact_email: string
   category_id: string
@@ -304,6 +305,7 @@ export type PpsrFormInput = {
   title: string
   description: string
   location_id: string
+  priority_id: string     
   designation: string
   contact_email: string
   service_type: PpsrServiceType

@@ -11,14 +11,14 @@ import type {
   RequesterStats,
   AdminStats,
 } from '@/types/requests.model'
-import type { PpsrServiceTypeValue } from '@/lib/validations/request.schema'
+import type { PpsrServiceType } from '@/lib/validations/request.schema'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type RequestActionState = {
   error?: string
   success?: boolean
-  ticketNumber?: string
+  ticketNumber?: string | null
   requestId?: string
   title?: string
   requestType?: string
@@ -114,6 +114,7 @@ export async function createRequest(
       description: input.description,
       request_type: type,
       location_id: input.location_id,
+      priority_id: input.priority_id, 
       category_id: type === 'rmr' ? (input as RmrFormInput).category_id : null,
       status_id: pendingStatusId,
       requester_id: dbUser.id,
@@ -146,7 +147,7 @@ export async function createRequest(
       .from('ppsr_details')
       .insert({
         request_id: newRequest.id,
-        service_type: ppsrInput.service_type as PpsrServiceTypeValue,
+        service_type: ppsrInput.service_type as PpsrServiceType,
         service_data: ppsrInput.service_data,
       })
 
@@ -261,14 +262,16 @@ export async function getRecentRequests(): Promise<RequestWithRelations[]> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
 
-  const { data: dbUser } = await supabase
+  const admin = createAdminClient() // bypass RLS
+
+  const { data: dbUser } = await admin
     .from('users')
     .select('id')
     .eq('auth_id', user.id)
     .single()
   if (!dbUser) return []
 
-  const { data, error } = await supabase
+  const { data, error } = await admin
     .from('requests')
     .select(
       `
@@ -281,7 +284,7 @@ export async function getRecentRequests(): Promise<RequestWithRelations[]> {
       priorities ( level )
       `
     )
-    .eq('requester_id', dbUser.id)
+    .eq('requester_id', dbUser.id) // manually enforce ownership
     .order('created_at', { ascending: false })
     .limit(5)
 

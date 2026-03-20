@@ -1,4 +1,4 @@
-// middleware.ts
+// middleware.ts change to proxy.ts to avoid conflict with next.js reserved filename for middleware
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createMiddlewareClient } from '@/lib/supabase/middleware'
