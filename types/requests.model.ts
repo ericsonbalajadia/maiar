@@ -293,6 +293,7 @@ export type RequestDetail = RequestWithRelations & {
 export type RmrFormInput = {
   title: string
   description: string
+  location_id: string          
   location_building: string
   location_floor?: string
   location_room?: string
@@ -305,6 +306,7 @@ export type RmrFormInput = {
 export type PpsrFormInput = {
   title: string
   description: string
+  location_id: string      
   location_building: string
   location_floor?: string
   location_room?: string

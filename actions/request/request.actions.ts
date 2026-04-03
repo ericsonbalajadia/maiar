@@ -1,3 +1,4 @@
+//actions/request/request.actions.ts
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
@@ -128,109 +129,101 @@ async function resolveOrCreateLocation(
   return inserted.id
 }
 
-// ─── createRequest ────────────────────────────────────────────────────────────
-
-/**
- * Inserts a new request into `requests`, then inserts the type-specific
- * detail row into either `rmr_details` or `ppsr_details`.
- * Returns the new ticket_number on success.
- */
 export async function createRequest(
   type: 'rmr',
-  input: RmrFormInput
-): Promise<RequestActionState>
+  input: {
+    title: string;
+    description: string;
+    category_id: string;
+    location_building: string;
+    location_floor?: string;
+    location_room?: string;
+    designation: string;
+    contact_email: string;
+  }
+): Promise<RequestActionState>;
 export async function createRequest(
   type: 'ppsr',
   input: PpsrFormInput
-): Promise<RequestActionState>
+): Promise<RequestActionState>;
 export async function createRequest(
   type: 'rmr' | 'ppsr',
-  input: RmrFormInput | PpsrFormInput
+  input: any
 ): Promise<RequestActionState> {
-  const supabase = await createClient()
+  const supabase = await createClient();
+  const admin = createAdminClient();
 
-  // 1. Auth check
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'You must be logged in to submit a request.' }
+  // Auth & user checks (same as before)
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'You must be logged in to submit a request.' };
 
-  // 2. Get users.id for requester_id
   const { data: dbUser } = await supabase
     .from('users')
     .select('id')
     .eq('auth_id', user.id)
-    .single()
-  if (!dbUser) return { error: 'User record not found. Please contact support.' }
+    .single();
+  if (!dbUser) return { error: 'User record not found.' };
 
-  // 3. Resolve pending status id
-  const pendingStatusId = await getPendingStatusId()
-  if (!pendingStatusId) return { error: 'System configuration error: pending status not found.' }
+  const pendingStatusId = await getPendingStatusId();
+  if (!pendingStatusId) return { error: 'System error: pending status not found.' };
 
-  // 4. Insert into requests
-  const requestInsertPayload = {
-  title: input.title,
-  description: input.description,
-  request_type: type,
-  location_id: input.location_id,
-  category_id: type === 'rmr' ? (input as RmrFormInput).category_id : null,
-  status_id: pendingStatusId,
-  requester_id: dbUser.id,
-}
+  // Resolve or create location ID
+  let locationId: string | null = null;
+  if (type === 'rmr') {
+    const { location_building, location_floor, location_room } = input;
+    locationId = await resolveOrCreateLocation(location_building, location_floor ?? '', location_room ?? '');
+    if (!locationId) return { error: 'Failed to resolve or create location.' };
+  } else {
+    // PPSR: input should already have location_id (but we can also resolve if needed)
+    locationId = input.location_id;
+    if (!locationId) return { error: 'Location ID is required for PPSR.' };
+  }
+
+  const payload: any = {
+    requester_id: dbUser.id,
+    title: input.title,
+    description: input.description ?? '',
+    location_id: locationId,
+    category_id: type === 'rmr' ? input.category_id : null,
+    status_id: pendingStatusId,
+    request_type: type,
+  };
 
   const { data: newRequest, error: requestError } = await supabase
     .from('requests')
-    .insert(requestInsertPayload as any)
+    .insert(payload)
     .select('id, ticket_number, title, request_type')
-    .single()
+    .single();
 
   if (requestError || !newRequest) {
-    console.error('createRequest insert error:', requestError)
-    return { error: requestError?.message ?? 'Failed to submit request. Please try again.' }
+    console.error('createRequest insert error:', requestError);
+    return { error: requestError?.message ?? 'Failed to submit request.' };
   }
 
-  // 6. Insert into detail table
-  if (type === 'rmr') {
-    const { error: detailError } = await supabase
-      .from('rmr_details')
-      .insert({ request_id: newRequest.id })
-
+  // Handle PPSR details if needed (similar to before)
+  if (type === 'ppsr') {
+    const ppsrInput = input as PpsrFormInput;
+    const { error: detailError } = await admin.from('ppsr_details').insert({
+      request_id: newRequest.id,
+      service_type: ppsrInput.service_type,
+      service_data: ppsrInput.service_data,
+    });
     if (detailError) {
-      console.error('rmr_details insert error:', detailError)
-      return {
-        error:
-          'Request submitted but detail record failed. Contact support with ticket: ' +
-          newRequest.ticket_number,
-      }
-    }
-  } else {
-    const ppsrInput = input as PpsrFormInput
-    const { error: detailError } = await supabase
-      .from('ppsr_details')
-      .insert({
-        request_id:   newRequest.id,
-        service_type: ppsrInput.service_type as PpsrServiceType,
-        service_data: ppsrInput.service_data,
-      })
-
-    if (detailError) {
-      console.error('ppsr_details insert error:', detailError)
-      return {
-        error:
-          'Request submitted but detail record failed. Contact support with ticket: ' +
-          newRequest.ticket_number,
-      }
+      console.error('ppsr_details insert error:', detailError);
+      return { error: 'Request created but details failed. Contact support.' };
     }
   }
 
-  revalidatePath('/requester/requests')
-  revalidatePath('/requester')
+  revalidatePath('/requester/requests');
+  revalidatePath('/requester');
 
   return {
-    success:     true,
+    success: true,
     ticketNumber: newRequest.ticket_number,
-    requestId:   newRequest.id,
-    title:       newRequest.title,
+    requestId: newRequest.id,
+    title: newRequest.title,
     requestType: newRequest.request_type,
-  }
+  };
 }
 
 // ─── getRequesterRequests ─────────────────────────────────────────────────────

@@ -15,6 +15,9 @@ import { redirect } from "next/navigation";
 import type { InsertRequest } from "@/types/models";
 import type { Json } from "@/types/database.types";
 import { isRequesterRole } from "@/lib/rbac";
+// Add missing imports for the form input types (not used directly but kept for clarity)
+import type { RmrFormInput, PpsrFormInput } from "@/types/requests.model";
+import type { PpsrServiceType } from "@/lib/constants/ppsr-service-types";
 
 export async function requestService(
   prevState: ActionResult,
@@ -41,8 +44,11 @@ export async function requestService(
   // 3. Parse base form fields
   const raw = Object.fromEntries(formData.entries());
   const result = requestSchema.safeParse(raw);
-  if (!result.success)
-    return { success: false, errors: result.error.flatten().fieldErrors };
+  console.log('Zod result.data:', JSON.stringify(result.data, null, 2));
+  if (!result.success) {
+  console.error('Zod validation errors:', result.error.flatten());
+  return { success: false, errors: result.error.flatten().fieldErrors };
+}
 
   // 4. PPSR: validate service_data
   let validatedServiceData: Record<string, unknown> | null = null;
@@ -117,8 +123,10 @@ export async function requestService(
   redirect(`/requester/requests/${newRequest.id}?submitted=true`);
 }
 
+// Export the service as createRequest – this is what the form will use
 export const createRequest = requestService;
 
+// ─── Cancel request (requester only) ─────────────────────────────────────────
 export async function cancelRequest(requestId: string): Promise<ActionResult> {
   const supabase = await createClient();
   const admin = createAdminClient();
@@ -160,8 +168,7 @@ export async function cancelRequest(requestId: string): Promise<ActionResult> {
   return { success: true };
 }
 
-
-// Allows requester to update description when status = under_review
+// ─── Update request description (needs_info workflow) ────────────────────────
 export async function updateRequestDescription(
   requestId: string,
   description: string,
