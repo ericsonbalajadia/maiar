@@ -2,6 +2,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { getRoleDashboard, isRequesterRole } from '@/lib/rbac'
 import { PpsrForm } from './ppsr-form'
 import { ChevronLeft, ClipboardList } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -18,12 +19,13 @@ export default async function PpsrRequestPage() {
     .single()
 
   if (!dbUser || dbUser.signup_status !== 'approved') redirect('/pending-approval')
-  if (!['student', 'staff'].includes(dbUser.role)) redirect(`/${dbUser.role}`)
+  if (!isRequesterRole(dbUser.role)) redirect(getRoleDashboard(dbUser.role))
 
-  const [{ data: locations }, { data: priorities }] = await Promise.all([
-    supabase.from('locations').select('id, building_name, floor_level, room_number').eq('is_active', true).order('building_name'),
-    supabase.from('priorities').select('id, level').order('response_time_hours'),
-  ])
+  const { data: locations } = await supabase
+    .from('locations')
+    .select('*')
+    .eq('is_active', true)
+    .order('building_name')
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -54,7 +56,6 @@ export default async function PpsrRequestPage() {
 
       <PpsrForm
         locations={locations ?? []}
-        priorities={priorities ?? []}
         dbUser={dbUser}
       />
     </div>

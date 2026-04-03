@@ -3,15 +3,14 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
 import { registerSchema, loginSchema } from '@/lib/validations/user.schema'
-import type { RegisterInput, LoginInput } from '@/lib/validations/user.schema'
+import { getRoleDashboard } from '@/lib/rbac'
 
 export type LoginState = {
   errors?: {
     email?: string[]
     password?: string[]
-    form?: string[]
+    form?: string[] 
   }
   success?: boolean
 }
@@ -32,6 +31,7 @@ export async function registerUser(
   prevState: RegisterState,
   formData: FormData
 ): Promise<RegisterState> {
+  void prevState
   const raw = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
@@ -58,30 +58,33 @@ export async function registerUser(
   //     },
   //   },
   // })
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+
   const { error } = await supabase.auth.signUp({
-  email: result.data.email,
-  password: result.data.password,
-  options: {
-    data: {
-      full_name: result.data.full_name,
-      role: result.data.role,
-      department: result.data.department ?? null,
+    email: result.data.email,
+    password: result.data.password,
+    options: {
+      data: {
+        full_name: result.data.full_name,
+        role: result.data.role,
+        department: result.data.department ?? null,
+      },
+      emailRedirectTo: `${appUrl}/api/auth/callback`,
     },
-    emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`
-  },
-})
+  })
 
   if (error) {
     return { errors: { form: [error.message] } }
   }
 
-  redirect('/check-email')
+  redirect('/pending-approval')
 }
 
 export async function loginUser(
   prevState: LoginState,
   formData: FormData
 ): Promise<LoginState> {
+  void prevState
   console.log('=== loginUser started ===')
   console.log('Email from form:', formData.get('email'))
 
@@ -111,9 +114,7 @@ export async function loginUser(
 
   console.log('Fetching user record from public.users for auth_id:', authData.user.id)
 
-  // Use admin client to bypass RLS
-  const admin = createAdminClient()
-  const { data: user, error: userError } = await admin
+  const { data: user, error: userError } = await supabase
     .from('users')
     .select('role, signup_status, is_active')
     .eq('auth_id', authData.user.id)
@@ -143,15 +144,7 @@ export async function loginUser(
   }
 
   console.log('User is approved, redirecting to role dashboard. Role:', user.role)
-  const roleDashboards: Record<string, string> = {
-    student: '/requester',
-    staff: '/requester',
-    clerk: '/clerk',
-    technician: '/technician',
-    supervisor: '/supervisor',
-    admin: '/admin',
-  }
-  redirect(roleDashboards[user.role] ?? '/requester')
+  redirect(getRoleDashboard(user.role))
 }
 
 export async function logoutUser() {

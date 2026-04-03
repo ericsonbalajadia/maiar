@@ -5,6 +5,11 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { saveAccomplishmentSchema, verifyAccomplishmentSchema } from '@/lib/validations/accomplishment.schema';
 import { actionFormError, actionError, type ActionResult } from '@/lib/utils/errors';
+import {
+  ACCOMPLISHMENT_RECORD_ROLES,
+  SUPERVISOR_ASSIGNMENT_ROLES,
+  hasRole,
+} from '@/lib/rbac';
 import { revalidatePath } from 'next/cache';
 
 export async function saveAccomplishment(
@@ -23,7 +28,7 @@ export async function saveAccomplishment(
 
   const { data: actor } = await admin
     .from('users').select('id, role').eq('auth_id', user.id).single();
-  if (!actor || !['technician', 'supervisor', 'admin'].includes(actor.role))
+  if (!actor || !hasRole(actor.role, ACCOMPLISHMENT_RECORD_ROLES))
     return actionError('form', 'Only technicians and supervisors can record accomplishments.');
 
   // Upsert: one accomplishments row per request (UNIQUE on request_id)
@@ -59,7 +64,7 @@ export async function verifyAccomplishment(
   // Only supervisors and admins can verify (act as GenSO Head)
   const { data: head } = await admin
     .from('users').select('id, role').eq('auth_id', user.id).single();
-  if (!head || !['supervisor', 'admin'].includes(head.role))
+  if (!head || !hasRole(head.role, SUPERVISOR_ASSIGNMENT_ROLES))
     return actionError('form', 'Only supervisors can verify completed work.');
 
   // Ensure the accomplishments row exists and has finished_at set

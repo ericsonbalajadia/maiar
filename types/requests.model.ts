@@ -114,7 +114,7 @@ export type InsertRmrDetails = {
 // ─── PPSR Details ─────────────────────────────────────────────────────────────
 
 export type PpsrServiceType =
-  | 'audio_sound_system'
+  | 'audio_system'
   | 'land_preparation'
   | 'site_development'
   | 'hauling'
@@ -294,7 +294,7 @@ export type RmrFormInput = {
   title: string
   description: string
   location_id: string
-  priority_id: string     
+  priority_id?: string
   designation: string
   contact_email: string
   category_id: string
@@ -305,11 +305,11 @@ export type PpsrFormInput = {
   title: string
   description: string
   location_id: string
-  priority_id: string     
+  priority_id?: string
   designation: string
   contact_email: string
   service_type: PpsrServiceType
-  service_data: PpsrServiceData
+  service_data: Record<string, string>
 }
 
 // ─── Stats ────────────────────────────────────────────────────────────────────

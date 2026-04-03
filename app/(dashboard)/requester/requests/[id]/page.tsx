@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getRoleDashboard, isRequesterRole } from '@/lib/rbac'
 import { getRequestById } from '@/actions/request/request.actions'
 import { StatusBadge, RequestTypeBadge, PriorityBadge } from '@/components/common/status-badge'
 import { Button } from '@/components/ui/button'
@@ -367,7 +368,7 @@ export default async function RequestDetailPage({
     .from('users').select('role, signup_status').eq('auth_id', user.id).single()
 
   if (!dbUser || dbUser.signup_status !== 'approved') redirect('/pending-approval')
-  if (!['student', 'staff'].includes(dbUser.role)) redirect(`/${dbUser.role}`)
+  if (!isRequesterRole(dbUser.role)) redirect(getRoleDashboard(dbUser.role))
 
   const { id } = await params
 

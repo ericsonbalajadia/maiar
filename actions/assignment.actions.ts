@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { assignmentSchema, acceptanceSchema } from '@/lib/validations/assignment.schema';
 import { actionFormError, actionError, type ActionResult } from '@/lib/utils/errors';
+import { ROLES, SUPERVISOR_ASSIGNMENT_ROLES, hasRole } from '@/lib/rbac';
 import { revalidatePath } from 'next/cache';
 
 
@@ -24,7 +25,7 @@ export async function assignTechnician(
 
   const { data: supervisor } = await admin
     .from('users').select('id, role').eq('auth_id', user.id).single();
-  if (!supervisor || !['supervisor', 'admin'].includes(supervisor.role))
+  if (!supervisor || !hasRole(supervisor.role, SUPERVISOR_ASSIGNMENT_ROLES))
     return actionError('form', 'Only supervisors can assign technicians.');
 
   // TODO: Replace this with a DB-level UNIQUE partial index once the
@@ -86,7 +87,7 @@ export async function updateAcceptanceStatus(
 
   const { data: technician } = await admin
     .from('users').select('id, role, full_name').eq('auth_id', user.id).single();
-  if (!technician || technician.role !== 'technician')
+  if (!technician || technician.role !== ROLES.TECHNICIAN)
     return actionError('form', 'Only technicians can update acceptance status.');
 
   // Verify the assignment belongs to this technician

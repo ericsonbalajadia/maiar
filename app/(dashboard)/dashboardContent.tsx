@@ -5,7 +5,6 @@ import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 import { NotificationProvider } from '@/components/notifications/notification-provider';
 import { getUnreadNotifications } from '@/lib/queries/lookup.queries';
-import { ROLE_DASHBOARD } from '@/types/roles';
 
 export default async function DashboardContent({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -30,11 +29,7 @@ export default async function DashboardContent({ children }: { children: React.R
     <>
       <Sidebar userRole={dbUser.role} />
       <div className="flex flex-col flex-1 overflow-hidden">
-        <Header
-          userName={dbUser.full_name}
-          userId={dbUser.id}
-          initialNotificationCount={initialCount}
-        />
+        <Header />
         <main className="flex-1 overflow-auto p-6">{children}</main>
       </div>
       <NotificationProvider userId={dbUser.id} initialCount={initialCount} />

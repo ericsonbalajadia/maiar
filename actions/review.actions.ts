@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { reviewSchema } from '@/lib/validations/review.schema';
 import { actionFormError, actionError, type ActionResult } from '@/lib/utils/errors';
+import { CLERK_REVIEW_ROLES, hasRole } from '@/lib/rbac';
 import { revalidatePath } from 'next/cache';
 
 export async function startReview(requestId: string): Promise<ActionResult> {
@@ -16,7 +17,7 @@ export async function startReview(requestId: string): Promise<ActionResult> {
 
   const { data: clerk } = await admin
     .from('users').select('id, role').eq('auth_id', user.id).single();
-  if (!clerk || !['clerk', 'admin'].includes(clerk.role))
+  if (!clerk || !hasRole(clerk.role, CLERK_REVIEW_ROLES))
     return actionError('form', 'Only clerks can review requests.');
 
   // Fetch both status IDs in parallel
@@ -58,7 +59,7 @@ export async function submitReview(
   // Verify clerk role
   const { data: clerk } = await admin
     .from('users').select('id, role').eq('auth_id', user.id).single();
-  if (!clerk || !['clerk', 'admin'].includes(clerk.role))
+  if (!clerk || !hasRole(clerk.role, CLERK_REVIEW_ROLES))
     return actionError('form', 'Only clerks can submit reviews.');
 
   // Insert review row – DB trigger enforce_reviewer_role validates role again

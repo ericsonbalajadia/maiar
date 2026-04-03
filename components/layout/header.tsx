@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
+import { getRoleDashboard } from '@/lib/rbac'
 import Link from 'next/link'
 import { NotificationBell } from '@/components/notifications/notification-bell'
 
@@ -49,8 +50,7 @@ export function Header() {
   const avatarColor = getAvatarColor(dbUser.full_name ?? 'User')
   
   // Clean path logic
-  const dashboardType = ['student', 'staff'].includes(role) ? 'requester' : role
-  const settingsHref = `/${dashboardType}/settings`
+  const settingsHref = `${getRoleDashboard(role)}/settings`
 
   return (
     <header className="h-14 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-6 flex items-center justify-end shrink-0 gap-3">
