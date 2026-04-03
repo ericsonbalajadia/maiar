@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getRoleDashboard, isRequesterRole } from '@/lib/rbac'
 import { getRequesterStats, getRecentRequests } from '@/actions/request/request.actions'
 import { StatusBadge, RequestTypeBadge, PriorityBadge } from '@/components/common/status-badge'
 import { Button } from '@/components/ui/button'
@@ -268,7 +269,7 @@ export default async function RequesterDashboardPage() {
     .single()
 
   if (!dbUser || dbUser.signup_status !== 'approved') redirect('/pending-approval')
-  if (!['student', 'staff'].includes(dbUser.role)) redirect(`/${dbUser.role}`)
+  if (!isRequesterRole(dbUser.role)) redirect(getRoleDashboard(dbUser.role))
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">

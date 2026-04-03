@@ -1,8 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { ROLE_DASHBOARD } from '@/types/roles';  // adjust path if needed
-import { error } from 'console';
+import { getRoleDashboard } from '@/lib/rbac';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -10,7 +9,7 @@ export async function GET(request: NextRequest) {
   const token_hash = searchParams.get('token_hash');
   const type = searchParams.get('type') as string | null;
   const next = searchParams.get('next') ?? '/';
-   const error = searchParams.get('error');
+  const error = searchParams.get('error');
   const error_code = searchParams.get('error_code');
   const error_description = searchParams.get('error_description');
 
@@ -69,8 +68,7 @@ export async function GET(request: NextRequest) {
 
   // 4. Redirect based on signup_status
   if (dbUser.signup_status === 'approved') {
-    const dashboardPath = ROLE_DASHBOARD[dbUser.role as keyof typeof ROLE_DASHBOARD] ?? '/requester';
-    return NextResponse.redirect(new URL(dashboardPath, request.url));
+    return NextResponse.redirect(new URL(getRoleDashboard(dbUser.role), request.url));
   }
 
   if (dbUser.signup_status === 'pending') {

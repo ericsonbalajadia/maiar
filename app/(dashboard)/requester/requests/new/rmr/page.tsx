@@ -2,6 +2,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { getRoleDashboard, isRequesterRole } from '@/lib/rbac'
 import { RmrForm } from './rmr-form'
 import { ChevronLeft, Wrench } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -18,14 +19,13 @@ export default async function RmrRequestPage() {
     .single()
 
   if (!dbUser || dbUser.signup_status !== 'approved') redirect('/pending-approval')
-  if (!['student', 'staff'].includes(dbUser.role)) redirect(`/${dbUser.role}`)
+  if (!isRequesterRole(dbUser.role)) redirect(getRoleDashboard(dbUser.role))
 
   // Fetch reference data in parallel
-  const [{ data: categories }, { data: locations }, { data: priorities }] =
+  const [{ data: categories }, { data: locations }] =
     await Promise.all([
-      supabase.from('categories').select('id, category_name').eq('is_active', true).order('category_name'),
-      supabase.from('locations').select('id, building_name, floor_level, room_number').eq('is_active', true).order('building_name'),
-      supabase.from('priorities').select('id, level').order('response_time_hours'),
+      supabase.from('categories').select('*').eq('is_active', true).order('category_name'),
+      supabase.from('locations').select('*').eq('is_active', true).order('building_name'),
     ])
 
   return (
@@ -67,7 +67,6 @@ export default async function RmrRequestPage() {
       <RmrForm
         categories={categories ?? []}
         locations={locations ?? []}
-        priorities={priorities ?? []}
         dbUser={dbUser}
       />
     </div>

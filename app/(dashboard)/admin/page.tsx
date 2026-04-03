@@ -1,8 +1,7 @@
-export default function AdminDashboard() {
-  return (
-    <div>
-      <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-      <p className="text-slate-500 mt-2">Manage users and system settings.</p>
-    </div>
-  )
+import { getAuthUser } from '@/lib/auth'
+import { ROLES } from '@/lib/rbac'
+
+export default async function AdminPage() {
+  const { profile } = await getAuthUser([ROLES.ADMIN])
+  return <div>Hello {profile.full_name}</div>
 }

@@ -1,6 +1,7 @@
 // app/(dashboard)/requester/requests/new/page.tsx
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getRoleDashboard, isRequesterRole } from '@/lib/rbac'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, Wrench, ClipboardList } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -17,7 +18,7 @@ export default async function NewRequestPage() {
     .single()
 
   if (!dbUser || dbUser.signup_status !== 'approved') redirect('/pending-approval')
-  if (!['student', 'staff'].includes(dbUser.role)) redirect(`/${dbUser.role}`)
+  if (!isRequesterRole(dbUser.role)) redirect(getRoleDashboard(dbUser.role))
 
   return (
     <div className="max-w-4xl mx-auto">
