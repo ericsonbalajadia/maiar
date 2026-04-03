@@ -141,3 +141,48 @@ export async function getCurrentAssignment(requestId: string, technicianId: stri
     .maybeSingle(); // returns null if not found
   return { data, error };
 }
+
+/**
+ * Returns the current active assignment for a request,
+ * including the assigned technician's full name.
+ * RLS: requesters can read assignments for their own requests.
+ */
+export async function getRequestAssignment(requestId: string) {
+  const supabase = await createClient()
+ 
+  const { data, error } = await supabase
+    .from('request_assignments')
+    .select(
+      `
+      id,
+      assigned_at,
+      acceptance_status,
+      notes,
+      is_current_assignment,
+      assigned_user:users!assigned_user_id (
+        id,
+        full_name,
+        role
+      )
+    `,
+    )
+    .eq('request_id', requestId)
+    .eq('is_current_assignment', true)
+    .maybeSingle()
+ 
+  return { data, error }
+}
+ 
+// Shape returned by getRequestAssignment:
+export type AssignmentWithTechnician = {
+  id: string
+  assigned_at: string
+  acceptance_status: string | null
+  notes: string | null
+  is_current_assignment: boolean
+  assigned_user: {
+    id: string
+    full_name: string
+    role: string
+  } | null
+}
