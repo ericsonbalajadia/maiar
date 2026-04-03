@@ -281,12 +281,37 @@ export type RequestAssignment = {
 
 // ─── Full Request Detail (for detail page) ────────────────────────────────────
 
-export type RequestDetail = RequestWithRelations & {
-  rmr_details: RmrDetails | null
-  ppsr_details: PpsrDetails | null
-  attachments: Attachment[]
-  status_history: StatusHistory[]
-}
+export type RequestDetail = {
+  id: string;
+  ticket_number: string;
+  title: string;
+  description: string | null;
+  request_type: 'rmr' | 'ppsr';
+  status_id: string;
+  category_id: string | null;
+  location_id: string;
+  priority_id: string;
+  requester_id: string;
+  assigned_technician_id: string | null;
+  estimated_completion_date: string | null;
+  actual_completion_date: string | null;
+  created_at: string;
+  updated_at: string;
+
+  // Joined relations (from Supabase select)
+  statuses: { status_name: string } | null;
+  locations: { building_name: string; floor_level: string | null; room_number: string | null } | null;
+  categories: { category_name: string } | null;
+  priorities: { level: string } | null;
+  requester: { full_name: string; email: string; department: string | null } | null;
+  assigned_technician: { full_name: string; email: string; role: string } | null;
+
+  // Detail tables
+  rmr_details: any | null;
+  ppsr_details: any | null;
+  attachments: any[] | null;
+  status_history: any[] | null;
+};
 
 // ─── Form Input Types ─────────────────────────────────────────────────────────
 

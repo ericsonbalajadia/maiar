@@ -499,19 +499,19 @@ async function RequestDetailContent({ id }: { id: string }) {
                   .join(', ') || '—'
               }
             />
-            <InfoRow label="Requester" value={request.users?.full_name ?? '—'} />
+            <InfoRow label="Requester" value={request.requester?.full_name ?? '—'} />
             <InfoRow
               label="Department"
-              value={request.users?.department ?? '—'}
+              value={request.requester?.department ?? '—'}
             />
             <InfoRow
               label="Email"
               value={
                 <a
-                  href={`mailto:${request.users?.email}`}
+                  href={`mailto:${request.requester?.email}`}
                   className="text-blue-600 dark:text-blue-400 hover:underline"
                 >
-                  {request.users?.email ?? '—'}
+                  {request.requester?.email ?? '—'}
                 </a>
               }
             />

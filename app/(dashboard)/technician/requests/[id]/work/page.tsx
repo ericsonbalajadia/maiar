@@ -37,7 +37,9 @@ export default async function TechnicianWorkPage({ params }: Props) {
   ]);
   if (!request) notFound();
 
-  const status = request.status.status_name;
+  const currentStatus = request.statuses?.status_name ?? 'pending';
+
+  const status = request.statuses?.status_name;
   const isAssigned = status === 'assigned';
   const isInProgress = status === 'in_progress';
 
@@ -56,13 +58,13 @@ export default async function TechnicianWorkPage({ params }: Props) {
           <p className="text-xs font-mono text-slate-400">{request.ticket_number}</p>
           <h1 className="mt-1 text-xl font-bold text-slate-800">{request.title}</h1>
         </div>
-        <StatusBadge status={status} />
+        <StatusBadge status={currentStatus} />
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white p-5 text-sm space-y-2 shadow-sm">
         <p>
           <span className="font-medium text-slate-500">Location:</span>{' '}
-          {request.location.building_name}
+          {request.locations?.building_name ?? 'Unknown'}
         </p>
         <div className="pt-2 border-t border-slate-100">
           <p className="font-medium text-slate-500 mb-1">Description</p>
