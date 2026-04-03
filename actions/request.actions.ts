@@ -3,7 +3,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createRequestSchema } from "@/lib/validations/request.schema";
+import { requestSchema } from "@/lib/validations/request.schema";
 import { ppsrServiceDataSchema } from "@/lib/validations/ppsr-service-data.schema";
 import {
   actionFormError,
@@ -14,8 +14,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { InsertRequest } from "@/types/models";
 import type { Json } from "@/types/database.types";
+import { isRequesterRole } from "@/lib/rbac";
 
-export async function createRequest(
+export async function requestService(
   prevState: ActionResult,
   formData: FormData
 ): Promise<ActionResult> { 
@@ -40,12 +41,12 @@ export async function createRequest(
       "form",
       "Your account is not yet approved to submit requests.",
     );
-  if (!["student", "staff"].includes(requester.role))
+  if (!isRequesterRole(requester.role))
     return actionError("form", "Only students and staff may submit requests.");
 
   // Parse and validate base form fields
   const raw = Object.fromEntries(formData.entries());
-  const result = createRequestSchema.safeParse(raw);
+    const result = requestSchema.safeParse(raw);
   if (!result.success)
     return { success: false, errors: result.error.flatten().fieldErrors };
 
@@ -91,7 +92,7 @@ export async function createRequest(
   const payload: InsertRequest = {
     requester_id: requester.id,
     title: result.data.title,
-    description: result.data.description,
+    description: result.data.description ?? "",
     location_id: result.data.location_id,
     priority_id: result.data.priority_id,
     status_id: pendingStatus.id,
@@ -131,6 +132,8 @@ export async function createRequest(
   revalidatePath("/requester/requests");
   redirect(`/requester/requests/${newRequest.id}?submitted=true`);
 }
+
+export const createRequest = requestService;
 
 export async function cancelRequest(requestId: string): Promise<ActionResult> {
   const supabase = await createClient();
