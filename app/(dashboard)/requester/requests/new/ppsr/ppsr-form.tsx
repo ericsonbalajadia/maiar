@@ -9,7 +9,6 @@ import {
   PPSR_SERVICE_FIELDS,
   type PpsrServiceType,
 } from '@/lib/constants/ppsr-service-types'
-import type { Location } from '@/types/requests.model'
 import type { DbUser } from '@/types/models'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -32,8 +31,7 @@ import {
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface PpsrFormProps {
-  locations: Location[]
-  dbUser:    DbUser
+  dbUser: DbUser
 }
 
 // Icons per service type (keyed to ppsr-service-types.ts)
@@ -131,8 +129,14 @@ function StepIndicator({ current }: { current: number }) {
 
 // ─── Success Modal ────────────────────────────────────────────────────────────
 
-function SuccessModal({ ticketNumber, onAnother, onView }: {
-  ticketNumber: string; onAnother: () => void; onView: () => void
+function SuccessModal({
+  ticketNumber,
+  onAnother,
+  onView,
+}: {
+  ticketNumber: string
+  onAnother: () => void
+  onView: () => void
 }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
@@ -144,8 +148,12 @@ function SuccessModal({ ticketNumber, onAnother, onView }: {
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Your request has been received.</p>
         <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 font-mono mb-6">{ticketNumber}</p>
         <div className="flex flex-col gap-2">
-          <Button onClick={onView} className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900">View My Requests</Button>
-          <Button onClick={onAnother} variant="outline" className="w-full">Submit Another</Button>
+          <Button onClick={onView} className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900">
+            View My Requests
+          </Button>
+          <Button onClick={onAnother} variant="outline" className="w-full">
+            Submit Another
+          </Button>
         </div>
       </div>
     </div>
@@ -153,7 +161,6 @@ function SuccessModal({ ticketNumber, onAnother, onView }: {
 }
 
 // ─── Dynamic service fields ───────────────────────────────────────────────────
-// Renders fields defined in PPSR_SERVICE_FIELDS[serviceType]
 
 function ServiceSubFields({
   serviceType,
@@ -207,10 +214,9 @@ function ServiceSubFields({
           )
         }
 
-        // Detect date-like fields
-        const isDate = field.includes('date') && !field.includes('date_time')
+        const isDate     = field.includes('date') && !field.includes('date_time')
         const isDateTime = field.includes('date_time')
-        const isNumber = field.includes('trips') || field.includes('tents') || field.includes('hrs')
+        const isNumber   = field.includes('trips') || field.includes('tents') || field.includes('hrs')
 
         return (
           <div key={field}>
@@ -230,7 +236,7 @@ function ServiceSubFields({
 
 // ─── Main Form ────────────────────────────────────────────────────────────────
 
-export function PpsrForm({ locations, dbUser }: PpsrFormProps) {
+export function PpsrForm({ dbUser }: PpsrFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [step, setStep]     = useState(1)
@@ -240,17 +246,19 @@ export function PpsrForm({ locations, dbUser }: PpsrFormProps) {
   const today = new Date().toISOString().split('T')[0]
 
   const [form, setFormState] = useState({
-    date_filled:      today,
-    building:         '',
-    location_id:      '',
-    requesting_party: dbUser.full_name,
-    designation:      dbUser.department ?? '',
-    contact_number:   dbUser.phone ?? '',
-    email:            dbUser.email,
-    service_type:     '' as PpsrServiceType | '',
-    service_data:     {} as Record<string, string>,
-    title:            '',
-    description:      '',
+    date_filled:       today,
+    building:          '',
+    location_building: '',
+    location_floor:    '',
+    location_room:     '',
+    requesting_party:  dbUser.full_name,
+    designation:       dbUser.department ?? '',
+    contact_number:    dbUser.phone ?? '',
+    email:             dbUser.email,
+    service_type:      '' as PpsrServiceType | '',
+    service_data:      {} as Record<string, string>,
+    title:             '',
+    description:       '',
   })
 
   const set = (key: string, value: string) => {
@@ -258,7 +266,6 @@ export function PpsrForm({ locations, dbUser }: PpsrFormProps) {
     setErrors((e) => { const n = { ...e }; delete n[key]; return n })
   }
 
-  // Reset service_data when service type changes
   const setServiceType = (type: PpsrServiceType) => {
     setFormState((f) => ({ ...f, service_type: type, service_data: {} }))
     setErrors((e) => { const n = { ...e }; delete n['service_type']; return n })
@@ -270,12 +277,12 @@ export function PpsrForm({ locations, dbUser }: PpsrFormProps) {
   const validateStep = (s: number): boolean => {
     const errs: Record<string, string> = {}
     if (s === 1) {
-      if (!form.building.trim())         errs.building         = 'Required'
-      if (!form.location_id)             errs.location_id      = 'Required'
-      if (!form.requesting_party.trim()) errs.requesting_party = 'Required'
-      if (!form.designation.trim())      errs.designation      = 'Required'
-      if (!form.contact_number.trim())   errs.contact_number   = 'Required'
-      if (!form.email.trim())            errs.email            = 'Required'
+      if (!form.building.trim())          errs.building          = 'Required'
+      if (!form.location_building.trim()) errs.location_building = 'Required'
+      if (!form.requesting_party.trim())  errs.requesting_party  = 'Required'
+      if (!form.designation.trim())       errs.designation       = 'Required'
+      if (!form.contact_number.trim())    errs.contact_number    = 'Required'
+      if (!form.email.trim())             errs.email             = 'Required'
     }
     if (s === 2 && !form.service_type)
       errs.service_type = 'Please select a service type'
@@ -293,13 +300,15 @@ export function PpsrForm({ locations, dbUser }: PpsrFormProps) {
     if (!validateStep(3)) return
     startTransition(async () => {
       const result = await createRequest('ppsr', {
-        title:        form.title,
-        description:  form.description,
-        location_id:  form.location_id,
-        designation:  form.designation,
-        contact_email: form.email,
-        service_type: form.service_type as PpsrServiceType,
-        service_data: form.service_data,
+        title:             form.title,
+        description:       form.description,
+        location_building: form.location_building,
+        location_floor:    form.location_floor,
+        location_room:     form.location_room,
+        designation:       form.designation,
+        contact_email:     form.email,
+        service_type:      form.service_type as PpsrServiceType,
+        service_data:      form.service_data,
       })
       if (result.success && result.ticketNumber) {
         setTicketNumber(result.ticketNumber)
@@ -326,46 +335,107 @@ export function PpsrForm({ locations, dbUser }: PpsrFormProps) {
       {/* ── Step 1: Request Info ── */}
       {step === 1 && (
         <div>
-          <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-6">Step 1: Request Information</h2>
+          <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-6">
+            Step 1: Request Information
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">Date Filled</Label>
               <Input value={form.date_filled} readOnly className="bg-slate-50 dark:bg-slate-800 text-slate-500" />
             </div>
             <div>
-              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">Building / Department <span className="text-rose-500">*</span></Label>
-              <Input placeholder="e.g. Engineering Block A" value={form.building} onChange={(e) => set('building', e.target.value)} className={errors.building ? 'border-rose-400' : ''} />
+              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
+                Building / Department <span className="text-rose-500">*</span>
+              </Label>
+              <Input
+                placeholder="e.g. Engineering Block A"
+                value={form.building}
+                onChange={(e) => set('building', e.target.value)}
+                className={errors.building ? 'border-rose-400' : ''}
+              />
               {errors.building && <p className="text-xs text-rose-500 mt-1">{errors.building}</p>}
             </div>
-            <div>
-              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">Location <span className="text-rose-500">*</span></Label>
-              <Select value={form.location_id} onValueChange={(v) => set('location_id', v)}>
-                <SelectTrigger className={errors.location_id ? 'border-rose-400' : ''}><SelectValue placeholder="Select location" /></SelectTrigger>
-                <SelectContent>
-                  {locations.map((loc) => (
-                    <SelectItem key={loc.id} value={loc.id}>
-                      {loc.building_name}{loc.room_number ? ` – Room ${loc.room_number}` : ''}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.location_id && <p className="text-xs text-rose-500 mt-1">{errors.location_id}</p>}
-            </div>
-            <div>
-              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">Requesting Party Name <span className="text-rose-500">*</span></Label>
-              <Input value={form.requesting_party} onChange={(e) => set('requesting_party', e.target.value)} className={errors.requesting_party ? 'border-rose-400' : ''} />
-            </div>
-            <div>
-              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">Designation / Position <span className="text-rose-500">*</span></Label>
-              <Input placeholder="e.g. Lab Technician" value={form.designation} onChange={(e) => set('designation', e.target.value)} className={errors.designation ? 'border-rose-400' : ''} />
-            </div>
-            <div>
-              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">Contact Number <span className="text-rose-500">*</span></Label>
-              <Input placeholder="09xxxxxxxxx" value={form.contact_number} onChange={(e) => set('contact_number', e.target.value)} className={errors.contact_number ? 'border-rose-400' : ''} />
-            </div>
+
+            {/* ── Location: 3 free-text inputs ── */}
             <div className="sm:col-span-2">
-              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">Email Address <span className="text-rose-500">*</span></Label>
-              <Input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} className={errors.email ? 'border-rose-400' : ''} />
+              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
+                Location <span className="text-rose-500">*</span>
+              </Label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <Input
+                    placeholder="Building name *"
+                    value={form.location_building}
+                    onChange={(e) => set('location_building', e.target.value)}
+                    className={errors.location_building ? 'border-rose-400' : ''}
+                  />
+                  {errors.location_building && (
+                    <p className="text-xs text-rose-500 mt-1">{errors.location_building}</p>
+                  )}
+                </div>
+                <div>
+                  <Input
+                    placeholder="Floor level (optional)"
+                    value={form.location_floor}
+                    onChange={(e) => set('location_floor', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Input
+                    placeholder="Room number (optional)"
+                    value={form.location_room}
+                    onChange={(e) => set('location_room', e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
+                Requesting Party Name <span className="text-rose-500">*</span>
+              </Label>
+              <Input
+                value={form.requesting_party}
+                onChange={(e) => set('requesting_party', e.target.value)}
+                className={errors.requesting_party ? 'border-rose-400' : ''}
+              />
+              {errors.requesting_party && <p className="text-xs text-rose-500 mt-1">{errors.requesting_party}</p>}
+            </div>
+            <div>
+              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
+                Designation / Position <span className="text-rose-500">*</span>
+              </Label>
+              <Input
+                placeholder="e.g. Lab Technician"
+                value={form.designation}
+                onChange={(e) => set('designation', e.target.value)}
+                className={errors.designation ? 'border-rose-400' : ''}
+              />
+              {errors.designation && <p className="text-xs text-rose-500 mt-1">{errors.designation}</p>}
+            </div>
+            <div>
+              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
+                Contact Number <span className="text-rose-500">*</span>
+              </Label>
+              <Input
+                placeholder="09xxxxxxxxx"
+                value={form.contact_number}
+                onChange={(e) => set('contact_number', e.target.value)}
+                className={errors.contact_number ? 'border-rose-400' : ''}
+              />
+              {errors.contact_number && <p className="text-xs text-rose-500 mt-1">{errors.contact_number}</p>}
+            </div>
+            <div>
+              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
+                Email Address <span className="text-rose-500">*</span>
+              </Label>
+              <Input
+                type="email"
+                value={form.email}
+                onChange={(e) => set('email', e.target.value)}
+                className={errors.email ? 'border-rose-400' : ''}
+              />
+              {errors.email && <p className="text-xs text-rose-500 mt-1">{errors.email}</p>}
             </div>
           </div>
         </div>
@@ -374,8 +444,12 @@ export function PpsrForm({ locations, dbUser }: PpsrFormProps) {
       {/* ── Step 2: Service Type ── */}
       {step === 2 && (
         <div>
-          <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-2">Step 2: Service Type</h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Select the type of physical plant service you need:</p>
+          <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-2">
+            Step 2: Service Type
+          </h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
+            Select the type of physical plant service you need:
+          </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {PPSR_SERVICE_TYPES.map((type) => {
               const Icon       = SERVICE_ICONS[type] ?? MoreHorizontal
@@ -395,7 +469,9 @@ export function PpsrForm({ locations, dbUser }: PpsrFormProps) {
                   <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center',
                     isSelected ? 'bg-slate-900 dark:bg-white' : 'bg-slate-100 dark:bg-slate-800'
                   )}>
-                    <Icon className={cn('h-5 w-5', isSelected ? 'text-white dark:text-slate-900' : 'text-slate-500 dark:text-slate-400')} />
+                    <Icon className={cn('h-5 w-5',
+                      isSelected ? 'text-white dark:text-slate-900' : 'text-slate-500 dark:text-slate-400'
+                    )} />
                   </div>
                   <span className={cn('text-xs font-medium leading-tight',
                     isSelected ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400'
@@ -415,14 +491,23 @@ export function PpsrForm({ locations, dbUser }: PpsrFormProps) {
       {step === 3 && form.service_type && (
         <div className="space-y-5">
           <div>
-            <h2 className="text-base font-semibold text-slate-900 dark:text-white">Step 3: Service Details</h2>
+            <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+              Step 3: Service Details
+            </h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
               {PPSR_SERVICE_LABELS[form.service_type]}
             </p>
           </div>
           <div>
-            <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">Request Title <span className="text-rose-500">*</span></Label>
-            <Input placeholder="Brief title for this request" value={form.title} onChange={(e) => set('title', e.target.value)} className={errors.title ? 'border-rose-400' : ''} />
+            <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
+              Request Title <span className="text-rose-500">*</span>
+            </Label>
+            <Input
+              placeholder="Brief title for this request"
+              value={form.title}
+              onChange={(e) => set('title', e.target.value)}
+              className={errors.title ? 'border-rose-400' : ''}
+            />
             {errors.title && <p className="text-xs text-rose-500 mt-1">{errors.title}</p>}
           </div>
           <ServiceSubFields
@@ -431,8 +516,15 @@ export function PpsrForm({ locations, dbUser }: PpsrFormProps) {
             onChange={setServiceData}
           />
           <div>
-            <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">Additional Notes</Label>
-            <Textarea placeholder="Any other details the team should know..." value={form.description} onChange={(e) => set('description', e.target.value)} className="resize-none" />
+            <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
+              Additional Notes
+            </Label>
+            <Textarea
+              placeholder="Any other details the team should know..."
+              value={form.description}
+              onChange={(e) => set('description', e.target.value)}
+              className="resize-none"
+            />
           </div>
         </div>
       )}
@@ -440,12 +532,16 @@ export function PpsrForm({ locations, dbUser }: PpsrFormProps) {
       {/* ── Step 4: Review ── */}
       {step === 4 && (
         <div>
-          <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-6">Step 4: Review &amp; Submit</h2>
+          <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-6">
+            Step 4: Review &amp; Submit
+          </h2>
           <div className="space-y-4 text-sm">
             <div className="rounded-xl border border-slate-200 dark:border-slate-700 divide-y divide-slate-100 dark:divide-slate-800 overflow-hidden">
               {[
                 ['Building / Dept',  form.building],
-                ['Location',         locations.find((l) => l.id === form.location_id)?.building_name ?? '—'],
+                ['Location',         form.location_building],
+                ['Floor Level',      form.location_floor || '—'],
+                ['Room Number',      form.location_room  || '—'],
                 ['Requesting Party', form.requesting_party],
                 ['Service Type',     form.service_type ? PPSR_SERVICE_LABELS[form.service_type] : '—'],
               ].map(([label, value]) => (
@@ -502,11 +598,20 @@ export function PpsrForm({ locations, dbUser }: PpsrFormProps) {
           </Button>
         )}
         {step < 4 ? (
-          <Button type="button" onClick={next} className="bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 gap-1.5">
+          <Button
+            type="button"
+            onClick={next}
+            className="bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 gap-1.5"
+          >
             Next <ChevronRight className="h-4 w-4" />
           </Button>
         ) : (
-          <Button type="button" onClick={handleSubmit} disabled={isPending} className="bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 min-w-[120px]">
+          <Button
+            type="button"
+            onClick={handleSubmit}
+            disabled={isPending}
+            className="bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 min-w-[120px]"
+          >
             {isPending ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Submitting…</> : 'Submit Request'}
           </Button>
         )}

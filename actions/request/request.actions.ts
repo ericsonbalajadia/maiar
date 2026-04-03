@@ -70,6 +70,64 @@ async function getCurrentUserId(): Promise<string | null> {
   return data?.id ?? null
 }
 
+/**
+ * Looks up a location by building_name + floor_level + room_number (case-insensitive).
+ * If a match exists, returns its ID.
+ * Otherwise inserts a new active location row and returns the new ID.
+ * Uses the admin client because requesters lack INSERT permission on locations.
+ */
+async function resolveOrCreateLocation(
+  buildingName: string,
+  floorLevel: string,
+  roomNumber: string,
+): Promise<string | null> {
+  const admin = createAdminClient()
+
+  const building = buildingName.trim()
+  const floor    = floorLevel.trim()
+  const room     = roomNumber.trim()
+
+  // Look for an existing match across all three fields
+  let query = admin
+    .from('locations')
+    .select('id')
+    .ilike('building_name', building)
+
+  if (floor) {
+    query = query.ilike('floor_level', floor)
+  } else {
+    query = query.is('floor_level', null)
+  }
+
+  if (room) {
+    query = query.ilike('room_number', room)
+  } else {
+    query = query.is('room_number', null)
+  }
+
+  const { data: existing } = await query.maybeSingle()
+  if (existing) return existing.id
+
+  // No match — create a new location
+  const { data: inserted, error } = await admin
+    .from('locations')
+    .insert({
+      building_name: building,
+      floor_level:   floor || null,
+      room_number:   room  || null,
+      is_active:     true,
+    })
+    .select('id')
+    .single()
+
+  if (error || !inserted) {
+    console.error('resolveOrCreateLocation insert error:', error)
+    return null
+  }
+
+  return inserted.id
+}
+
 // ─── createRequest ────────────────────────────────────────────────────────────
 
 /**
@@ -107,26 +165,36 @@ export async function createRequest(
   const pendingStatusId = await getPendingStatusId()
   if (!pendingStatusId) return { error: 'System configuration error: pending status not found.' }
 
-  // 4. Insert into requests
+  // 4. Resolve or create location from the three free-text inputs
+  const locationId = await resolveOrCreateLocation(
+    input.location_building,
+    input.location_floor ?? '',
+    input.location_room  ?? '',
+  )
+  if (!locationId) return { error: 'Failed to resolve location. Please try again.' }
+
+  // 5. Insert into requests
   const requestInsertPayload =
     type === 'rmr'
       ? {
-          title: input.title,
-          description: input.description,
+          title:        input.title,
+          description:  input.description,
           request_type: type,
-          location_id: input.location_id,
-          category_id: (input as RmrFormInput).category_id,
-          status_id: pendingStatusId,
+          location_id:  locationId,
+          category_id:  (input as RmrFormInput).category_id,
+          status_id:    pendingStatusId,
           requester_id: dbUser.id,
-          ...((input as RmrFormInput).priority_id ? { priority_id: (input as RmrFormInput).priority_id } : {}),
+          ...((input as RmrFormInput).priority_id
+            ? { priority_id: (input as RmrFormInput).priority_id }
+            : {}),
         }
       : {
-          title: input.title,
-          description: input.description,
+          title:        input.title,
+          description:  input.description,
           request_type: type,
-          location_id: input.location_id,
-          category_id: null,
-          status_id: pendingStatusId,
+          location_id:  locationId,
+          category_id:  null,
+          status_id:    pendingStatusId,
           requester_id: dbUser.id,
         }
 
@@ -141,7 +209,7 @@ export async function createRequest(
     return { error: requestError?.message ?? 'Failed to submit request. Please try again.' }
   }
 
-  // 5. Insert into detail table
+  // 6. Insert into detail table
   if (type === 'rmr') {
     const { error: detailError } = await supabase
       .from('rmr_details')
@@ -149,9 +217,10 @@ export async function createRequest(
 
     if (detailError) {
       console.error('rmr_details insert error:', detailError)
-      // Request was created — don't fail silently, but note the issue
       return {
-        error: 'Request submitted but detail record failed. Contact support with ticket: ' + newRequest.ticket_number,
+        error:
+          'Request submitted but detail record failed. Contact support with ticket: ' +
+          newRequest.ticket_number,
       }
     }
   } else {
@@ -159,7 +228,7 @@ export async function createRequest(
     const { error: detailError } = await supabase
       .from('ppsr_details')
       .insert({
-        request_id: newRequest.id,
+        request_id:   newRequest.id,
         service_type: ppsrInput.service_type as PpsrServiceType,
         service_data: ppsrInput.service_data,
       })
@@ -167,7 +236,9 @@ export async function createRequest(
     if (detailError) {
       console.error('ppsr_details insert error:', detailError)
       return {
-        error: 'Request submitted but detail record failed. Contact support with ticket: ' + newRequest.ticket_number,
+        error:
+          'Request submitted but detail record failed. Contact support with ticket: ' +
+          newRequest.ticket_number,
       }
     }
   }
@@ -176,10 +247,10 @@ export async function createRequest(
   revalidatePath('/requester')
 
   return {
-    success: true,
+    success:     true,
     ticketNumber: newRequest.ticket_number,
-    requestId: newRequest.id,
-    title: newRequest.title,
+    requestId:   newRequest.id,
+    title:       newRequest.title,
     requestType: newRequest.request_type,
   }
 }
@@ -206,10 +277,10 @@ export async function getRequesterRequests(
     .single()
   if (!dbUser) return empty
 
-  const page = filters.page ?? 1
+  const page     = filters.page     ?? 1
   const pageSize = filters.pageSize ?? 10
-  const from = (page - 1) * pageSize
-  const to = from + pageSize - 1
+  const from     = (page - 1) * pageSize
+  const to       = from + pageSize - 1
 
   let query = supabase
     .from('requests')
@@ -230,7 +301,6 @@ export async function getRequesterRequests(
     .range(from, to)
 
   if (filters.status) {
-    // Filter by status name via join
     const { data: statusRow } = await supabase
       .from('statuses')
       .select('id')
@@ -248,7 +318,6 @@ export async function getRequesterRequests(
   }
 
   if (filters.date_to) {
-    // Include the full day
     query = query.lte('created_at', filters.date_to + 'T23:59:59.999Z')
   }
 
@@ -260,8 +329,8 @@ export async function getRequesterRequests(
   }
 
   return {
-    data: (data ?? []) as unknown as RequestWithRelations[],
-    count: count ?? 0,
+    data:       (data ?? []) as unknown as RequestWithRelations[],
+    count:      count ?? 0,
     page,
     pageSize,
     totalPages: Math.ceil((count ?? 0) / pageSize),
@@ -275,7 +344,7 @@ export async function getRecentRequests(): Promise<RequestWithRelations[]> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
 
-  const admin = createAdminClient() // bypass RLS
+  const admin = createAdminClient()
 
   const { data: dbUser } = await admin
     .from('users')
@@ -297,7 +366,7 @@ export async function getRecentRequests(): Promise<RequestWithRelations[]> {
       priorities ( level )
       `
     )
-    .eq('requester_id', dbUser.id) // manually enforce ownership
+    .eq('requester_id', dbUser.id)
     .order('created_at', { ascending: false })
     .limit(5)
 
@@ -327,7 +396,6 @@ export async function getRequesterStats(): Promise<RequesterStats> {
     .single()
   if (!dbUser) return empty
 
-  // Fetch all statuses to resolve names → ids
   const { data: statuses } = await supabase
     .from('statuses')
     .select('id, status_name')
@@ -344,17 +412,15 @@ export async function getRequesterStats(): Promise<RequesterStats> {
 
   if (error || !requests) return empty
 
-  const total = requests.length
-  const pending = requests.filter((r) => r.status_id === statusMap['pending']).length
-  const inProgress = requests.filter(
+  const total       = requests.length
+  const pending     = requests.filter((r) => r.status_id === statusMap['pending']).length
+  const inProgress  = requests.filter(
     (r) =>
       r.status_id === statusMap['in progress'] ||
-      r.status_id === statusMap['in_progress'] ||
+      r.status_id === statusMap['in_progress']  ||
       r.status_id === statusMap['assigned']
   ).length
-  const completed = requests.filter((r) => r.status_id === statusMap['completed']).length
-  // "Awaiting Feedback": completed within 30 days — real feedback table check
-  // would require a feedback table; for now we approximate as recently completed
+  const completed   = requests.filter((r) => r.status_id === statusMap['completed']).length
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
   const awaitingFeedback = requests.filter(
     (r) =>
@@ -429,7 +495,6 @@ export async function getAllRequests(
   const empty: PaginatedRequests = { data: [], count: 0, page: 1, pageSize: 10, totalPages: 0 }
   if (!user) return empty
 
-  // Verify caller is admin
   const { data: caller } = await supabase
     .from('users')
     .select('role')
@@ -437,11 +502,11 @@ export async function getAllRequests(
     .single()
   if (caller?.role !== 'admin') return empty
 
-  const admin = createAdminClient()
-  const page = filters.page ?? 1
+  const admin    = createAdminClient()
+  const page     = filters.page     ?? 1
   const pageSize = filters.pageSize ?? 10
-  const from = (page - 1) * pageSize
-  const to = from + pageSize - 1
+  const from     = (page - 1) * pageSize
+  const to       = from + pageSize - 1
 
   let query = admin
     .from('requests')
@@ -490,8 +555,8 @@ export async function getAllRequests(
   }
 
   return {
-    data: (data ?? []) as unknown as RequestWithRelations[],
-    count: count ?? 0,
+    data:       (data ?? []) as unknown as RequestWithRelations[],
+    count:      count ?? 0,
     page,
     pageSize,
     totalPages: Math.ceil((count ?? 0) / pageSize),
@@ -502,12 +567,12 @@ export async function getAllRequests(
 
 export async function getAdminStats(): Promise<AdminStats> {
   const empty: AdminStats = {
-    totalRequests: 0,
+    totalRequests:     0,
     requestsThisMonth: 0,
-    pendingReview: 0,
+    pendingReview:     0,
     completedThisMonth: 0,
-    activeUsers: 0,
-    pendingApprovals: 0,
+    activeUsers:       0,
+    pendingApprovals:  0,
   }
 
   const supabase = await createClient()
@@ -516,7 +581,6 @@ export async function getAdminStats(): Promise<AdminStats> {
 
   const admin = createAdminClient()
 
-  // Verify admin
   const { data: caller } = await admin
     .from('users')
     .select('role')
@@ -524,67 +588,46 @@ export async function getAdminStats(): Promise<AdminStats> {
     .single()
   if (caller?.role !== 'admin') return empty
 
-  const now = new Date()
+  const now          = new Date()
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
 
-  // Fetch statuses
-  const { data: statuses } = await admin
-    .from('statuses')
-    .select('id, status_name')
+  const { data: statuses } = await admin.from('statuses').select('id, status_name')
 
   const statusMap = Object.fromEntries(
     (statuses ?? []).map((s) => [s.status_name.toLowerCase(), s.id])
   )
 
-  // Total requests
   const { count: totalRequests } = await admin
-    .from('requests')
-    .select('id', { count: 'exact', head: true })
+    .from('requests').select('id', { count: 'exact', head: true })
 
-  // Requests this month
   const { count: requestsThisMonth } = await admin
-    .from('requests')
-    .select('id', { count: 'exact', head: true })
+    .from('requests').select('id', { count: 'exact', head: true })
     .gte('created_at', startOfMonth)
 
-  // Pending review
   const pendingId = statusMap['pending']
   const { count: pendingReview } = pendingId
-    ? await admin
-        .from('requests')
-        .select('id', { count: 'exact', head: true })
-        .eq('status_id', pendingId)
+    ? await admin.from('requests').select('id', { count: 'exact', head: true }).eq('status_id', pendingId)
     : { count: 0 }
 
-  // Completed this month
   const completedId = statusMap['completed']
   const { count: completedThisMonth } = completedId
-    ? await admin
-        .from('requests')
-        .select('id', { count: 'exact', head: true })
-        .eq('status_id', completedId)
-        .gte('created_at', startOfMonth)
+    ? await admin.from('requests').select('id', { count: 'exact', head: true })
+        .eq('status_id', completedId).gte('created_at', startOfMonth)
     : { count: 0 }
 
-  // Active users
   const { count: activeUsers } = await admin
-    .from('users')
-    .select('id', { count: 'exact', head: true })
-    .eq('is_active', true)
+    .from('users').select('id', { count: 'exact', head: true }).eq('is_active', true)
 
-  // Pending approvals
   const { count: pendingApprovals } = await admin
-    .from('users')
-    .select('id', { count: 'exact', head: true })
-    .eq('signup_status', 'pending')
+    .from('users').select('id', { count: 'exact', head: true }).eq('signup_status', 'pending')
 
   return {
-    totalRequests: totalRequests ?? 0,
-    requestsThisMonth: requestsThisMonth ?? 0,
-    pendingReview: pendingReview ?? 0,
+    totalRequests:      totalRequests      ?? 0,
+    requestsThisMonth:  requestsThisMonth  ?? 0,
+    pendingReview:      pendingReview      ?? 0,
     completedThisMonth: completedThisMonth ?? 0,
-    activeUsers: activeUsers ?? 0,
-    pendingApprovals: pendingApprovals ?? 0,
+    activeUsers:        activeUsers        ?? 0,
+    pendingApprovals:   pendingApprovals   ?? 0,
   }
 }
 
@@ -598,10 +641,7 @@ export async function getRecentAdminRequests(): Promise<RequestWithRelations[]> 
   const admin = createAdminClient()
 
   const { data: caller } = await admin
-    .from('users')
-    .select('role')
-    .eq('auth_id', user.id)
-    .single()
+    .from('users').select('role').eq('auth_id', user.id).single()
   if (caller?.role !== 'admin') return []
 
   const { data, error } = await admin
