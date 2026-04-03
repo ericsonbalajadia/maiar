@@ -1,4 +1,4 @@
-// types/request.models.ts
+// types/requests.model.ts
 // Manual type definitions for tables not yet in generated database.types.ts
 // These mirror the actual Supabase schema exactly.
 
@@ -296,7 +296,6 @@ export type RmrFormInput = {
   location_building: string
   location_floor?: string
   location_room?: string
-  priority_id?: string
   designation: string
   contact_email: string
   category_id: string
@@ -309,7 +308,6 @@ export type PpsrFormInput = {
   location_building: string
   location_floor?: string
   location_room?: string
-  priority_id?: string
   designation: string
   contact_email: string
   service_type: PpsrServiceType

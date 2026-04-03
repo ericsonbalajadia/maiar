@@ -165,38 +165,16 @@ export async function createRequest(
   const pendingStatusId = await getPendingStatusId()
   if (!pendingStatusId) return { error: 'System configuration error: pending status not found.' }
 
-  // 4. Resolve or create location from the three free-text inputs
-  const locationId = await resolveOrCreateLocation(
-    input.location_building,
-    input.location_floor ?? '',
-    input.location_room  ?? '',
-  )
-  if (!locationId) return { error: 'Failed to resolve location. Please try again.' }
-
-  // 5. Insert into requests
-  const requestInsertPayload =
-    type === 'rmr'
-      ? {
-          title:        input.title,
-          description:  input.description,
-          request_type: type,
-          location_id:  locationId,
-          category_id:  (input as RmrFormInput).category_id,
-          status_id:    pendingStatusId,
-          requester_id: dbUser.id,
-          ...((input as RmrFormInput).priority_id
-            ? { priority_id: (input as RmrFormInput).priority_id }
-            : {}),
-        }
-      : {
-          title:        input.title,
-          description:  input.description,
-          request_type: type,
-          location_id:  locationId,
-          category_id:  null,
-          status_id:    pendingStatusId,
-          requester_id: dbUser.id,
-        }
+  // 4. Insert into requests
+  const requestInsertPayload = {
+  title: input.title,
+  description: input.description,
+  request_type: type,
+  location_id: input.location_id,
+  category_id: type === 'rmr' ? (input as RmrFormInput).category_id : null,
+  status_id: pendingStatusId,
+  requester_id: dbUser.id,
+}
 
   const { data: newRequest, error: requestError } = await supabase
     .from('requests')
