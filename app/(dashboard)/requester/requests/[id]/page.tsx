@@ -12,7 +12,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getRoleDashboard, isRequesterRole } from '@/lib/rbac'
 import { getRequestById } from '@/actions/request/request.actions'
 import { getRequestAssignment } from '@/lib/queries/request.queries'
-import { StatusBadge, RequestTypeBadge, PriorityBadge } from '@/components/common/status-badge'
+import { StatusBadge, RequestTypeBadge } from '@/components/common/status-badge'
 import { StatusTimeline } from '@/components/requests/status-timeline'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -456,9 +456,6 @@ async function RequestDetailContent({ id }: { id: string }) {
               {request.ticket_number}
             </h1>
             <StatusBadge status={currentStatusName} />
-            {request.priorities?.level && (
-              <PriorityBadge level={request.priorities.level} />
-            )}
           </div>
           <p className="text-sm text-slate-500 dark:text-slate-400">Request Details</p>
         </div>
