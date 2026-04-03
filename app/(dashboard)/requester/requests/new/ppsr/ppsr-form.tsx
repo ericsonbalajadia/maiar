@@ -296,6 +296,8 @@ export function PpsrForm({ locations, dbUser }: PpsrFormProps) {
         title:        form.title,
         description:  form.description,
         location_id:  form.location_id,
+        designation:  form.designation,
+        contact_email: form.email,
         service_type: form.service_type as PpsrServiceType,
         service_data: form.service_data,
       })
