@@ -78,8 +78,7 @@ export const rmrSchema = z.object({
   request_type: z.literal('rmr'),
   title:        z.string().min(3, 'Title must be at least 3 characters'),
   description:  z.string().optional(),
-  location_id:  z.string().uuid('Invalid location'),
-  priority_id:  z.string().uuid('Invalid priority'),
+  location_id: z.string().uuid('Location is required'),   
   category_id:  z.string().uuid('Invalid category'),
 })
 
@@ -90,8 +89,7 @@ export const ppsrBaseSchema = z.object({
   request_type: z.literal('ppsr'),
   title:        z.string().min(3, 'Title must be at least 3 characters'),
   description:  z.string().optional(),
-  location_id:  z.string().uuid('Invalid location'),
-  priority_id:  z.string().uuid('Invalid priority'),
+  location_id: z.string().uuid('Location is required'),   
   service_type: z.enum(PPSR_SERVICE_TYPES, { message: 'Service type is required' }),
 })
 

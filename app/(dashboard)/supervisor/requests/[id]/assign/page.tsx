@@ -1,3 +1,4 @@
+// app/(dashboard)/supervisor/requests/[id]/assign/page.tsx
 import { getRequestById } from '@/lib/queries/request.queries';
 import { getActiveTechnicians } from '@/lib/queries/lookup.queries';
 import { notFound } from 'next/navigation';
@@ -17,6 +18,8 @@ export default async function SupervisorAssignPage({ params }: Props) {
   ]);
   if (!request) notFound();
 
+  const currentStatus = request.statuses?.status_name ?? 'pending';
+
   return (
     <div className="max-w-2xl space-y-6">
       <nav className="text-sm text-slate-400">
@@ -32,7 +35,7 @@ export default async function SupervisorAssignPage({ params }: Props) {
           <p className="text-xs font-mono text-slate-400">{request.ticket_number}</p>
           <h1 className="mt-1 text-xl font-bold text-slate-800">{request.title}</h1>
         </div>
-        <StatusBadge status={request.status.status_name} />
+        <StatusBadge status={currentStatus} />
       </div>
 
       <AssignTechnicianForm

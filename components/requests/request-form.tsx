@@ -28,10 +28,9 @@ function SubmitButton() {
 interface NewRequestFormProps {
   locations: DbLocation[];
   categories: DbCategory[];
-  priorities: DbPriority[];
 }
 
-export function NewRequestForm({ locations, categories, priorities }: NewRequestFormProps) {
+export function NewRequestForm({ locations, categories }: NewRequestFormProps) {
   const [requestType, setRequestType] = useState<'rmr' | 'ppsr'>('rmr');
   const [selectedPpsrType, setSelectedPpsrType] = useState<string>('');
   const [state, formAction] = useFormState(createRequest, INITIAL_STATE);
@@ -182,28 +181,6 @@ export function NewRequestForm({ locations, categories, priorities }: NewRequest
         )}
       </div>
 
-      {/* Priority */}
-      <div>
-        <label htmlFor="priority_id" className="block text-sm font-medium text-slate-700">
-          Priority
-        </label>
-        <select
-          id="priority_id"
-          name="priority_id"
-          required
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
-        >
-          <option value="">Select priority</option>
-          {priorities.map((pri) => (
-            <option key={pri.id} value={pri.id}>
-              {pri.level} – {pri.description}
-            </option>
-          ))}
-        </select>
-        {!state.success && state.errors?.priority_id && (
-          <p className="mt-1 text-xs text-red-600">{state.errors.priority_id[0]}</p>
-        )}
-      </div>
 
       {/* Global form error */}
       {!state.success && state.errors?.form && (

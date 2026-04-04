@@ -133,7 +133,7 @@ async function RequestHistoryTable() {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-slate-100 dark:border-slate-800">
-            {['Ref #', 'Type', 'Date', 'Nature of Work', 'Building', 'Status', 'Priority', 'Action'].map((h) => (
+            {['Ref #', 'Type', 'Date', 'Nature of Work', 'Building', 'Status', 'Action'].map((h) => (
               <th key={h} className="text-left text-xs font-semibold text-slate-500 dark:text-slate-400 px-3 py-3 first:pl-0 last:pr-0 whitespace-nowrap">
                 {h}
               </th>
@@ -178,13 +178,6 @@ async function RequestHistoryTable() {
                 {/* Status */}
                 <td className="px-3 py-3.5">
                   <StatusBadge status={req.statuses?.status_name ?? 'pending'} />
-                </td>
-                {/* Priority */}
-                <td className="px-3 py-3.5">
-                  {req.priorities?.level
-                    ? <PriorityBadge level={req.priorities.level} />
-                    : <span className="text-slate-300 dark:text-slate-600">—</span>
-                  }
                 </td>
                 {/* Actions */}
                 <td className="px-3 py-3.5 last:pr-0">

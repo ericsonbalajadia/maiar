@@ -3,19 +3,12 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { createRequest } from '@/actions/request/request.actions'
-import type { Category, Location } from '@/types/requests.model'
+import type { Category } from '@/types/requests.model'
 import type { DbUser } from '@/types/models'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { ChevronRight, ChevronLeft, Check, Loader2, CheckCircle2, X } from 'lucide-react'
 
@@ -23,21 +16,22 @@ import { ChevronRight, ChevronLeft, Check, Loader2, CheckCircle2, X } from 'luci
 
 interface RmrFormProps {
   categories: Category[]
-  locations:  Location[]
   dbUser:     DbUser
 }
 
 interface FormData {
-  date_filled:       string
-  building:          string
-  location_id:       string
-  requesting_party:  string
-  designation:       string
-  contact_number:    string
-  email:             string
-  category_ids:      string[]
-  title:             string
-  description:       string
+  date_filled:        string
+  building:           string
+  location_building:  string
+  location_floor:     string
+  location_room:      string
+  requesting_party:   string
+  designation:        string
+  contact_number:     string
+  email:              string
+  category_ids:       string[]
+  title:              string
+  description:        string
 }
 
 // ─── Step indicator ───────────────────────────────────────────────────────────
@@ -123,7 +117,7 @@ function SuccessModal({
 
 // ─── Main Form ────────────────────────────────────────────────────────────────
 
-export function RmrForm({ categories, locations, dbUser }: RmrFormProps) {
+export function RmrForm({ categories, dbUser }: RmrFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [step, setStep]     = useState(1)
@@ -133,16 +127,18 @@ export function RmrForm({ categories, locations, dbUser }: RmrFormProps) {
   const today = new Date().toISOString().split('T')[0]
 
   const [form, setForm] = useState<FormData>({
-    date_filled:      today,
-    building:         '',
-    location_id:      '',
-    requesting_party: dbUser.full_name,
-    designation:      dbUser.department ?? '',
-    contact_number:   dbUser.phone ?? '',
-    email:            dbUser.email,
-    category_ids:     [],
-    title:            '',
-    description:      '',
+    date_filled:       today,
+    building:          '',
+    location_building: '',
+    location_floor:    '',
+    location_room:     '',
+    requesting_party:  dbUser.full_name,
+    designation:       dbUser.department ?? '',
+    contact_number:    dbUser.phone ?? '',
+    email:             dbUser.email,
+    category_ids:      [],
+    title:             '',
+    description:       '',
   })
 
   const set = (key: keyof FormData, value: string | string[]) => {
@@ -160,12 +156,12 @@ export function RmrForm({ categories, locations, dbUser }: RmrFormProps) {
   const validateStep = (s: number): boolean => {
     const errs: Record<string, string> = {}
     if (s === 1) {
-      if (!form.building.trim())         errs.building         = 'Required'
-      if (!form.location_id)             errs.location_id      = 'Required'
-      if (!form.requesting_party.trim()) errs.requesting_party = 'Required'
-      if (!form.designation.trim())      errs.designation      = 'Required'
-      if (!form.contact_number.trim())   errs.contact_number   = 'Required'
-      if (!form.email.trim())            errs.email            = 'Required'
+      if (!form.building.trim())          errs.building          = 'Required'
+      if (!form.location_building.trim()) errs.location_building = 'Required'
+      if (!form.requesting_party.trim())  errs.requesting_party  = 'Required'
+      if (!form.designation.trim())       errs.designation       = 'Required'
+      if (!form.contact_number.trim())    errs.contact_number    = 'Required'
+      if (!form.email.trim())             errs.email             = 'Required'
     }
     if (s === 2 && form.category_ids.length === 0)
       errs.category_ids = 'Please select at least one type of work'
@@ -175,10 +171,8 @@ export function RmrForm({ categories, locations, dbUser }: RmrFormProps) {
     return Object.keys(errs).length === 0
   }
 
-  const next = () => { if (validateStep(step)) setStep((s) => s + 1) }
-  const back = () => setStep((s) => s - 1)
-
-  // Cancel always goes back to the type-selector
+  const next   = () => { if (validateStep(step)) setStep((s) => s + 1) }
+  const back   = () => setStep((s) => s - 1)
   const cancel = () => router.push('/requester/requests/new')
 
   const handleSubmit = () => {
@@ -186,12 +180,14 @@ export function RmrForm({ categories, locations, dbUser }: RmrFormProps) {
     startTransition(async () => {
       const primaryCategory = categories.find((c) => form.category_ids.includes(c.id))
       const result = await createRequest('rmr', {
-        title:         form.title,
-        description:   form.description,
-        category_id:   primaryCategory?.id ?? form.category_ids[0],
-        location_id:   form.location_id,
-        designation:   form.designation,
-        contact_email: form.email,
+        title:             form.title,
+        description:       form.description,
+        category_id:       primaryCategory?.id ?? form.category_ids[0],
+        location_building: form.location_building,
+        location_floor:    form.location_floor,
+        location_room:     form.location_room,
+        designation:       form.designation,
+        contact_email:     form.email,
       })
       if (result.success && result.ticketNumber) {
         setTicketNumber(result.ticketNumber)
@@ -205,7 +201,8 @@ export function RmrForm({ categories, locations, dbUser }: RmrFormProps) {
     setTicketNumber(null)
     setStep(1)
     setForm({
-      date_filled: today, building: '', location_id: '',
+      date_filled: today, building: '',
+      location_building: '', location_floor: '', location_room: '',
       requesting_party: dbUser.full_name, designation: dbUser.department ?? '',
       contact_number: dbUser.phone ?? '', email: dbUser.email,
       category_ids: [], title: '', description: '',
@@ -249,24 +246,41 @@ export function RmrForm({ categories, locations, dbUser }: RmrFormProps) {
               />
               {errors.building && <p className="text-xs text-rose-500 mt-1">{errors.building}</p>}
             </div>
-            <div>
+
+            {/* ── Location: 3 free-text inputs ── */}
+            <div className="sm:col-span-2">
               <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
                 Location <span className="text-rose-500">*</span>
               </Label>
-              <Select value={form.location_id} onValueChange={(v) => set('location_id', v)}>
-                <SelectTrigger className={errors.location_id ? 'border-rose-400' : ''}>
-                  <SelectValue placeholder="Select location" />
-                </SelectTrigger>
-                <SelectContent>
-                  {locations.map((loc) => (
-                    <SelectItem key={loc.id} value={loc.id}>
-                      {loc.building_name}{loc.room_number ? ` – Room ${loc.room_number}` : ''}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.location_id && <p className="text-xs text-rose-500 mt-1">{errors.location_id}</p>}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <Input
+                    placeholder="Building name *"
+                    value={form.location_building}
+                    onChange={(e) => set('location_building', e.target.value)}
+                    className={errors.location_building ? 'border-rose-400' : ''}
+                  />
+                  {errors.location_building && (
+                    <p className="text-xs text-rose-500 mt-1">{errors.location_building}</p>
+                  )}
+                </div>
+                <div>
+                  <Input
+                    placeholder="Floor level (optional)"
+                    value={form.location_floor}
+                    onChange={(e) => set('location_floor', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Input
+                    placeholder="Room number (optional)"
+                    value={form.location_room}
+                    onChange={(e) => set('location_room', e.target.value)}
+                  />
+                </div>
+              </div>
             </div>
+
             <div>
               <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
                 Requesting Party Name <span className="text-rose-500">*</span>
@@ -302,7 +316,7 @@ export function RmrForm({ categories, locations, dbUser }: RmrFormProps) {
               />
               {errors.contact_number && <p className="text-xs text-rose-500 mt-1">{errors.contact_number}</p>}
             </div>
-            <div className="sm:col-span-2">
+            <div>
               <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
                 Email Address <span className="text-rose-500">*</span>
               </Label>
@@ -422,12 +436,14 @@ export function RmrForm({ categories, locations, dbUser }: RmrFormProps) {
           <div className="space-y-4 text-sm">
             <div className="rounded-xl border border-slate-200 dark:border-slate-700 divide-y divide-slate-100 dark:divide-slate-800 overflow-hidden">
               {[
-                ['Building / Dept',   form.building],
-                ['Location',          locations.find((l) => l.id === form.location_id)?.building_name ?? '—'],
-                ['Requesting Party',  form.requesting_party],
-                ['Designation',       form.designation],
-                ['Contact',           form.contact_number],
-                ['Email',             form.email],
+                ['Building / Dept',  form.building],
+                ['Location',         form.location_building],
+                ['Floor Level',      form.location_floor || '—'],
+                ['Room Number',      form.location_room  || '—'],
+                ['Requesting Party', form.requesting_party],
+                ['Designation',      form.designation],
+                ['Contact',          form.contact_number],
+                ['Email',            form.email],
               ].map(([label, value]) => (
                 <div key={label} className="flex gap-4 px-4 py-3">
                   <span className="text-slate-400 dark:text-slate-500 min-w-[140px] shrink-0">{label}</span>
@@ -471,7 +487,6 @@ export function RmrForm({ categories, locations, dbUser }: RmrFormProps) {
 
       {/* ── Navigation ── */}
       <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
-        {/* Left button: Cancel on step 1, Back on other steps */}
         {step === 1 ? (
           <Button type="button" variant="outline" onClick={cancel}>
             Cancel

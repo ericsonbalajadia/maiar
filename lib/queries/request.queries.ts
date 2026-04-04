@@ -1,26 +1,81 @@
 // lib/queries/request.queries.ts
 import { createClient } from "@/lib/supabase/server";
 import type { RequestWithDetails, RequestSummary } from "@/types/models";
+import type { RequestDetail } from '@/types/requests.model';
+
 
 export async function getRequestById(id: string) {
   const supabase = await createClient();
+
   const { data, error } = await supabase
-    .from("requests")
-    .select(
-      `
-      *,
-      status:statuses(*),
-      priority:priorities(*),
-      location:locations(*),
-      category:categories(*),
-      requester:users!requester_id(id, full_name, email, role),
-      rmr_details(*),
-      ppsr_details(*)
-    `,
-    )
-    .eq("id", id)
-    .single();
-  return { data: data as RequestWithDetails | null, error };
+    .from('requests')
+    .select(`
+      id,
+      ticket_number,
+      title,
+      description,
+      request_type,
+      created_at,
+      updated_at,
+      statuses:statuses ( id, status_name ), 
+      locations:locations ( id, building_name, floor_level, room_number ),
+      priority:priorities ( id, level ),
+      category:categories ( id, category_name ),
+      requester:users!requests_requester_id_fkey (
+        id,
+        full_name,
+        email,
+        department
+      ),
+      assigned_technician:users!requests_assigned_technician_id_fkey (
+        id,
+        full_name,
+        email,
+        role
+      ),
+      rmr_details (
+        id,
+        inspection_date,
+        inspection_time_start,
+        inspection_time_end,
+        inspector_notes,
+        repair_mode,
+        materials_available,
+        manpower_required,
+        estimated_duration,
+        schedule_notes
+      ),
+      ppsr_details (
+        id,
+        service_type,
+        service_data
+      ),
+      attachments (
+        id,
+        file_name,
+        file_path,
+        file_size,
+        mime_type
+      ),
+      status_history (
+        id,
+        changed_at,
+        change_reason,
+        metadata,
+        old_status:old_status_id ( id, status_name ),
+        new_status:new_status_id ( id, status_name ),
+        changed_by_user:changed_by ( id, full_name, role )
+      )
+    `)
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error) {
+    console.error('getRequestById error:', error);
+    return { data: null, error };
+  }
+
+  return { data: data as RequestDetail | null, error: null };
 }
 
 // Used by /requester/requests list view.
@@ -140,4 +195,49 @@ export async function getCurrentAssignment(requestId: string, technicianId: stri
     .eq('is_current_assignment', true)
     .maybeSingle(); // returns null if not found
   return { data, error };
+}
+
+/**
+ * Returns the current active assignment for a request,
+ * including the assigned technician's full name.
+ * RLS: requesters can read assignments for their own requests.
+ */
+export async function getRequestAssignment(requestId: string) {
+  const supabase = await createClient()
+ 
+  const { data, error } = await supabase
+    .from('request_assignments')
+    .select(
+      `
+      id,
+      assigned_at,
+      acceptance_status,
+      notes,
+      is_current_assignment,
+      assigned_user:users!assigned_user_id (
+        id,
+        full_name,
+        role
+      )
+    `,
+    )
+    .eq('request_id', requestId)
+    .eq('is_current_assignment', true)
+    .maybeSingle()
+ 
+  return { data, error }
+}
+ 
+// Shape returned by getRequestAssignment:
+export type AssignmentWithTechnician = {
+  id: string
+  assigned_at: string
+  acceptance_status: string | null
+  notes: string | null
+  is_current_assignment: boolean
+  assigned_user: {
+    id: string
+    full_name: string
+    role: string
+  } | null
 }
