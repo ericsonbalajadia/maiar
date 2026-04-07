@@ -1,11 +1,14 @@
 // components/clerk/status-update-panel.tsx
-'use client';
+"use client";
 
-import { useState, useTransition } from 'react';
-import { updateRequestStatusByClerk } from '@/actions/clerk/clerk-status.actions';
-import { CLERK_ALLOWED_TRANSITIONS, CLERK_NOTES_REQUIRED } from '@/lib/constants/statuses';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { useState, useTransition } from "react";
+import { updateRequestStatusByClerk } from "@/actions/clerk/clerk-status.actions";
+import {
+  CLERK_ALLOWED_TRANSITIONS,
+  CLERK_NOTES_REQUIRED,
+} from "@/lib/constants/statuses";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 
 interface StatusUpdatePanelProps {
   requestId: string;
@@ -14,17 +17,20 @@ interface StatusUpdatePanelProps {
 }
 
 const LABEL: Record<string, string> = {
-  under_review: 'Start Review',
-  approved: 'Approve',
-  rejected: 'Reject',
-  cancelled: 'Cancel Request',
+  under_review: "Start Review",
+  approved: "Approve",
+  rejected: "Reject",
+  cancelled: "Cancel Request",
 };
 
-const VARIANT: Record<string, 'default' | 'destructive' | 'outline' | 'secondary'> = {
-  under_review: 'secondary',
-  approved: 'default',
-  rejected: 'destructive',
-  cancelled: 'destructive',
+const VARIANT: Record<
+  string,
+  "default" | "destructive" | "outline" | "secondary"
+> = {
+  under_review: "secondary",
+  approved: "default",
+  rejected: "destructive",
+  cancelled: "destructive",
 };
 
 export function StatusUpdatePanel({
@@ -32,7 +38,7 @@ export function StatusUpdatePanel({
   currentStatus,
   ticketNumber,
 }: StatusUpdatePanelProps) {
-  const [notes, setNotes] = useState('');
+  const [notes, setNotes] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -42,17 +48,23 @@ export function StatusUpdatePanel({
   function handleAction(newStatus: string) {
     setFeedback(null);
     startTransition(async () => {
-      const result = await updateRequestStatusByClerk(requestId, newStatus, notes);
+      const result = await updateRequestStatusByClerk(
+        requestId,
+        newStatus,
+        notes,
+      );
       if (result?.error) {
         setFeedback(`Error: ${result.error}`);
       } else {
         setFeedback(`Status updated to ${result.newStatus}.`);
-        setNotes('');
+        setNotes("");
       }
     });
   }
 
-  const requiresNotes = allowedTargets.some(s => CLERK_NOTES_REQUIRED.includes(s));
+  const requiresNotes = allowedTargets.some((s) =>
+    CLERK_NOTES_REQUIRED.includes(s),
+  );
 
   return (
     <div className="rounded-lg border border-border p-4 space-y-3">
@@ -64,17 +76,17 @@ export function StatusUpdatePanel({
         <Textarea
           placeholder="Notes / reason (required for reject or cancel)"
           value={notes}
-          onChange={e => setNotes(e.target.value)}
-          className="text-sm"
+          onChange={(e) => setNotes(e.target.value)}
+          className="text-sm placeholder:text-gray-600"
           rows={3}
         />
       )}
 
       <div className="flex flex-wrap gap-2">
-        {allowedTargets.map(target => (
+        {allowedTargets.map((target) => (
           <Button
             key={target}
-            variant={VARIANT[target] ?? 'outline'}
+            variant={VARIANT[target] ?? "outline"}
             size="sm"
             disabled={isPending}
             onClick={() => handleAction(target)}
@@ -85,9 +97,13 @@ export function StatusUpdatePanel({
       </div>
 
       {feedback && (
-        <p className={`text-sm ${feedback.startsWith('Error') ? 'text-destructive' : 'text-green-600'}`}>
+        <div
+          className={`mt-3 text-xs ${
+            feedback.startsWith("Error") ? "text-red-500" : "text-green-600"
+          }`}
+        >
           {feedback}
-        </p>
+        </div>
       )}
     </div>
   );

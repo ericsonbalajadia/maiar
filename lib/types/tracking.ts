@@ -8,3 +8,10 @@ export interface StatusHistoryEntry {
   change_reason: string | null;
   metadata: Record<string, unknown> | null;
 }
+
+export const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
+  pending: { label: 'Pending', color: '#B45309', bg: '#FEF3C7' },        // darker amber text
+  under_review: { label: 'Under Review', color: '#1E40AF', bg: '#DBEAFE' },
+  approved: { label: 'Approved', color: '#166534', bg: '#DCFCE7' },
+  // ... etc.
+};
