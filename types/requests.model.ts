@@ -203,6 +203,42 @@ export type Attachment = {
   updated_at: string
 }
 
+// ─── Joined Status History (for timeline) ─────────────────────────────────────
+
+export type JoinedStatusHistory = {
+  id: string;
+  request_id: string;
+  changed_at: string;
+  change_reason: string | null;
+  metadata: Json | null;
+  old_status: { status_name: string } | null;
+  new_status: { status_name: string };
+  changed_by_user: { full_name: string; role: string } | null;
+};
+
+// ─── Joined Attachment (for clerk detail view) ────────────────────────────────
+
+export type JoinedAttachment = {
+  id: string;
+  file_name: string;
+  file_path: string;
+  mime_type: string;         
+  file_size: number;
+  created_at: string;
+  uploaded_by: string;
+  // Optional: add attachment_type derived from mime_type or a separate column
+};
+
+// ─── Joined Request Review (for displaying reviewer name) ─────────────────────
+
+export type JoinedRequestReview = {
+  id: string;
+  decision: 'approved' | 'rejected';
+  review_notes: string | null;
+  reviewed_at: string;
+  reviewer: { full_name: string } | null;
+};
+
 // ─── Status History ───────────────────────────────────────────────────────────
 
 export type StatusHistory = {
@@ -306,11 +342,14 @@ export type RequestDetail = {
   requester: { full_name: string; email: string; department: string | null } | null;
   assigned_technician: { full_name: string; email: string; role: string } | null;
 
-  // Detail tables
+  // Detail tables (optional, typed as any for now – replace with proper types later)
   rmr_details: any | null;
   ppsr_details: any | null;
-  attachments: any[] | null;
-  status_history: any[] | null;
+
+  // Phase 4 additions
+  request_reviews?: JoinedRequestReview[] | null;
+  attachments?: JoinedAttachment[] | null;
+  status_history?: JoinedStatusHistory[] | null;
 };
 
 // ─── Form Input Types ─────────────────────────────────────────────────────────
