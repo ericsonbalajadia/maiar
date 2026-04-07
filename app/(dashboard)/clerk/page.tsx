@@ -1,5 +1,6 @@
 import { getRequestsForClerk } from '@/lib/queries/request.queries';
 import { RequestCard } from '@/components/requests/request-card';
+import { StatusUpdatePanel } from '@/components/clerk/status-update-panel';
 
 export default async function ClerkDashboardPage() {
   const { data: requests } = await getRequestsForClerk();
@@ -27,11 +28,18 @@ export default async function ClerkDashboardPage() {
         {pending.length > 0 ? (
           <div className="space-y-3">
             {pending.map((r) => (
+              <>
               <RequestCard
                 key={r.id}
                 request={r}
                 href={`/clerk/requests/${r.id}/review`}
               />
+              <StatusUpdatePanel
+                  requestId={r.id}
+                  currentStatus={r.status.status_name}
+                  ticketNumber={r.ticket_number ?? ''}
+                />
+              </>
             ))}
           </div>
         ) : (
@@ -50,11 +58,18 @@ export default async function ClerkDashboardPage() {
           </div>
           <div className="space-y-3">
             {underReview.map((r) => (
+              <>
               <RequestCard
                 key={r.id}
                 request={r}
                 href={`/clerk/requests/${r.id}/review`}
               />
+              <StatusUpdatePanel
+                  requestId={r.id}
+                  currentStatus={r.status.status_name}
+                  ticketNumber={r.ticket_number ?? ''}
+                />
+              </>
             ))}
           </div>
         </section>
