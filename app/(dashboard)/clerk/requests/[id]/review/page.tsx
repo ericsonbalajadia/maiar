@@ -7,11 +7,14 @@ import { StatusBadge } from '@/components/requests/statusBadge';
 import { ReviewForm } from '@/components/reviews/review-form';
 import { fetchStatusHistory } from '@/lib/actions/tracking';
 import { RequestTimeline } from '@/components/tracking/requestTimeline';
+import { StatusUpdatePanel } from '@/components/clerk/status-update-panel';
 import Link from 'next/link';
 
 interface Props {
   params: Promise<{ id: string }>;
 }
+
+// app/(dashboard)/clerk/requests/[id]/review/page.tsx
 
 export default async function ClerkReviewPage({ params }: Props) {
   const { id } = await params;
@@ -20,16 +23,12 @@ export default async function ClerkReviewPage({ params }: Props) {
 
   const history = await fetchStatusHistory(id);
 
-  // ✅ Defensive: handle missing status
   const currentStatus = request.statuses?.status_name ?? 'pending';
   const isReviewable = ['pending', 'under_review'].includes(currentStatus);
-
-  // ✅ Defensive: handle missing location
   const buildingName = request.locations?.building_name ?? 'Unknown location';
 
-  if (currentStatus === 'pending') {
-    await startReview(id);
-  }
+  // Moved startReview inside the conditional – it should not run on every render
+  // Instead, we'll handle it via the ReviewForm action. Remove this automatic call.
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -70,7 +69,14 @@ export default async function ClerkReviewPage({ params }: Props) {
       </div>
 
       {isReviewable ? (
-        <ReviewForm requestId={id} />
+        <>
+          <ReviewForm requestId={id} />
+          <StatusUpdatePanel
+            requestId={request.id}
+            currentStatus={currentStatus}
+            ticketNumber={request.ticket_number}
+          />
+        </>
       ) : (
         <p className="rounded-lg bg-slate-50 p-4 text-sm text-slate-500">
           Already reviewed – status: {currentStatus}
