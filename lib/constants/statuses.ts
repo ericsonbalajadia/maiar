@@ -21,3 +21,10 @@ export const STATUS_TRANSITIONS: Record<StatusName, StatusName[]> = {
   completed:    [], 
   cancelled:    [], 
 };
+
+export const CLERK_ALLOWED_TRANSITIONS: Record<string, string[]> = {
+  pending: ['under_review', 'cancelled'],
+  under_review: ['approved', 'rejected', 'cancelled'],
+};
+
+export const CLERK_NOTES_REQUIRED: string[] = ['rejected', 'cancelled'];
