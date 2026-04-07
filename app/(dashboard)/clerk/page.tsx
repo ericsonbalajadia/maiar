@@ -1,3 +1,4 @@
+import React from 'react';
 import { getRequestsForClerk } from '@/lib/queries/request.queries';
 import { RequestCard } from '@/components/requests/request-card';
 import { StatusUpdatePanel } from '@/components/clerk/status-update-panel';
@@ -28,7 +29,7 @@ export default async function ClerkDashboardPage() {
         {pending.length > 0 ? (
           <div className="space-y-3">
             {pending.map((r) => (
-              <>
+              <React.Fragment key={r.id}>
               <RequestCard
                 key={r.id}
                 request={r}
@@ -39,7 +40,7 @@ export default async function ClerkDashboardPage() {
                   currentStatus={r.status.status_name}
                   ticketNumber={r.ticket_number ?? ''}
                 />
-              </>
+              </React.Fragment>
             ))}
           </div>
         ) : (
@@ -58,7 +59,7 @@ export default async function ClerkDashboardPage() {
           </div>
           <div className="space-y-3">
             {underReview.map((r) => (
-              <>
+              <React.Fragment key={r.id}>
               <RequestCard
                 key={r.id}
                 request={r}
@@ -69,7 +70,7 @@ export default async function ClerkDashboardPage() {
                   currentStatus={r.status.status_name}
                   ticketNumber={r.ticket_number ?? ''}
                 />
-              </>
+              </React.Fragment >
             ))}
           </div>
         </section>
