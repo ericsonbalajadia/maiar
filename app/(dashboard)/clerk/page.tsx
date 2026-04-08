@@ -2,6 +2,7 @@ import React from "react";
 import { getRequestsForClerk } from "@/lib/queries/request.queries";
 import { RequestCard } from "@/components/requests/request-card";
 import { StatusUpdatePanel } from "@/components/clerk/status-update-panel";
+import Link from 'next/link';
 
 export default async function ClerkDashboardPage() {
   const { data: requests } = await getRequestsForClerk();
@@ -35,7 +36,7 @@ export default async function ClerkDashboardPage() {
                 <RequestCard
                   key={r.id}
                   request={r}
-                  href={`/clerk/requests/${r.id}/review`}
+                  href={`/clerk/requests/${r.id}`}
                 />
                 <StatusUpdatePanel
                   requestId={r.id}
@@ -65,7 +66,7 @@ export default async function ClerkDashboardPage() {
                 <RequestCard
                   key={r.id}
                   request={r}
-                  href={`/clerk/requests/${r.id}/review`}
+                  href={`/clerk/requests/${r.id}`}
                 />
                 <StatusUpdatePanel
                   requestId={r.id}
