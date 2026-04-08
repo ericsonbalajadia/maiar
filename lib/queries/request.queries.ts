@@ -2,10 +2,12 @@
 import { createClient } from "@/lib/supabase/server";
 import type { RequestWithDetails, RequestSummary } from "@/types/models";
 import type { RequestDetail } from '@/types/requests.model';
+import { createServiceClient } from '@/lib/supabase/service';
 
 
+// lib/queries/request.queries.ts
 export async function getRequestById(id: string) {
-  const supabase = await createClient();
+  const supabase = createServiceClient();
 
   const { data, error } = await supabase
     .from('requests')
@@ -17,14 +19,12 @@ export async function getRequestById(id: string) {
       request_type,
       created_at,
       updated_at,
-      statuses:statuses ( id, status_name ), 
+      statuses:statuses ( id, status_name ),
       locations:locations ( id, building_name, floor_level, room_number ),
-      priority:priorities ( id, level ),
-      category:categories ( id, category_name ),
-      requester:users!requests_requester_id_fkey (
-        id, full_name, email, department
-      ),
-      assigned_technician:users!requests_assigned_technician_id_fkey (
+      priorities:priorities ( id, level ),   
+      categories:categories ( id, category_name ),
+      requester:users!requests_requester_id_fkey ( id, full_name, email, department ),
+      assigned_technician:users!assigned_technician_id (
         id, full_name, email, role
       ),
       rmr_details (
@@ -51,6 +51,9 @@ export async function getRequestById(id: string) {
     `)
     .eq('id', id)
     .maybeSingle();
+
+    console.log('DEBUG getRequestById - requester field:', data?.requester);
+console.log('DEBUG full data keys:', Object.keys(data || {}));
 
   if (error) {
     console.error('getRequestById error:', error);
