@@ -1,7 +1,8 @@
 // components/reviews/review-form.tsx
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';  
 import { submitReview } from '@/actions/review.actions';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -28,7 +29,7 @@ interface ReviewFormProps {
 
 export function ReviewForm({ requestId }: ReviewFormProps) {
   const router = useRouter();
-  const [state, formAction] = useFormState(submitReview, INITIAL_STATE);
+  const [state, formAction] = useActionState(submitReview, INITIAL_STATE);
 
   // Redirect to clerk dashboard on success
   useEffect(() => {

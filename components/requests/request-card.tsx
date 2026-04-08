@@ -19,7 +19,7 @@ export function RequestCard({ request, href }: Props) {
   return (
     <Link
       href={href}
-      className="block rounded-lg border border-slate-200 bg-white p-4 shadow-sm hover:border-teal-400 hover:shadow-md transition-all"
+      className="block rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:scale-[1.02] hover:border-teal-400 hover:shadow-lg active:scale-[0.98]"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">

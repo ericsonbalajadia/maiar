@@ -22,46 +22,28 @@ export async function getRequestById(id: string) {
       priority:priorities ( id, level ),
       category:categories ( id, category_name ),
       requester:users!requests_requester_id_fkey (
-        id,
-        full_name,
-        email,
-        department
+        id, full_name, email, department
       ),
       assigned_technician:users!requests_assigned_technician_id_fkey (
-        id,
-        full_name,
-        email,
-        role
+        id, full_name, email, role
       ),
       rmr_details (
-        id,
-        inspection_date,
-        inspection_time_start,
-        inspection_time_end,
-        inspector_notes,
-        repair_mode,
-        materials_available,
-        manpower_required,
-        estimated_duration,
-        schedule_notes
+        id, inspection_date, inspection_time_start, inspection_time_end,
+        inspector_notes, repair_mode, materials_available, manpower_required,
+        estimated_duration, schedule_notes
       ),
       ppsr_details (
-        id,
-        service_type,
-        service_data
+        id, service_type, service_data
       ),
       attachments (
-        id,
-        file_name,
-        file_path,
-        file_size,
-        mime_type
+        id, file_name, file_path, file_size, mime_type, created_at, uploaded_by
+      ),
+      request_reviews (
+        id, decision, review_notes, reviewed_at,
+        reviewer:users!request_reviews_reviewer_id_fkey ( full_name )
       ),
       status_history (
-        id,
-        changed_at,
-        change_reason,
-        metadata,
+        id, changed_at, change_reason, metadata,
         old_status:old_status_id ( id, status_name ),
         new_status:new_status_id ( id, status_name ),
         changed_by_user:changed_by ( id, full_name, role )
