@@ -3,6 +3,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { notifyRequesterByEmail } from '@/lib/notifications/request-email';
 import { revalidatePath } from "next/cache";
 import type {
   RmrFormInput,
@@ -221,6 +222,18 @@ export async function createRequest(
       console.error("ppsr_details insert error:", detailError);
       return { error: "Request created but details failed. Contact support." };
     }
+  }
+
+  try {
+    await notifyRequesterByEmail({
+      requestId: newRequest.id,
+      event: 'request_submitted',
+    });
+  } catch (error) {
+    console.error('createRequest: failed to queue submission email', {
+      requestId: newRequest.id,
+      error,
+    });
   }
 
   revalidatePath("/requester/requests");

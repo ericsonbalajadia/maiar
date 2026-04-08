@@ -6,6 +6,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { assignmentSchema, acceptanceSchema } from '@/lib/validations/assignment.schema';
 import { actionFormError, actionError, type ActionResult } from '@/lib/utils/errors';
 import { ROLES, SUPERVISOR_ASSIGNMENT_ROLES, hasRole } from '@/lib/rbac';
+import { notifyRequesterByEmail } from '@/lib/notifications/request-email';
 import { revalidatePath } from 'next/cache';
 
 
@@ -51,6 +52,12 @@ export async function assignTechnician(
   });
   if (assignError) return actionFormError(assignError);
 
+  const { data: assignedTechnician } = await admin
+    .from('users')
+    .select('full_name')
+    .eq('id', result.data.assigned_user_id)
+    .single();
+
   // Update denormalized field and status on requests
   const { data: assignedStatus } = await admin
     .from('statuses').select('id').eq('status_name', 'assigned').single();
@@ -64,6 +71,19 @@ export async function assignTechnician(
     })
     .eq('id', result.data.request_id);
   if (reqError) return actionFormError(reqError);
+
+  try {
+    await notifyRequesterByEmail({
+      requestId: result.data.request_id,
+      event: 'technician_assigned',
+      actorName: assignedTechnician?.full_name,
+    });
+  } catch (notifyError) {
+    console.error('assignTechnician: failed to queue requester assignment email', {
+      requestId: result.data.request_id,
+      error: notifyError,
+    });
+  }
 
   revalidatePath('/supervisor');
   revalidatePath(`/supervisor/requests/${result.data.request_id}`);
@@ -124,9 +144,25 @@ export async function updateAcceptanceStatus(
     const { data: inProgressStatus } = await admin
       .from('statuses').select('id').eq('status_name', 'in_progress').single();
     if (inProgressStatus) {
-      await admin.from('requests')
+      const { data: updatedRequest } = await admin.from('requests')
         .update({ status_id: inProgressStatus.id })
-        .eq('id', assignment.request_id);
+        .eq('id', assignment.request_id)
+        .select('id')
+        .maybeSingle();
+
+      if (updatedRequest) {
+        try {
+          await notifyRequesterByEmail({
+            requestId: assignment.request_id,
+            event: 'in_progress',
+          });
+        } catch (notifyError) {
+          console.error('updateAcceptanceStatus: failed to queue in-progress email', {
+            requestId: assignment.request_id,
+            error: notifyError,
+          });
+        }
+      }
     }
   }
 

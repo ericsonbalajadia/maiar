@@ -10,6 +10,7 @@ import {
   SUPERVISOR_ASSIGNMENT_ROLES,
   hasRole,
 } from '@/lib/rbac';
+import { notifyRequesterByEmail } from '@/lib/notifications/request-email';
 import { revalidatePath } from 'next/cache';
 
 export async function saveAccomplishment(
@@ -92,6 +93,26 @@ export async function verifyAccomplishment(
     .eq('id', existing.id);
 
   if (error) return actionFormError(error);
+
+  try {
+    await notifyRequesterByEmail({
+      requestId: result.data.request_id,
+      event: 'completed',
+    });
+
+    if (result.data.notes?.trim()) {
+      await notifyRequesterByEmail({
+        requestId: result.data.request_id,
+        event: 'new_comment',
+        reason: result.data.notes.trim(),
+      });
+    }
+  } catch (notifyError) {
+    console.error('verifyAccomplishment: failed to queue completion email', {
+      requestId: result.data.request_id,
+      error: notifyError,
+    });
+  }
 
   revalidatePath('/supervisor');
   revalidatePath(`/requester/requests/${result.data.request_id}`);
