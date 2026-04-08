@@ -8,9 +8,33 @@ iTrack is a web-based application that streamlines the submission, tracking, and
 | [MA.010.001](#ma010001-release-notes) | 2026-02-27 |
 | [MA.010.002](#ma010002-release-notes) | 2026-03-13 |
 | [MA.010.003](#ma010003-release-notes) | 2026-04-04 |
+| [MA.010.004](#ma010004-release-notes) | 2026-04-09 |
 
 ---
 
+<h2 id="ma010004-release-notes">📦 MA.010.004 Release Notes</h2>
+
+##### Clerk Status Update
+- Wire inline `StatusUpdatePanel` into clerk dashboard rows and review page
+- Add `StatusUpdatePanel` UI component for inline status management
+- Add `updateRequestStatusByClerk` server action
+- Add `ClerkStatusUpdateSchema` for clerk status change validation
+- Improve review queue UI with visual separation between entries
+- Fix migration from deprecated `useFormState` to `useActionState` + `useFormStatus`
+- Fix missing React import and key props in dashboard components
+
+##### Clerk Request View
+- Add clerk request detail page with direct link support
+- Add `RequestDetailPanel` component for clerk detail view
+- Fix `getRequestById` to use service role client and correct joins for RLS bypass
+
+##### Email Notification System
+- Send requester emails on request status changes
+- Add requester notification preferences
+- Add reminder notification cron job
+
+
+---
 <h2 id="ma010003-release-notes">📦 MA.010.003 Release Notes</h2>
 
 ##### Request Tracking & Timeline
