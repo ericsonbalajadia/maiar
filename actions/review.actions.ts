@@ -6,6 +6,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { reviewSchema } from '@/lib/validations/review.schema';
 import { actionFormError, actionError, type ActionResult } from '@/lib/utils/errors';
 import { CLERK_REVIEW_ROLES, hasRole } from '@/lib/rbac';
+import { notifyRequesterByEmail } from '@/lib/notifications/request-email';
 import { revalidatePath } from 'next/cache';
 
 export async function startReview(requestId: string): Promise<ActionResult> {
@@ -86,6 +87,35 @@ export async function submitReview(
     .update({ status_id: nextStatus.id })
     .eq('id', result.data.request_id);
   if (statusError) return actionFormError(statusError);
+
+  try {
+    if (result.data.decision === 'approved') {
+      await notifyRequesterByEmail({
+        requestId: result.data.request_id,
+        event: 'request_approved',
+      });
+    } else if (result.data.decision === 'rejected') {
+      await notifyRequesterByEmail({
+        requestId: result.data.request_id,
+        event: 'cancelled',
+        reason: result.data.review_notes ?? 'Rejected during review.',
+      });
+    }
+
+    if (result.data.review_notes?.trim()) {
+      await notifyRequesterByEmail({
+        requestId: result.data.request_id,
+        event: 'new_comment',
+        reason: result.data.review_notes.trim(),
+      });
+    }
+  } catch (notifyError) {
+    console.error('submitReview: failed to queue requester email', {
+      requestId: result.data.request_id,
+      decision: result.data.decision,
+      error: notifyError,
+    });
+  }
 
   revalidatePath('/clerk');
   revalidatePath(`/clerk/requests/${result.data.request_id}/review`);

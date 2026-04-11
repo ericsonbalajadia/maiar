@@ -15,6 +15,7 @@ import { redirect } from "next/navigation";
 import type { InsertRequest } from "@/types/models";
 import type { Json } from "@/types/database.types";
 import { isRequesterRole } from "@/lib/rbac";
+import { notifyRequesterByEmail } from '@/lib/notifications/request-email';
 // Add missing imports for the form input types (not used directly but kept for clarity)
 import type { RmrFormInput, PpsrFormInput } from "@/types/requests.model";
 import type { PpsrServiceType } from "@/lib/constants/ppsr-service-types";
@@ -118,6 +119,18 @@ export async function requestService(
     if (ppsError) return actionFormError(ppsError);
   }
 
+  try {
+    await notifyRequesterByEmail({
+      requestId: newRequest.id,
+      event: 'request_submitted',
+    });
+  } catch (error) {
+    console.error('requestService: failed to queue submission email', {
+      requestId: newRequest.id,
+      error,
+    });
+  }
+
   // 9. Revalidate and redirect
   revalidatePath("/requester/requests");
   redirect(`/requester/requests/${newRequest.id}?submitted=true`);
@@ -156,13 +169,30 @@ export async function cancelRequest(requestId: string): Promise<ActionResult> {
   if (!cancelledStatus || !pendingStatus)
     return actionError("form", "System error: status not found.");
 
-  const { error } = await admin
+  const { data: updatedRequest, error } = await admin
     .from("requests")
     .update({ status_id: cancelledStatus.id })
+    .select('id')
     .eq("id", requestId)
     .eq("requester_id", requester.id) // own requests only
-    .eq("status_id", pendingStatus.id); // only cancellable from pending
+    .eq("status_id", pendingStatus.id) // only cancellable from pending
+    .maybeSingle();
   if (error) return actionFormError(error);
+
+  if (updatedRequest) {
+    try {
+      await notifyRequesterByEmail({
+        requestId,
+        event: 'cancelled',
+        reason: 'Cancelled by requester.',
+      });
+    } catch (notifyError) {
+      console.error('cancelRequest: failed to queue cancellation email', {
+        requestId,
+        error: notifyError,
+      });
+    }
+  }
 
   revalidatePath("/requester/requests");
   return { success: true };
