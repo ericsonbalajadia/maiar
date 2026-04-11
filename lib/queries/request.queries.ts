@@ -192,12 +192,11 @@ export async function getCurrentAssignment(requestId: string, technicianId: stri
  * RLS: requesters can read assignments for their own requests.
  */
 export async function getRequestAssignment(requestId: string) {
-  const supabase = await createClient()
- 
+  const supabase = createServiceClient(); // ← use service client
+
   const { data, error } = await supabase
     .from('request_assignments')
-    .select(
-      `
+    .select(`
       id,
       assigned_at,
       acceptance_status,
@@ -208,13 +207,13 @@ export async function getRequestAssignment(requestId: string) {
         full_name,
         role
       )
-    `,
-    )
+    `)
     .eq('request_id', requestId)
     .eq('is_current_assignment', true)
-    .maybeSingle()
- 
-  return { data, error }
+    .order('assigned_at', { ascending: false })
+    .maybeSingle();
+
+  return { data, error };
 }
  
 // Shape returned by getRequestAssignment:
