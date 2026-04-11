@@ -5,6 +5,7 @@ import { getRequestById } from "@/lib/queries/request.queries";
 import { getAvailableTechnicians } from "@/lib/queries/technician.queries";
 import { AssignTechnicianForm } from "@/components/assignments/assign-technician-form";
 import { RequestDetailPanel } from "@/components/clerk/request-detail-panel";
+import { ScheduleForm } from "@/components/assignments/schedule-form";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -49,20 +50,24 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
       <RequestDetailPanel request={request} hideStatusPanel={true} />
 
       {canAssign && (
-       
-          <AssignTechnicianForm
-            requestId={id}
-            technicians={technicians}
-            currentAssignedId={currentTechnicianId}
-            ticketNumber={request.ticket_number}
-          />
-      
+        <AssignTechnicianForm
+          requestId={id}
+          technicians={technicians}
+          currentAssignedId={currentTechnicianId}
+          ticketNumber={request.ticket_number}
+        />
       )}
 
       {activeAssignment && (
-        <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm text-blue-800">
-          Assignment active. Use the Schedule tab (Release 5.2) to set date and
-          time.
+        <div className="rounded-lg border p-4 text-sm">
+          {activeAssignment && (
+              <ScheduleForm
+                assignmentId={activeAssignment.id}
+                scheduledStart={activeAssignment.scheduled_start}
+                scheduledEnd={activeAssignment.scheduled_end}
+                scheduleNotes={activeAssignment.schedule_notes}
+              />
+          )}
         </div>
       )}
     </div>
