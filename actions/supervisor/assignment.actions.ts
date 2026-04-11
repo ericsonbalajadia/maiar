@@ -59,12 +59,15 @@ export async function assignTechnician(
     return { success: false, error: `Request must be approved or assigned to reassign. Current: ${currentStatus}` };
   }
 
-  // 5. Mark any existing active assignment as completed (reassignment)
-  await serviceSupabase
-    .from('request_assignments')
-    .update({ completed_at: new Date().toISOString() })
-    .eq('request_id', requestId)
-    .is('completed_at', null);
+// 5. Mark any existing active assignment as not current and completed
+await serviceSupabase
+  .from('request_assignments')
+  .update({ 
+    completed_at: new Date().toISOString(),
+    is_current_assignment: false 
+  })
+  .eq('request_id', requestId)
+  .eq('is_current_assignment', true);
 
   // 6. Create new assignment
   const { error: insertError } = await serviceSupabase
