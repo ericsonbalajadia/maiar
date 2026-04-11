@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getRequestById } from "@/lib/queries/request.queries";
 import { getAvailableTechnicians } from "@/lib/queries/technician.queries";
+import { SupervisorStatusPanel } from "@/components/supervisor/supervisor-status-panel";
 import { AssignTechnicianForm } from "@/components/assignments/assign-technician-form";
 import { RequestDetailPanel } from "@/components/clerk/request-detail-panel";
 import { ScheduleForm } from "@/components/assignments/schedule-form";
@@ -30,15 +31,18 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
   // Find active assignment from the request_assignments relation
   const assignments = request.request_assignments ?? [];
   const activeAssignment = assignments.find((a: any) => !a.completed_at);
+  const hasSchedule = activeAssignment?.scheduled_start != null;
   const currentTechnicianId = activeAssignment?.technician?.id ?? null;
   const currentStatus = request.statuses?.status_name ?? "";
   const canAssign = ["approved", "assigned"].includes(currentStatus);
+  const showStatusPanel =
+    ["assigned", "in_progress"].includes(currentStatus) && hasSchedule;
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">
-          Request Detail -- {request.ticket_number}
+        <h1 className="text-3xl font-bold">
+          Request Detail
         </h1>
         <Link href="/supervisor">
           <Button variant="outline" size="sm">
@@ -51,6 +55,7 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
 
       {canAssign && (
         <AssignTechnicianForm
+          key={`assign-form-${currentTechnicianId || "none"}`}
           requestId={id}
           technicians={technicians}
           currentAssignedId={currentTechnicianId}
@@ -61,13 +66,18 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
       {activeAssignment && (
         <div className="rounded-lg border p-4 text-sm">
           {activeAssignment && (
-              <ScheduleForm
-                assignmentId={activeAssignment.id}
-                scheduledStart={activeAssignment.scheduled_start}
-                scheduledEnd={activeAssignment.scheduled_end}
-                scheduleNotes={activeAssignment.schedule_notes}
-              />
+            <ScheduleForm
+              assignmentId={activeAssignment.id}
+              scheduledStart={activeAssignment.scheduled_start}
+              scheduledEnd={activeAssignment.scheduled_end}
+              scheduleNotes={activeAssignment.schedule_notes}
+            />
           )}
+        </div>
+      )}
+      {showStatusPanel && (
+        <div className="rounded-lg border p-6 shadow-sm">
+          <SupervisorStatusPanel requestId={id} currentStatus={currentStatus} />
         </div>
       )}
     </div>

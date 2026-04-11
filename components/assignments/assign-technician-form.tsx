@@ -94,7 +94,7 @@ export function AssignTechnicianForm({
           />
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="sm:col-span-2">
           <Button
             type="submit"
             disabled={isPending}
