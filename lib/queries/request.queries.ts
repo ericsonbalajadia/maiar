@@ -42,6 +42,10 @@ export async function getRequestById(id: string) {
         id, decision, review_notes, reviewed_at,
         reviewer:users!request_reviews_reviewer_id_fkey ( full_name )
       ),
+      request_assignments (
+        id, assigned_at, completed_at, notes, acceptance_status,
+        technician:users!request_assignments_assigned_user_id_fkey ( id, full_name, email )
+      ),
       status_history (
         id, changed_at, change_reason, metadata,
         old_status:old_status_id ( id, status_name ),
