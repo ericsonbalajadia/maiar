@@ -218,7 +218,7 @@ function TechnicianCard({
               label="Assigned on"
               value={formatDate(assignment.assigned_at)}
             />
-            {assignment.acceptance_status && (
+            {/* {assignment.acceptance_status && (
               <InfoRow
                 label="Acceptance"
                 value={
@@ -235,7 +235,7 @@ function TechnicianCard({
                   </span>
                 }
               />
-            )}
+            )} */}
             {assignment.notes && (
               <div className="pt-2">
                 <p className="text-xs text-slate-400 mb-1">Notes</p>
