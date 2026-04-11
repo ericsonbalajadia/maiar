@@ -385,64 +385,72 @@ export async function getRecentRequests(): Promise<RequestWithRelations[]> {
 
 export async function getRequesterStats(): Promise<RequesterStats> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  const empty: RequesterStats = {
+  // Define the default empty stats object
+  const emptyStats: RequesterStats = {
     total: 0,
     pending: 0,
     inProgress: 0,
     completed: 0,
     awaitingFeedback: 0,
   };
-  if (!user) return empty;
+
+  if (!user) return emptyStats;
 
   const { data: dbUser } = await supabase
     .from("users")
     .select("id")
     .eq("auth_id", user.id)
     .single();
-  if (!dbUser) return empty;
+  if (!dbUser) return emptyStats;
 
+  // Get status IDs once
   const { data: statuses } = await supabase
     .from("statuses")
     .select("id, status_name")
     .eq("is_active", true);
+  if (!statuses) return emptyStats;
 
-  const statusMap = Object.fromEntries(
-    (statuses ?? []).map((s) => [s.status_name.toLowerCase(), s.id]),
-  );
+  const statusMap = new Map<string, string>();
+  for (const s of statuses) {
+    statusMap.set(s.status_name.toLowerCase(), s.id);
+  }
 
-  const { data: requests, error } = await supabase
-    .from("requests")
-    .select("id, status_id, created_at")
-    .eq("requester_id", dbUser.id);
+  // Helper to safely get status ID or return undefined
+  const getStatusId = (name: string): string | undefined => statusMap.get(name);
 
-  if (error || !requests) return empty;
+  const pendingId = getStatusId("pending");
+  const inProgressId = getStatusId("in_progress");
+  const assignedId = getStatusId("assigned");
+  const completedId = getStatusId("completed");
 
-  const total = requests.length;
-  const pending = requests.filter(
-    (r) => r.status_id === statusMap["pending"],
-  ).length;
-  const inProgress = requests.filter(
-    (r) =>
-      r.status_id === statusMap["in progress"] ||
-      r.status_id === statusMap["in_progress"] ||
-      r.status_id === statusMap["assigned"],
-  ).length;
-  const completed = requests.filter(
-    (r) => r.status_id === statusMap["completed"],
-  ).length;
-  const thirtyDaysAgo = new Date(
-    Date.now() - 30 * 24 * 60 * 60 * 1000,
-  ).toISOString();
-  const awaitingFeedback = requests.filter(
-    (r) =>
-      r.status_id === statusMap["completed"] && r.created_at >= thirtyDaysAgo,
-  ).length;
+  // If any required status is missing, return empty (should not happen in a healthy DB)
+  if (!pendingId || !inProgressId || !assignedId || !completedId) {
+    console.error("Missing required statuses in getRequesterStats");
+    return emptyStats;
+  }
 
-  return { total, pending, inProgress, completed, awaitingFeedback };
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const thirtyDaysAgoISO = thirtyDaysAgo.toISOString();
+
+  // Run parallel count queries
+  const [totalResult, pendingResult, inProgressResult, completedResult, awaitingFeedbackResult] = await Promise.all([
+    supabase.from("requests").select("id", { count: "exact", head: true }).eq("requester_id", dbUser.id),
+    supabase.from("requests").select("id", { count: "exact", head: true }).eq("requester_id", dbUser.id).eq("status_id", pendingId),
+    supabase.from("requests").select("id", { count: "exact", head: true }).eq("requester_id", dbUser.id).in("status_id", [inProgressId, assignedId]),
+    supabase.from("requests").select("id", { count: "exact", head: true }).eq("requester_id", dbUser.id).eq("status_id", completedId),
+    supabase.from("requests").select("id", { count: "exact", head: true }).eq("requester_id", dbUser.id).eq("status_id", completedId).gte("created_at", thirtyDaysAgoISO),
+  ]);
+
+  return {
+    total: totalResult.count ?? 0,
+    pending: pendingResult.count ?? 0,
+    inProgress: inProgressResult.count ?? 0,
+    completed: completedResult.count ?? 0,
+    awaitingFeedback: awaitingFeedbackResult.count ?? 0,
+  };
 }
 
 // ─── getRequestById ───────────────────────────────────────────────────────────

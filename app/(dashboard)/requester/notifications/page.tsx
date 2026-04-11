@@ -46,8 +46,10 @@ function PreferenceRow({
 export default async function RequesterNotificationsPage({
   searchParams,
 }: {
-  searchParams: SearchParams
+  searchParams: Promise<SearchParams>
 }) {
+  const { saved } = await searchParams
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -85,7 +87,7 @@ export default async function RequesterNotificationsPage({
         </p>
       </div>
 
-      {searchParams.saved === '1' && (
+      {saved === '1' && (
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-300">
           Your notification preferences were saved.
         </div>
