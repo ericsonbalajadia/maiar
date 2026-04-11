@@ -108,12 +108,12 @@ await serviceSupabase
   try {
     const { data: reqInfo } = await serviceSupabase
       .from('requests')
-      .select('ticket_number, title')
+      .select('ticket_number, title, requester_id')
       .eq('id', requestId)
       .single();
 
     await serviceSupabase.from('notifications').insert({
-      user_id: technicianId,
+      user_id: reqInfo?.requester_id, 
       request_id: requestId,
       type: 'request_assigned',
       subject: `New Assignment: ${reqInfo?.ticket_number}`,
