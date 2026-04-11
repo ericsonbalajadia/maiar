@@ -5,18 +5,21 @@
 //   - Assigned technician name (from request_assignments)
 //   - Scheduled repair date/time (from rmr_details inspection fields)
 
-import { Suspense } from 'react'
-import Link from 'next/link'
-import { redirect, notFound } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import { getRoleDashboard, isRequesterRole } from '@/lib/rbac'
-import { getRequestById } from '@/actions/request/request.actions'
-import { getRequestAssignment } from '@/lib/queries/request.queries'
-import { StatusBadge, RequestTypeBadge } from '@/components/common/status-badge'
-import { StatusTimeline } from '@/components/requests/status-timeline'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import { STATUS_NAMES } from '@/lib/constants/statuses'
+import { Suspense } from "react";
+import Link from "next/link";
+import { redirect, notFound } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { getRoleDashboard, isRequesterRole } from "@/lib/rbac";
+import { getRequestById } from "@/actions/request/request.actions";
+import { getRequestAssignment } from "@/lib/queries/request.queries";
+import {
+  StatusBadge,
+  RequestTypeBadge,
+} from "@/components/common/status-badge";
+import { StatusTimeline } from "@/components/requests/status-timeline";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { STATUS_NAMES } from "@/lib/constants/statuses";
 import {
   ChevronLeft,
   Paperclip,
@@ -27,56 +30,59 @@ import {
   Calendar,
   Clock,
   ClipboardList,
-} from 'lucide-react'
-import type { AssignmentWithTechnician } from '@/lib/queries/request.queries'
-import type { RequestDetail } from '@/types/requests.model'
+} from "lucide-react";
+import type { AssignmentWithTechnician } from "@/lib/queries/request.queries";
+import type { RequestDetail } from "@/types/requests.model";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatDate(dateStr: string | null | undefined) {
-  if (!dateStr) return '—'
-  return new Date(dateStr).toLocaleDateString('en-PH', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
+  if (!dateStr) return "—";
+  return new Date(dateStr).toLocaleDateString("en-PH", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 }
 
 function formatTime(timeStr: string | null | undefined) {
-  if (!timeStr) return '—'
+  if (!timeStr) return "—";
   // timeStr is "HH:MM:SS" from Postgres time type
-  const [hours, minutes] = timeStr.split(':')
-  const date = new Date()
-  date.setHours(parseInt(hours, 10), parseInt(minutes, 10))
-  return date.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' })
+  const [hours, minutes] = timeStr.split(":");
+  const date = new Date();
+  date.setHours(parseInt(hours, 10), parseInt(minutes, 10));
+  return date.toLocaleTimeString("en-PH", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function formatFileSize(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function isWithin30Days(dateStr: string | null | undefined) {
-  if (!dateStr) return false
-  return Date.now() - new Date(dateStr).getTime() <= 30 * 24 * 60 * 60 * 1000
+  if (!dateStr) return false;
+  return Date.now() - new Date(dateStr).getTime() <= 30 * 24 * 60 * 60 * 1000;
 }
 
 // ─── Status Stepper ───────────────────────────────────────────────────────────
 
 const STATUS_FLOW = [
-  { key: STATUS_NAMES.PENDING,      label: 'Pending' },
-  { key: STATUS_NAMES.UNDER_REVIEW, label: 'Under Review' },
-  { key: STATUS_NAMES.APPROVED,     label: 'Approved' },
-  { key: STATUS_NAMES.ASSIGNED,     label: 'Assigned' },
-  { key: STATUS_NAMES.IN_PROGRESS,  label: 'In Progress' },
-  { key: STATUS_NAMES.COMPLETED,    label: 'Completed' },
-]
+  { key: STATUS_NAMES.PENDING, label: "Pending" },
+  { key: STATUS_NAMES.UNDER_REVIEW, label: "Under Review" },
+  { key: STATUS_NAMES.APPROVED, label: "Approved" },
+  { key: STATUS_NAMES.ASSIGNED, label: "Assigned" },
+  { key: STATUS_NAMES.IN_PROGRESS, label: "In Progress" },
+  { key: STATUS_NAMES.COMPLETED, label: "Completed" },
+];
 
 function StatusStepper({ currentStatus }: { currentStatus: string }) {
-  const normalised = currentStatus.toLowerCase().replace(/\s+/g, '_')
-  const isCancelled = normalised === STATUS_NAMES.CANCELLED
-  const currentIndex = STATUS_FLOW.findIndex((s) => s.key === normalised)
+  const normalised = currentStatus.toLowerCase().replace(/\s+/g, "_");
+  const isCancelled = normalised === STATUS_NAMES.CANCELLED;
+  const currentIndex = STATUS_FLOW.findIndex((s) => s.key === normalised);
 
   if (isCancelled) {
     return (
@@ -91,7 +97,7 @@ function StatusStepper({ currentStatus }: { currentStatus: string }) {
           </span>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -101,20 +107,23 @@ function StatusStepper({ currentStatus }: { currentStatus: string }) {
       </h3>
       <div className="flex items-start">
         {STATUS_FLOW.map((step, index) => {
-          const isPast    = index < currentIndex
-          const isCurrent = index === currentIndex
-          const isFuture  = index > currentIndex
+          const isPast = index < currentIndex;
+          const isCurrent = index === currentIndex;
+          const isFuture = index > currentIndex;
 
           return (
-            <div key={step.key} className="flex items-start flex-1 last:flex-none">
+            <div
+              key={step.key}
+              className="flex items-start flex-1 last:flex-none"
+            >
               <div className="flex flex-col items-center gap-2 min-w-0">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center border-2 shrink-0 transition-all ${
                     isPast
-                      ? 'bg-slate-900 dark:bg-white border-slate-900 dark:border-white'
+                      ? "bg-slate-900 dark:bg-white border-slate-900 dark:border-white"
                       : isCurrent
-                      ? 'bg-slate-900 dark:bg-white border-slate-900 dark:border-white'
-                      : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700'
+                        ? "bg-slate-900 dark:bg-white border-slate-900 dark:border-white"
+                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
                   }`}
                 >
                   {isPast ? (
@@ -128,10 +137,10 @@ function StatusStepper({ currentStatus }: { currentStatus: string }) {
                 <span
                   className={`text-xs text-center leading-tight ${
                     isCurrent
-                      ? 'font-semibold text-slate-900 dark:text-white'
+                      ? "font-semibold text-slate-900 dark:text-white"
                       : isPast
-                      ? 'text-slate-500 dark:text-slate-400'
-                      : 'text-slate-300 dark:text-slate-600'
+                        ? "text-slate-500 dark:text-slate-400"
+                        : "text-slate-300 dark:text-slate-600"
                   }`}
                 >
                   {step.label}
@@ -141,17 +150,17 @@ function StatusStepper({ currentStatus }: { currentStatus: string }) {
                 <div
                   className={`flex-1 h-px mt-4 mx-1 ${
                     index < currentIndex
-                      ? 'bg-slate-900 dark:bg-white'
-                      : 'bg-slate-200 dark:bg-slate-700'
+                      ? "bg-slate-900 dark:bg-white"
+                      : "bg-slate-200 dark:bg-slate-700"
                   }`}
                 />
               )}
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }
 
 // ─── Info Row ─────────────────────────────────────────────────────────────────
@@ -166,7 +175,7 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
         {value}
       </span>
     </div>
-  )
+  );
 }
 
 // ─── Assigned Technician Card ─────────────────────────────────────────────────
@@ -177,22 +186,22 @@ function TechnicianCard({
   assignment: AssignmentWithTechnician | null
 }) {
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
-      <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
-        <User className="h-4 w-4 text-slate-400" />
+    <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl p-5">
+      <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-4 flex items-center gap-2">
+        <User className="h-4 w-4 text-blue-500" />
         Assigned Technician
       </h3>
 
       {!assignment || !assignment.assigned_user ? (
         <div className="flex items-center gap-3 py-2">
-          <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-            <User className="h-4 w-4 text-slate-300 dark:text-slate-600" />
+          <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-800 flex items-center justify-center shrink-0">
+            <User className="h-4 w-4 text-blue-400 dark:text-blue-300" />
           </div>
           <div>
-            <p className="text-sm text-slate-400 dark:text-slate-500 italic">
+            <p className="text-sm text-blue-600 dark:text-blue-400 italic">
               Not yet assigned
             </p>
-            <p className="text-xs text-slate-300 dark:text-slate-600 mt-0.5">
+            <p className="text-xs text-blue-500 dark:text-blue-500 mt-0.5">
               A technician will be assigned after review.
             </p>
           </div>
@@ -200,46 +209,32 @@ function TechnicianCard({
       ) : (
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-slate-900 dark:bg-white flex items-center justify-center shrink-0 text-white dark:text-slate-900 text-sm font-bold uppercase">
+            <div className="w-9 h-9 rounded-full bg-blue-900 dark:bg-white flex items-center justify-center shrink-0 text-white dark:text-blue-900 text-sm font-bold uppercase">
               {assignment.assigned_user.full_name.charAt(0)}
             </div>
             <div>
-              <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+              <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
                 {assignment.assigned_user.full_name}
               </p>
-              <p className="text-xs text-slate-400 capitalize">
+              <p className="text-xs text-blue-600 dark:text-blue-400 capitalize">
                 {assignment.assigned_user.role}
               </p>
             </div>
           </div>
 
-          <div className="divide-y divide-slate-50 dark:divide-slate-800">
-            <InfoRow
-              label="Assigned on"
-              value={formatDate(assignment.assigned_at)}
-            />
-            {/* {assignment.acceptance_status && (
-              <InfoRow
-                label="Acceptance"
-                value={
-                  <span
-                    className={`capitalize ${
-                      assignment.acceptance_status === 'accepted'
-                        ? 'text-emerald-600 dark:text-emerald-400'
-                        : assignment.acceptance_status === 'rejected'
-                        ? 'text-red-600 dark:text-red-400'
-                        : 'text-amber-600 dark:text-amber-400'
-                    }`}
-                  >
-                    {assignment.acceptance_status}
-                  </span>
-                }
-              />
-            )} */}
+          <div className="divide-y divide-blue-100 dark:divide-blue-800">
+            <div className="py-1.5">
+              <span className="text-blue-700 dark:text-blue-400 font-medium text-sm">Assigned on:</span>{' '}
+              <span className="text-blue-900 dark:text-blue-100 text-sm">
+                {formatDate(assignment.assigned_at)}
+              </span>
+            </div>
             {assignment.notes && (
               <div className="pt-2">
-                <p className="text-xs text-slate-400 mb-1">Notes</p>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
+                <p className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-1">
+                  Notes
+                </p>
+                <p className="text-sm text-blue-800 dark:text-blue-200">
                   {assignment.notes}
                 </p>
               </div>
@@ -254,7 +249,7 @@ function TechnicianCard({
 // ─── Scheduled Date Card ──────────────────────────────────────────────────────
 
 function ScheduledDateCard({ request }: { request: RequestDetail }) {
-  const rmr = request.rmr_details
+  const rmr = request.rmr_details;
 
   // For RMR: inspection_date + time fields + schedule_notes
   // For PPSR: estimated_completion_date on the request itself
@@ -262,22 +257,12 @@ function ScheduledDateCard({ request }: { request: RequestDetail }) {
 
   const hasRmrSchedule =
     rmr &&
-    (rmr.inspection_date || rmr.inspection_time_start || rmr.schedule_notes)
+    (rmr.inspection_date || rmr.inspection_time_start || rmr.schedule_notes);
 
-  const hasEstimatedCompletion = !!request.estimated_completion_date
+  const hasEstimatedCompletion = !!request.estimated_completion_date;
 
   if (!hasRmrSchedule && !hasEstimatedCompletion) {
-    return (
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
-        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-slate-400" />
-          Schedule
-        </h3>
-        <p className="text-sm text-slate-400 dark:text-slate-500 italic py-2">
-          No schedule has been set yet.
-        </p>
-      </div>
-    )
+    return null;
   }
 
   return (
@@ -360,7 +345,7 @@ function ScheduledDateCard({ request }: { request: RequestDetail }) {
         )}
       </div>
     </div>
-  )
+  );
 }
 
 // ─── Feedback Prompt ──────────────────────────────────────────────────────────
@@ -380,7 +365,8 @@ function FeedbackPrompt({ requestId }: { requestId: string }) {
             How did we do?
           </h3>
           <p className="text-xs text-amber-700 dark:text-amber-400 mb-3">
-            Your request has been completed. Share your feedback — it helps us improve.
+            Your request has been completed. Share your feedback — it helps us
+            improve.
           </p>
           <Button
             size="sm"
@@ -396,7 +382,7 @@ function FeedbackPrompt({ requestId }: { requestId: string }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
@@ -418,7 +404,81 @@ function DetailSkeleton() {
       <Skeleton className="h-48 rounded-xl" />
       <Skeleton className="h-40 rounded-xl" />
     </div>
-  )
+  );
+}
+
+// ─── Assignment Schedule Card (FR 3.0) ───────────────────────────────────────
+
+function AssignmentScheduleCard({
+  assignment,
+}: {
+  assignment: AssignmentWithTechnician | null;
+}) {
+  if (!assignment?.scheduled_start) {
+    return null;
+  }
+
+  const start = new Date(assignment.scheduled_start);
+  const end = assignment.scheduled_end
+    ? new Date(assignment.scheduled_end)
+    : null;
+
+  return (
+    <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl p-5">
+      <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-4 flex items-center gap-2">
+        <Calendar className="h-4 w-4 text-blue-500" />
+        Scheduled Repair Window
+      </h3>
+      <div className="space-y-3">
+        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+          <div>
+            <span className="text-blue-700 dark:text-blue-400 font-medium">
+              Start:
+            </span>{" "}
+            <span className="text-blue-900 dark:text-blue-100">
+              {start.toLocaleString("en-PH", {
+                dateStyle: "medium",
+                timeStyle: "short",
+              })}
+            </span>
+          </div>
+          {end && (
+            <div>
+              <span className="text-blue-700 dark:text-blue-400 font-medium">
+                End:
+              </span>{" "}
+              <span className="text-blue-900 dark:text-blue-100">
+                {end.toLocaleString("en-PH", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
+              </span>
+            </div>
+          )}
+        </div>
+        {assignment.schedule_notes && (
+          <div className="pt-2 border-t border-blue-100 dark:border-blue-800">
+            <p className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+              Notes
+            </p>
+            <p className="text-sm text-blue-800 dark:text-blue-200 mt-1">
+              {assignment.schedule_notes}
+            </p>
+          </div>
+        )}
+        {assignment.assigned_user && (
+          <div className="pt-2 border-t border-blue-100 dark:border-blue-800">
+            <p className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+              Assigned Technician
+            </p>
+            <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mt-1">
+              {assignment.assigned_user.full_name}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 // ─── Main Content (async) ─────────────────────────────────────────────────────
@@ -428,26 +488,26 @@ async function RequestDetailContent({ id }: { id: string }) {
   const [request, assignmentResult] = await Promise.all([
     getRequestById(id),
     getRequestAssignment(id),
-  ])
+  ]);
 
-  if (!request) notFound()
+  if (!request) notFound();
 
-  const currentStatusName = request.statuses?.status_name ?? 'pending'
-  const isCompleted = currentStatusName === STATUS_NAMES.COMPLETED
-  const showFeedback = isCompleted && isWithin30Days(request.actual_completion_date)
+  const currentStatusName = request.statuses?.status_name ?? "pending";
+  const isCompleted = currentStatusName === STATUS_NAMES.COMPLETED;
+  const showFeedback =
+    isCompleted && isWithin30Days(request.actual_completion_date);
 
-  const rmr  = request.rmr_details
-  const ppsr = request.ppsr_details
-  const hasInspection = rmr && (rmr.inspection_date || rmr.inspector_notes)
+  const rmr = request.rmr_details;
+  const ppsr = request.ppsr_details;
+  const hasInspection = rmr && (rmr.inspection_date || rmr.inspector_notes);
 
-  const assignment = assignmentResult.data as AssignmentWithTechnician | null
+  const assignment = assignmentResult.data as AssignmentWithTechnician | null;
 
   // status_history is already embedded in the request object from getRequestById
-  const history = (request.status_history ?? []) as any[]
+  const history = (request.status_history ?? []) as any[];
 
   return (
     <div className="space-y-5">
-
       {/* ── Title row ── */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
@@ -457,7 +517,9 @@ async function RequestDetailContent({ id }: { id: string }) {
             </h1>
             <StatusBadge status={currentStatusName} />
           </div>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Request Details</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Request Details
+          </p>
         </div>
         <RequestTypeBadge type={request.request_type} showFull />
       </div>
@@ -470,7 +532,6 @@ async function RequestDetailContent({ id }: { id: string }) {
 
       {/* ── Two-column: Request info + Work details ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-
         {/* Request Information */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">
@@ -484,7 +545,7 @@ async function RequestDetailContent({ id }: { id: string }) {
             <InfoRow label="Date" value={formatDate(request.created_at)} />
             <InfoRow
               label="Building"
-              value={request.locations?.building_name ?? '—'}
+              value={request.locations?.building_name ?? "—"}
             />
             <InfoRow
               label="Location"
@@ -496,13 +557,16 @@ async function RequestDetailContent({ id }: { id: string }) {
                     `Room ${request.locations.room_number}`,
                 ]
                   .filter(Boolean)
-                  .join(', ') || '—'
+                  .join(", ") || "—"
               }
             />
-            <InfoRow label="Requester" value={request.requester?.full_name ?? '—'} />
+            <InfoRow
+              label="Requester"
+              value={request.requester?.full_name ?? "—"}
+            />
             <InfoRow
               label="Department"
-              value={request.requester?.department ?? '—'}
+              value={request.requester?.department ?? "—"}
             />
             <InfoRow
               label="Email"
@@ -511,7 +575,7 @@ async function RequestDetailContent({ id }: { id: string }) {
                   href={`mailto:${request.requester?.email}`}
                   className="text-blue-600 dark:text-blue-400 hover:underline"
                 >
-                  {request.requester?.email ?? '—'}
+                  {request.requester?.email ?? "—"}
                 </a>
               }
             />
@@ -526,20 +590,22 @@ async function RequestDetailContent({ id }: { id: string }) {
           <div className="space-y-3">
             <div>
               <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">
-                {request.request_type === 'rmr' ? 'Nature of Work' : 'Service Type'}
+                {request.request_type === "rmr"
+                  ? "Nature of Work"
+                  : "Service Type"}
               </p>
-              {request.request_type === 'rmr' ? (
+              {request.request_type === "rmr" ? (
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                    {request.categories?.category_name ?? '—'}
+                    {request.categories?.category_name ?? "—"}
                   </span>
                 </div>
               ) : ppsr ? (
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-300 capitalize">
-                    {ppsr.service_type.replace(/_/g, ' ')}
+                    {ppsr.service_type.replace(/_/g, " ")}
                   </span>
                 </div>
               ) : (
@@ -548,20 +614,20 @@ async function RequestDetailContent({ id }: { id: string }) {
             </div>
 
             {/* PPSR service_data fields */}
-            {ppsr?.service_data && typeof ppsr.service_data === 'object' && (
+            {ppsr?.service_data && typeof ppsr.service_data === "object" && (
               <div className="mt-2 space-y-1">
                 {Object.entries(ppsr.service_data as Record<string, unknown>)
-                  .filter(([, v]) => v !== null && v !== undefined && v !== '')
+                  .filter(([, v]) => v !== null && v !== undefined && v !== "")
                   .map(([key, val]) => (
                     <div key={key} className="flex gap-2 text-sm">
                       <span className="text-slate-400 min-w-[160px] shrink-0 capitalize">
-                        {key.replace(/_/g, ' ')}:
+                        {key.replace(/_/g, " ")}:
                       </span>
                       <span className="font-medium text-slate-700 dark:text-slate-300">
-                        {typeof val === 'boolean'
+                        {typeof val === "boolean"
                           ? val
-                            ? 'Yes'
-                            : 'No'
+                            ? "Yes"
+                            : "No"
                           : String(val)}
                       </span>
                     </div>
@@ -575,7 +641,7 @@ async function RequestDetailContent({ id }: { id: string }) {
                 Description
               </p>
               <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-wrap">
-                {request.description ?? 'No description provided.'}
+                {request.description ?? "No description provided."}
               </p>
             </div>
           </div>
@@ -584,12 +650,19 @@ async function RequestDetailContent({ id }: { id: string }) {
 
       {/* ── Two-column: Technician + Schedule ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Left: Technician Card */}
         <TechnicianCard assignment={assignment} />
-        <ScheduledDateCard request={request} />
+
+        {/* Right: Schedule Card – prefer assignment schedule, fallback to legacy */}
+        {assignment?.scheduled_start ? (
+          <AssignmentScheduleCard assignment={assignment} />
+        ) : (
+          <ScheduledDateCard request={request} />
+        )}
       </div>
 
       {/* ── Inspection Report (RMR only, if filled) ── */}
-      {request.request_type === 'rmr' && rmr && hasInspection && (
+      {request.request_type === "rmr" && rmr && hasInspection && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
             <Wrench className="h-4 w-4 text-slate-400" />
@@ -600,10 +673,16 @@ async function RequestDetailContent({ id }: { id: string }) {
               <InfoRow label="Date" value={formatDate(rmr.inspection_date)} />
             )}
             {rmr.inspection_time_start && (
-              <InfoRow label="Time Start" value={formatTime(rmr.inspection_time_start)} />
+              <InfoRow
+                label="Time Start"
+                value={formatTime(rmr.inspection_time_start)}
+              />
             )}
             {rmr.inspection_time_end && (
-              <InfoRow label="Time End" value={formatTime(rmr.inspection_time_end)} />
+              <InfoRow
+                label="Time End"
+                value={formatTime(rmr.inspection_time_end)}
+              />
             )}
             {rmr.repair_mode && (
               <InfoRow label="Repair Mode" value={rmr.repair_mode} />
@@ -614,7 +693,7 @@ async function RequestDetailContent({ id }: { id: string }) {
             {rmr.materials_available !== null && (
               <InfoRow
                 label="Materials"
-                value={rmr.materials_available ? 'Available' : 'Not available'}
+                value={rmr.materials_available ? "Available" : "Not available"}
               />
             )}
             {rmr.manpower_required !== null && (
@@ -653,7 +732,9 @@ async function RequestDetailContent({ id }: { id: string }) {
           Attachments
         </h3>
         {!request.attachments || request.attachments.length === 0 ? (
-          <p className="text-sm text-slate-400 italic">No attachments uploaded.</p>
+          <p className="text-sm text-slate-400 italic">
+            No attachments uploaded.
+          </p>
         ) : (
           <div className="space-y-2">
             {request.attachments.map((file) => (
@@ -684,7 +765,7 @@ async function RequestDetailContent({ id }: { id: string }) {
         )}
       </div>
     </div>
-  )
+  );
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -692,24 +773,25 @@ async function RequestDetailContent({ id }: { id: string }) {
 export default async function RequestDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }) {
-  const supabase = await createClient()
+  const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
 
   const { data: dbUser } = await supabase
-    .from('users')
-    .select('role, signup_status')
-    .eq('auth_id', user.id)
-    .single()
+    .from("users")
+    .select("role, signup_status")
+    .eq("auth_id", user.id)
+    .single();
 
-  if (!dbUser || dbUser.signup_status !== 'approved') redirect('/pending-approval')
-  if (!isRequesterRole(dbUser.role)) redirect(getRoleDashboard(dbUser.role))
+  if (!dbUser || dbUser.signup_status !== "approved")
+    redirect("/pending-approval");
+  if (!isRequesterRole(dbUser.role)) redirect(getRoleDashboard(dbUser.role));
 
-  const { id } = await params
+  const { id } = await params;
 
   return (
     <div className="max-w-5xl mx-auto space-y-5">
@@ -728,5 +810,5 @@ export default async function RequestDetailPage({
         <RequestDetailContent id={id} />
       </Suspense>
     </div>
-  )
+  );
 }
