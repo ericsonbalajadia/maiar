@@ -1,3 +1,4 @@
+//app/(dashboard)/supervisor/page.tsx
 import { getAuthUser } from '@/lib/auth'
 import { SUPERVISOR_ASSIGNMENT_ROLES } from '@/lib/rbac'
 import { getRequestsForSupervisor } from '@/lib/queries/request.queries'
@@ -12,10 +13,7 @@ export default async function SupervisorDashboardPage() {
   const assigned = requests?.filter((r) => r.status.status_name === 'assigned') ?? []
   const inProgress = requests?.filter((r) => r.status.status_name === 'in_progress') ?? []
 
-  const getHref = (statusName: string, id: string) =>
-    statusName === 'in_progress'
-      ? `/supervisor/requests/${id}/verify`
-      : `/supervisor/requests/${id}/assign`
+  const getHref = (statusName: string, id: string) => `/supervisor/requests/${id}`
 
   return (
     <div className="space-y-8">
