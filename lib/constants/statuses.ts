@@ -28,3 +28,20 @@ export const CLERK_ALLOWED_TRANSITIONS: Record<string, string[]> = {
 };
 
 export const CLERK_NOTES_REQUIRED: string[] = ['rejected', 'cancelled'];
+
+// ─── Supervisor / Assignment transitions ───────────────────────────────────
+export const SUPERVISOR_ALLOWED_TRANSITIONS: Record<string, string[]> = {
+   approved: ['assigned', 'cancelled'],
+   assigned: ['in_progress', 'cancelled'],
+   in_progress: ['completed', 'cancelled'],
+ };
+
+ export const SUPERVISOR_NOTES_REQUIRED: string[] = ['cancelled'];
+
+// ─── Technician transitions ────────────────────────────────────────────────
+export const TECHNICIAN_ALLOWED_TRANSITIONS: Record<string, string[]> = {
+   assigned: ['in_progress'],
+   in_progress: ['completed'],
+ };
+
+export const TECHNICIAN_NOTES_REQUIRED: string[] = [];

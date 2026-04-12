@@ -10,6 +10,7 @@ import type { StatusHistoryEntry } from '@/lib/types/tracking';
 
 interface RequestDetailPanelProps {
   request: RequestDetail;
+  hideStatusPanel?: boolean;
 }
 
 function mapToStatusHistoryEntry(history: NonNullable<RequestDetail['status_history']>): StatusHistoryEntry[] {
@@ -36,7 +37,7 @@ function mapToStatusHistoryEntry(history: NonNullable<RequestDetail['status_hist
   }));
 }
 
-export function RequestDetailPanel({ request }: RequestDetailPanelProps) {
+export function RequestDetailPanel({ request, hideStatusPanel = false }: RequestDetailPanelProps){
   const status = request.statuses?.status_name ?? 'unknown';
   const priority = request.priorities?.level ?? 'unknown';
   const requester = request.requester;
@@ -143,12 +144,14 @@ export function RequestDetailPanel({ request }: RequestDetailPanelProps) {
 
       <Separator />
 
-      {/* Status Actions (from FR 2.1) */}
-      <StatusUpdatePanel
-        requestId={request.id}
-        currentStatus={status}
-        ticketNumber={request.ticket_number}
-      />
+       {/* Status Actions – only show if not hidden */}
+      {!hideStatusPanel && (
+        <StatusUpdatePanel
+          requestId={request.id}
+          currentStatus={status}
+          ticketNumber={request.ticket_number}
+        />
+      )}
     </div>
   );
 }
