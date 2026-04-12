@@ -1,17 +1,17 @@
 // lib/queries/request.queries.ts
 import { createClient } from "@/lib/supabase/server";
 import type { RequestWithDetails, RequestSummary } from "@/types/models";
-import type { RequestDetail } from '@/types/requests.model';
-import { createServiceClient } from '@/lib/supabase/service';
-
+import type { RequestDetail } from "@/types/requests.model";
+import { createServiceClient } from "@/lib/supabase/service";
 
 // lib/queries/request.queries.ts
 export async function getRequestById(id: string) {
   const supabase = createServiceClient();
 
   const { data, error } = await supabase
-    .from('requests')
-    .select(`
+    .from("requests")
+    .select(
+      `
       id,
       ticket_number,
       title,
@@ -44,6 +44,7 @@ export async function getRequestById(id: string) {
       ),
       request_assignments (
         id, assigned_at, completed_at, notes, acceptance_status,
+        scheduled_start, scheduled_end, schedule_notes,
         technician:users!request_assignments_assigned_user_id_fkey ( id, full_name, email )
       ),
       status_history (
@@ -52,15 +53,16 @@ export async function getRequestById(id: string) {
         new_status:new_status_id ( id, status_name ),
         changed_by_user:changed_by ( id, full_name, role )
       )
-    `)
-    .eq('id', id)
+    `,
+    )
+    .eq("id", id)
     .maybeSingle();
 
-    console.log('DEBUG getRequestById - requester field:', data?.requester);
-console.log('DEBUG full data keys:', Object.keys(data || {}));
+  console.log("DEBUG getRequestById - requester field:", data?.requester);
+  console.log("DEBUG full data keys:", Object.keys(data || {}));
 
   if (error) {
-    console.error('getRequestById error:', error);
+    console.error("getRequestById error:", error);
     return { data: null, error };
   }
 
@@ -174,14 +176,17 @@ export async function getRequestsForTechnician(technicianId: string) {
   return { data, error };
 }
 
-export async function getCurrentAssignment(requestId: string, technicianId: string) {
+export async function getCurrentAssignment(
+  requestId: string,
+  technicianId: string,
+) {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('request_assignments')
-    .select('id, acceptance_status, notes')
-    .eq('request_id', requestId)
-    .eq('assigned_user_id', technicianId)
-    .eq('is_current_assignment', true)
+    .from("request_assignments")
+    .select("id, acceptance_status, notes")
+    .eq("request_id", requestId)
+    .eq("assigned_user_id", technicianId)
+    .eq("is_current_assignment", true)
     .maybeSingle(); // returns null if not found
   return { data, error };
 }
@@ -195,11 +200,17 @@ export async function getRequestAssignment(requestId: string) {
   const supabase = createServiceClient(); // ← use service client
 
   const { data, error } = await supabase
-    .from('request_assignments')
-    .select(`
+    .from("request_assignments")
+    .select(
+      `
       id,
       assigned_at,
+      completed_at,
       acceptance_status,
+      acceptance_status,
+      scheduled_start,
+      scheduled_end,
+      schedule_notes,
       notes,
       is_current_assignment,
       assigned_user:users!assigned_user_id (
@@ -207,25 +218,29 @@ export async function getRequestAssignment(requestId: string) {
         full_name,
         role
       )
-    `)
-    .eq('request_id', requestId)
-    .eq('is_current_assignment', true)
-    .order('assigned_at', { ascending: false })
+    `,
+    )
+    .eq("request_id", requestId)
+    .eq("is_current_assignment", true)
+    .order("assigned_at", { ascending: false })
     .maybeSingle();
 
   return { data, error };
 }
- 
+
 // Shape returned by getRequestAssignment:
 export type AssignmentWithTechnician = {
-  id: string
-  assigned_at: string
-  acceptance_status: string | null
-  notes: string | null
-  is_current_assignment: boolean
+  id: string;
+  assigned_at: string;
+  acceptance_status: string | null;
+  notes: string | null;
+  is_current_assignment: boolean;
+  scheduled_start: string | null;
+  scheduled_end: string | null;
+  schedule_notes: string | null;
   assigned_user: {
-    id: string
-    full_name: string
-    role: string
-  } | null
-}
+    id: string;
+    full_name: string;
+    role: string;
+  } | null;
+};

@@ -313,7 +313,34 @@ export type RequestAssignment = {
   notes: string | null
   created_at: string
   updated_at: string
+  scheduled_start: string | null;
+  scheduled_end: string | null;
+  schedule_notes: string | null;
+  technician: {
+    id: string;
+    full_name: string;
+    email: string;
+  } | null;
 }
+
+// ─── Assignment with Technician Details ───────────────────────────────────────
+
+export type AssignmentWithTechnician = {
+  id: string;
+  assigned_at: string;
+  completed_at: string | null;
+  notes: string | null;
+  acceptance_status: string;
+  scheduled_start: string | null;
+  scheduled_end: string | null;
+  schedule_notes: string | null;
+  assigned_user: {
+    id: string;
+    full_name: string;
+    email: string;
+    role: string;
+  } | null;
+};
 
 // ─── Full Request Detail (for detail page) ────────────────────────────────────
 
@@ -334,7 +361,7 @@ export type RequestDetail = {
   created_at: string;
   updated_at: string;
 
-  // Joined relations (from Supabase select)
+  // Joined relations
   statuses: { status_name: string } | null;
   locations: { building_name: string; floor_level: string | null; room_number: string | null } | null;
   categories: { category_name: string } | null;
@@ -342,7 +369,7 @@ export type RequestDetail = {
   requester: { full_name: string; email: string; department: string | null } | null;
   assigned_technician: { full_name: string; email: string; role: string } | null;
 
-  // Detail tables (optional, typed as any for now – replace with proper types later)
+  // Detail tables
   rmr_details: any | null;
   ppsr_details: any | null;
 
@@ -350,6 +377,23 @@ export type RequestDetail = {
   request_reviews?: JoinedRequestReview[] | null;
   attachments?: JoinedAttachment[] | null;
   status_history?: JoinedStatusHistory[] | null;
+
+  // Phase 5 additions
+  request_assignments?: Array<{
+    id: string;
+    assigned_at: string;
+    completed_at: string | null;
+    notes: string | null;
+    acceptance_status: string;
+    scheduled_start: string | null;
+    scheduled_end: string | null;
+    schedule_notes: string | null;
+    technician: {
+      id: string;
+      full_name: string;
+      email: string;
+    } | null;
+  }> | null;
 };
 
 // ─── Form Input Types ─────────────────────────────────────────────────────────
