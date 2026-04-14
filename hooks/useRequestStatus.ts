@@ -1,4 +1,3 @@
-// hooks/useRequestStatus.ts
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -32,7 +31,7 @@ export function useRequestStatus(
           table: 'requests',
           filter: `id=eq.${requestId}`,
         },
-        async (payload) => {
+        async (payload: any) => {   // ← Added explicit `any` type
           const newStatusId = (payload.new as { status_id: string }).status_id;
           const { data } = await supabase
             .from('statuses')
