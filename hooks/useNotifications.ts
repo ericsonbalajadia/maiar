@@ -1,4 +1,3 @@
-// hooks/useNotifications.ts
 'use client';
 
 import { useEffect } from 'react';
@@ -30,7 +29,7 @@ export function useNotifications(userId: string) {
           table: 'notifications',
           filter: `user_id=eq.${userId}`,
         },
-        (payload) => {
+        (payload: any) => {   // ← Added explicit `any` type
           increment();
           // Extend: trigger a toast library here if needed
           // e.g., toast.info(payload.new.subject)
