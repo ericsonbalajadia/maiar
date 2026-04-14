@@ -55,7 +55,6 @@ export default async function PpsrRequestPage() {
       </div>
 
       <PpsrForm
-        locations={locations ?? []}
         dbUser={dbUser}
       />
     </div>
