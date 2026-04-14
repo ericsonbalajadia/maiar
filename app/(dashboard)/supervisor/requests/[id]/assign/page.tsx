@@ -1,6 +1,5 @@
-// app/(dashboard)/supervisor/requests/[id]/assign/page.tsx
 import { getRequestById } from '@/lib/queries/request.queries';
-import { getActiveTechnicians } from '@/lib/queries/lookup.queries';
+import { getAvailableTechnicians } from '@/lib/queries/technician.queries'; // changed import
 import { notFound } from 'next/navigation';
 import { AssignTechnicianForm } from '@/components/assignments/assign-technician-form';
 import { StatusBadge } from '@/components/requests/statusBadge';
@@ -12,13 +11,15 @@ interface Props {
 
 export default async function SupervisorAssignPage({ params }: Props) {
   const { id } = await params;
-  const [{ data: request }, { data: technicians }] = await Promise.all([
+  const [{ data: request }, technicians] = await Promise.all([
     getRequestById(id),
-    getActiveTechnicians(),
+    getAvailableTechnicians(), // now returns AvailableTechnician[]
   ]);
   if (!request) notFound();
 
   const currentStatus = request.statuses?.status_name ?? 'pending';
+  const currentAssignment = request.request_assignments?.find(a => !a.completed_at);
+  const currentTechnicianId = currentAssignment?.technician?.id ?? null;
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -40,7 +41,9 @@ export default async function SupervisorAssignPage({ params }: Props) {
 
       <AssignTechnicianForm
         requestId={id}
-        technicians={technicians ?? []}
+        technicians={technicians}
+        currentAssignedId={currentTechnicianId}
+        ticketNumber={request.ticket_number}
       />
     </div>
   );
