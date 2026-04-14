@@ -173,21 +173,17 @@ export async function createRequest(
   if (!pendingStatusId)
     return { error: "System error: pending status not found." };
 
-  // Resolve or create location ID
-  let locationId: string | null = null;
-  if (type === "rmr") {
-    const { location_building, location_floor, location_room } = input;
-    locationId = await resolveOrCreateLocation(
-      location_building,
-      location_floor ?? "",
-      location_room ?? "",
-    );
-    if (!locationId) return { error: "Failed to resolve or create location." };
-  } else {
-    // PPSR: input should already have location_id (but we can also resolve if needed)
-    locationId = input.location_id;
-    if (!locationId) return { error: "Location ID is required for PPSR." };
+  // Resolve or create location ID from free‑text fields (works for both RMR and PPSR)
+  const { location_building, location_floor, location_room } = input as any;
+  if (!location_building || location_building.trim() === "") {
+    return { error: "Building name is required." };
   }
+  const locationId = await resolveOrCreateLocation(
+    location_building,
+    location_floor ?? "",
+    location_room ?? "",
+  );
+  if (!locationId) return { error: "Failed to resolve or create location." };
 
   const payload: any = {
     requester_id: dbUser.id,

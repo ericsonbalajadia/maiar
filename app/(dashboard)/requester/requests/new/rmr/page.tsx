@@ -66,7 +66,6 @@ export default async function RmrRequestPage() {
 
       <RmrForm
         categories={categories ?? []}
-        locations={locations ?? []}
         dbUser={dbUser}
       />
     </div>

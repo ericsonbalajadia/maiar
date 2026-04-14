@@ -27,7 +27,7 @@ export default async function NewRequestPage() {
       <NewRequestForm
         locations={locations ?? []}
         categories={categories ?? []}
-        priorities={priorities ?? []}
+        //priorities={priorities ?? []}
       />
     </div>
   );
