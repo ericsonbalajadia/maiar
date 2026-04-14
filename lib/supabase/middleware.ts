@@ -3,9 +3,11 @@ import { type NextRequest, NextResponse } from 'next/server'
 import type { Database } from '@/types/database.types'
 
 export function createMiddlewareClient(request: NextRequest, response: NextResponse) {
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseKey!,
     {
       cookies: {
         getAll() {

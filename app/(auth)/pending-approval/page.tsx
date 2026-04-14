@@ -4,6 +4,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { getRoleDashboard } from '@/lib/rbac'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2 } from 'lucide-react'
 
@@ -29,17 +30,7 @@ export default function PendingApprovalPage() {
         .single()
 
       if (dbUser?.signup_status === 'approved') {
-        // Redirect to role dashboard
-        const roleDashboards: Record<string, string> = {
-          student: '/requester',
-          staff: '/requester',
-          clerk: '/clerk',
-          technician: '/technician',
-          supervisor: '/supervisor',
-          admin: '/admin',
-        }
-
-        router.push(roleDashboards[dbUser.role] ?? '/requester')
+        router.push(getRoleDashboard(dbUser.role))
       }
     }
 
