@@ -1,3 +1,4 @@
+//app/(dashboard)/supervisor/requests/page.tsx
 import { getFilteredRequests } from '@/lib/queries/request.queries';
 import { RequestsTable } from '@/components/requests/requests-table';
 
@@ -6,28 +7,56 @@ interface Props {
 }
 
 export default async function SupervisorAllRequestsPage({ searchParams }: Props) {
-  const sp = await searchParams;
-  const page = Number(sp.page ?? 1);
+const sp = await searchParams;
+const page = Number(sp.page ?? 1);
+const month = sp.month;
+const year = sp.year;
 
-  const { data, totalPages } = await getFilteredRequests({
-    role: 'supervisor',
-    status: sp.status,
-    priority: sp.priority,
-    search: sp.search,
-    page,
-  });
+// Convert month/year to date range
+let startDate: string | undefined;
+let endDate: string | undefined;
+if (month && year) {
+  const start = new Date(Number(year), Number(month) - 1, 1);
+  const end = new Date(Number(year), Number(month), 0);
+  startDate = start.toISOString().split('T')[0];
+  endDate = end.toISOString().split('T')[0];
+} else if (year) {
+  startDate = `${year}-01-01`;
+  endDate = `${year}-12-31`;
+} else if (month) {
+  const currentYear = new Date().getFullYear();
+  const start = new Date(currentYear, Number(month) - 1, 1);
+  const end = new Date(currentYear, Number(month), 0);
+  startDate = start.toISOString().split('T')[0];
+  endDate = end.toISOString().split('T')[0];
+}
 
-  // Transform: Supabase returns arrays for relations; extract first element
+const { data, error, totalPages } = await getFilteredRequests({
+  role: 'supervisor',
+  status: sp.status,
+  priority: sp.priority,
+  search: sp.search,
+  startDate,
+  endDate,
+  page,
+});
+
+if (error) {
+  console.error('Query error details:', error);
+}
+
+  // Transform: relations are already single objects (not arrays)
   const transformedRequests = (data ?? []).map((item: any) => ({
     id: item.id,
     ticket_number: item.ticket_number,
     title: item.title,
     created_at: item.created_at,
     updated_at: item.updated_at,
-    status: item.status ?? null,      // already an object or null
-    priority: item.priority ?? null,  // already an object or null
-    category: item.category ?? null,  // already an object or null
-    requester: item.requester ?? null,// already an object or null
+    request_type: item.request_type,
+    status: item.status ?? null,
+    priority: item.priority ?? null,
+    category: item.category ?? null,
+    requester: item.requester ?? null,
   }));
 
   return (
