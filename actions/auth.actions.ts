@@ -104,7 +104,7 @@ export async function registerUser(
     })
   }
 
-  redirect('/pending-approval')
+  redirect('/check-email')
 }
 
 export async function loginUser(
@@ -136,6 +136,9 @@ export async function loginUser(
   console.log('signInWithPassword result:', { authData, authError })
 
   if (authError || !authData.user) {
+    if (authError?.message && /email.*confirm|confirm.*email|not confirmed/i.test(authError.message)) {
+      return { errors: { form: ['Please verify your email address. Check your inbox for the confirmation link.'] } }
+    }
     return { errors: { form: ['Invalid email or password'] } }
   }
 
