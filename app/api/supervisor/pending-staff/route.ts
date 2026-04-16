@@ -23,12 +23,12 @@ export async function GET() {
     return NextResponse.json({ error: 'Only supervisors can view pending staff' }, { status: 403 });
   }
 
-  // Fetch pending clerks and technicians
+  // Fetch pending requester and staff account applications
   const { data, error } = await admin
     .from('users')
     .select('id, email, full_name, role, department, created_at')
     .eq('signup_status', 'pending')
-    .in('role', ['clerk', 'technician'])
+    .in('role', ['student', 'staff', 'clerk', 'technician'])
     .order('created_at', { ascending: true });
 
   if (error) {

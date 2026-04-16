@@ -42,7 +42,7 @@ export const APPROVAL_PERMISSIONS: Partial<Record<UserRole, readonly UserRole[]>
         ROLES.TECHNICIAN,
         ROLES.SUPERVISOR,
     ],
-    supervisor: [ROLES.CLERK, ROLES.TECHNICIAN],
+    supervisor: [ROLES.STUDENT, ROLES.STAFF, ROLES.CLERK, ROLES.TECHNICIAN],
     clerk: [ROLES.STUDENT, ROLES.STAFF],
 }
 

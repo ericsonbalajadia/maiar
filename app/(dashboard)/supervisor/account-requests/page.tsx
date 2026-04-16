@@ -40,14 +40,14 @@ export default function SupervisorAccountRequestsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Staff Account Requests</h1>
-        <p className="text-slate-500">{users.length} staff member(s) awaiting approval</p>
+        <h1 className="text-2xl font-bold">Account Requests</h1>
+        <p className="text-slate-500">{users.length} account request(s) awaiting approval</p>
       </div>
 
       {users.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-slate-400">
-            No pending requests. All staff registrations have been reviewed.
+            No pending requests. All account registrations have been reviewed.
           </CardContent>
         </Card>
       ) : (
