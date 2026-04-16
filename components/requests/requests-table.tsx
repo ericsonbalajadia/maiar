@@ -56,7 +56,10 @@ export function RequestsTable({
   return (
     <div className="space-y-6">
       {/* Filter bar - improved with date filter */}
-      <div className="rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md shadow-lg p-4 space-y-4">
+      <div
+        key={params.toString()}
+        className="rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md shadow-lg p-4 space-y-4"
+      >
         <div className="flex flex-wrap gap-3 items-end">
           <div className="flex-1 min-w-[200px]">
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
