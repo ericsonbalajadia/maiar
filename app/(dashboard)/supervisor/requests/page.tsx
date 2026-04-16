@@ -63,7 +63,6 @@ if (error) {
     <div className="max-w-7xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">All Requests</h1>
-        <span className="text-sm text-gray-500">Supervisor – Full Access</span>
       </div>
       <RequestsTable
         requests={transformedRequests}
