@@ -244,3 +244,62 @@ export type AssignmentWithTechnician = {
     role: string;
   } | null;
 };
+
+export type RequestFilter = {
+  role: 'clerk' | 'supervisor' | 'admin';
+  status?: string;
+  category?: string;
+  priority?: string;
+  search?: string;
+  page?: number;
+  pageSize?: number;
+};
+
+export async function getFilteredRequests(filter: RequestFilter) {
+  const supabase = createServiceClient();
+  const {
+    role,
+    status,
+    category,
+    priority,
+    search,
+    page = 1,
+    pageSize = 20,
+  } = filter;
+
+  let query = supabase
+    .from('requests')
+    .select(
+      `
+        id,
+        ticket_number,
+        title,
+        created_at,
+        updated_at,
+        status:status_id ( status_name ),
+        priority:priority_id ( level ),
+        category:category_id ( category_name ),
+        requester:requester_id ( full_name ),
+        request_assignments (
+          assigned_user:assigned_user_id ( full_name ),
+          completed_at
+        )
+      `,
+      { count: 'exact' }
+    )
+    .order('created_at', { ascending: false })
+    .range((page - 1) * pageSize, page * pageSize - 1);
+
+  if (status) query = query.eq('status.status_name', status);
+  if (category) query = query.eq('category.category_name', category);
+  if (priority) query = query.eq('priority.level', priority);
+  if (search) query = query.ilike('title', `%${search}%`);
+
+  const { data, error, count } = await query;
+  return {
+    data,
+    error,
+    count,
+    totalPages: Math.ceil((count ?? 0) / pageSize),
+  };
+}
