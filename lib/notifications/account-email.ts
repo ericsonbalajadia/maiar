@@ -1,6 +1,10 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 
-type AccountNotificationEvent = 'account_request_submitted' | 'account_approved' | 'account_rejected';
+type AccountNotificationEvent =
+  | 'account_request_submitted'
+  | 'account_pending_approval'
+  | 'account_approved'
+  | 'account_rejected';
 
 type NotifyAccountParams = {
   userId: string;
@@ -37,17 +41,49 @@ function toRoleLabel(role: string): string {
   return labels[role] || role.charAt(0).toUpperCase() + role.slice(1);
 }
 
-function buildEventContent(event: AccountNotificationEvent, rejectionReason?: string) {
+function isRequesterRole(role: string): boolean {
+  return role === 'student' || role === 'staff';
+}
+
+function isClerkRole(role: string): boolean {
+  return role === 'clerk';
+}
+
+function buildEventContent(
+  event: AccountNotificationEvent,
+  userRole: string,
+  rejectionReason?: string,
+) {
+  const requester = isRequesterRole(userRole);
+  const clerk = isClerkRole(userRole);
+
   switch (event) {
     case 'account_request_submitted':
       return {
         subject: 'Account Request Received - iTrack',
-        message: 'Your account request has been received and is now pending review. We will notify you once a decision has been made.',
+        message: requester
+          ? 'Your requester account registration has been received. Please verify your email using the verification link we sent.'
+          : clerk
+            ? 'Your clerk account registration has been received. Please verify your email using the verification link we sent.'
+            : 'Your account request has been received. Please verify your email using the verification link we sent.',
+      };
+    case 'account_pending_approval':
+      return {
+        subject: 'Email Verified - Account Pending Approval - iTrack',
+        message: requester
+          ? 'Your email has been verified successfully. Your account is now pending approval by a Clerk or Supervisor.'
+          : clerk
+            ? 'Your email has been verified successfully. Your account is now pending approval by a Supervisor.'
+            : 'Your email has been verified successfully. Your account is now pending administrator approval.',
       };
     case 'account_approved':
       return {
         subject: 'Account Approved - iTrack',
-        message: 'Congratulations! Your account request has been approved. You can now log in to the iTrack system with your credentials.',
+        message: requester
+          ? 'Congratulations! Your account has been approved. You may now log in and submit repair or service requests.'
+          : clerk
+            ? 'Congratulations! Your account has been approved. You may now log in and manage request review duties.'
+            : 'Congratulations! Your account request has been approved. You can now log in to the iTrack system with your credentials.',
       };
     case 'account_rejected':
       return {
@@ -153,7 +189,7 @@ export async function notifyAccountByEmail({
 
   if (!context) return;
 
-  const { subject, message } = buildEventContent(event, rejectionReason);
+  const { subject, message } = buildEventContent(event, context.userRole, rejectionReason);
   const htmlBody = buildEmailHtml(context, message);
 
   try {
