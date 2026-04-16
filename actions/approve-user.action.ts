@@ -3,7 +3,13 @@
 
     import { createClient } from '@/lib/supabase/server'
     import { canApproveRole } from '@/lib/rbac'
+    import { notifyAccountByEmail } from '@/lib/notifications/account-email'
     import { revalidatePath } from 'next/cache'
+
+    export type UserActionState = {
+    success?: boolean
+    error?: string
+    }
 
     export async function approveUser(targetUserId: string) {
     const supabase = await createClient()
@@ -45,6 +51,18 @@
         .eq('id', targetUserId)
 
     if (error) return { error: error.message }
+
+    try {
+        await notifyAccountByEmail({
+            userId: targetUserId,
+            event: 'account_approved',
+        });
+    } catch (notifyError) {
+        console.error('approveUser: failed to send approval email', {
+            userId: targetUserId,
+            error: notifyError,
+        });
+    }
 
     revalidatePath('/clerk')
     revalidatePath('/supervisor')
@@ -88,6 +106,19 @@
         .eq('id', targetUserId)
 
     if (error) return { error: error.message }
+
+    try {
+        await notifyAccountByEmail({
+            userId: targetUserId,
+            event: 'account_rejected',
+            rejectionReason: reason,
+        });
+    } catch (notifyError) {
+        console.error('rejectUser: failed to send rejection email', {
+            userId: targetUserId,
+            error: notifyError,
+        });
+    }
 
     revalidatePath('/clerk')
     revalidatePath('/supervisor')
