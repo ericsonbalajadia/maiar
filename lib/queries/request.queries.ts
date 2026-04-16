@@ -244,3 +244,91 @@ export type AssignmentWithTechnician = {
     role: string;
   } | null;
 };
+
+export type RequestFilter = {
+  role: 'clerk' | 'supervisor' | 'admin';
+  status?: string;
+  priority?: string;
+  search?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  pageSize?: number;
+};
+
+export async function getFilteredRequests(filter: RequestFilter) {
+  const supabase = createServiceClient();
+  const {
+    status,
+    priority,
+    search,
+    startDate,
+    endDate,
+    page = 1,
+    pageSize = 20,
+  } = filter;
+
+  // Get status_id, priority_id from name filters
+  let statusId: string | undefined;
+  if (status) {
+    const { data: s } = await supabase
+      .from('statuses')
+      .select('id')
+      .eq('status_name', status)
+      .single();
+    statusId = s?.id;
+  }
+
+  let priorityId: string | undefined;
+  if (priority) {
+    const { data: p } = await supabase
+      .from('priorities')
+      .select('id')
+      .eq('level', priority)
+      .single();
+    priorityId = p?.id;
+  }
+
+  // Build query with count
+  let query = supabase
+    .from('requests')
+    .select(
+      `
+        id,
+        ticket_number,
+        title,
+        created_at,
+        updated_at,
+        request_type,
+        status:status_id ( status_name ),
+        priority:priority_id ( level ),
+        category:category_id ( category_name ),
+        requester:requester_id ( full_name )
+      `,
+      { count: 'exact' }
+    )
+    .order('created_at', { ascending: false })
+    .range((page - 1) * pageSize, page * pageSize - 1);
+
+  if (statusId) query = query.eq('status_id', statusId);
+  if (priorityId) query = query.eq('priority_id', priorityId);
+  if (search) {
+    query = query.or(`ticket_number.ilike.%${search}%,title.ilike.%${search}%`);
+  }
+  if (startDate) query = query.gte('created_at', `${startDate}T00:00:00Z`);
+  if (endDate) query = query.lte('created_at', `${endDate}T23:59:59Z`);
+
+  const { data, error, count } = await query;
+
+  if (error) {
+    console.error('Supabase query error:', error);
+    return { data: [], error, count: 0, totalPages: 0 };
+  }
+
+  return {
+    data: data ?? [],
+    error: null,
+    count: count ?? 0,
+    totalPages: Math.ceil((count ?? 0) / pageSize),
+  };
+}
