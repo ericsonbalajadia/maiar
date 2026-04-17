@@ -32,7 +32,7 @@ function SubmitBtn() {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-lg bg-teal-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50 transition-colors"
+      className="w-full rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-teal-500/20 hover:from-teal-600 hover:to-emerald-600 focus:outline-none focus:ring-2 focus:ring-teal-400/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {pending ? 'Sending...' : 'Submit Feedback'}
     </button>
@@ -45,7 +45,7 @@ export function FeedbackForm({ requestId }: { requestId: string }) {
 
   if (state.success) {
     return (
-      <div className="rounded-xl border border-green-200 bg-green-50 p-6 text-center">
+      <div className="rounded-xl backdrop-blur-md bg-white/30 border border-white/40 shadow-xl p-6 text-center">
         <p className="text-base font-semibold text-green-800">Thank you for your feedback!</p>
         <p className="mt-1 text-sm text-green-600">Your response has been recorded.</p>
       </div>
@@ -59,13 +59,13 @@ export function FeedbackForm({ requestId }: { requestId: string }) {
   };
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+    <div className="rounded-2xl backdrop-blur-lg bg-white/20 border border-white/20 shadow-2xl p-6 space-y-5">
       <form action={handleSubmit} className="space-y-5">
         <input type="hidden" name="request_id" value={requestId} />
 
         {/* Service satisfaction rating */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label className="block text-sm text-white font-medium  mb-2">
             Service Satisfaction <span className="text-red-500">*</span>
           </label>
           <StarRating name="service_satisfaction" required labels={serviceLabels} />
@@ -76,7 +76,7 @@ export function FeedbackForm({ requestId }: { requestId: string }) {
 
         {/* Overall rating */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label className="block text-sm text-white font-medium  mb-2">
             Overall Rating <span className="text-red-500">*</span>
           </label>
           <StarRating name="overall_rating" required labels={overallLabels} />
@@ -87,20 +87,22 @@ export function FeedbackForm({ requestId }: { requestId: string }) {
 
         {/* Comments */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
-            Comments <span className="ml-1 text-slate-400 font-normal">(optional)</span>
+          <label className="block text-sm text-white font-medium mb-1">
+            Comments <span className="ml-1 text-slate-500 font-normal">(optional)</span>
           </label>
           <textarea
             name="comments"
             rows={4}
             placeholder="Tell us about your experience..."
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm resize-none focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+            className="w-full rounded-xl bg-white/20 backdrop-blur-sm border border-white/50 px-4 py-3 text-sm text-slate-800 placeholder:text-slate-500 
+                       focus:bg-white/60 focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-400/30 
+                       transition-all duration-200 resize-y"
           />
         </div>
 
         {state.errors?.form && (
-          <div className="rounded-md bg-red-50 border border-red-200 p-3">
-            <p className="text-xs text-red-700">{state.errors.form[0]}</p>
+          <div className="rounded-md bg-red-500/20 backdrop-blur-sm border border-red-400/30 p-3">
+            <p className="text-xs text-red-800">{state.errors.form[0]}</p>
           </div>
         )}
 
