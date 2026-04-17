@@ -9,6 +9,51 @@ iTrack is a web-based application that streamlines the submission, tracking, and
 | [MA.010.002](#ma010002-release-notes) | 2026-03-13 |
 | [MA.010.003](#ma010003-release-notes) | 2026-04-04 |
 | [MA.010.004](#ma010004-release-notes) | 2026-04-09 |
+| [MA.010.005](#ma010005-release-notes) | 2026-04-15 |
+
+---
+
+<h2 id="ma010005-release-notes">📦 MA.010.005 Release Notes</h2>
+
+##### Technician Assignment (FR 3.1)
+- Add supervisor and technician transition constants, extend assignment validation schema  
+- Add server queries for available technicians and approved requests  
+- Add `assignTechnician` server action with role check, reassignment logic, and notifications  
+- Extend `getRequestById` to fetch `request_assignments` with technician data  
+- Replace assign technician form with `useActionState` and enhanced technician dropdown  
+- Add `hideStatusPanel` prop to `RequestDetailPanel` for supervisor use  
+- Add supervisor request detail page with assignment form  
+- Link supervisor dashboard cards to new detail page instead of separate assign page  
+- Ensure supervisor navigation includes requests link  
+- Use service client in `getRequestAssignment` to bypass RLS and order by `assigned_at DESC`  
+- Mark old assignment as not current and completed during reassignment  
+- Remove irrelevant acceptance status from requester technician card
+
+##### Repair / Service Scheduling (FR 3.0)
+- Add scheduling fields to request queries and `RequestDetail` type  
+- Add `UpdateScheduleSchema` validation  
+- Add `updateSchedule` server action for supervisor  
+- Add `ScheduleForm` component with datetime inputs  
+- Integrate `ScheduleForm` into supervisor request detail page  
+- Display schedule window on requester request detail page  
+- Add migration `018` for scheduling columns to `request_assignments`
+
+##### Supervisor Status Update (FR 3.2, revised for no technician web access)
+- Add `SupervisorStatusUpdateSchema` validation  
+- Add `updateRequestStatusBySupervisor` server action  
+- Add `SupervisorStatusPanel` component  
+- Integrate `SupervisorStatusPanel` and improve assign form with dynamic key and `ticketNumber`
+
+##### Improvements & Fixes
+- Fix technician dropdown reset after reassignment using dynamic `key`  
+- Replace deprecated `ZodIssueCode` enum with string literals  
+- Extend `RequestDetail` type with `request_assignments` and scheduling fields for full TypeScript support  
+- Add missing enum values (`request_assigned`, `request_completed`, `request_cancelled`) to `notification_type`  
+- Improve logging in server actions for easier debugging  
+- Resolve build issues: Google Fonts fetch, `React.unstable_postpone` with `cacheComponents`, static generation of `/_not-found`  
+- Conditionally mock Supabase client during build to prevent missing environment variable errors  
+- Remove obsolete `/supervisor/requests/[id]/assign` page (replaced by new detail page)  
+- Fix TypeScript errors in `useNotifications` and `useRequestStatus` (explicit `any` for Realtime payloads)
 
 ---
 
