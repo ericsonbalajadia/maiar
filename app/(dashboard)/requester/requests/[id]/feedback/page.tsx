@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import { FeedbackForm } from "@/components/feedback/feedback-form";
+import Link from 'next/link'
 
 interface Props {
     params: Promise<{ id: string }>;
@@ -62,34 +63,27 @@ export default async function RequesterFeedbackPage({ params }: Props) {
         );
     }
 
-    if (!canSubmit) {
-        // Check why: maybe feedback exists or window closed
-        const { data: existingFeedback } = await admin
-            .from("feedbacks")
-            .select("id, submitted_at")
-            .eq("request_id", id)
-            .maybeSingle();
-
-        const { data: completionDate } = await admin
-            .from("requests")
-            .select("actual_completion_date")
-            .eq("id", id)
-            .single();
-
-        return (
-            <div className="p-6 space-y-2">
-                <h1 className="text-xl font-bold text-amber-600">Cannot submit feedback</h1>
-                {existingFeedback ? (
-                    <p>✓ Feedback already submitted on {new Date(existingFeedback.submitted_at).toLocaleDateString()}</p>
-                ) : (
-                    <p>✗ No feedback found, but RPC returned false.</p>
-                )}
-                <p>Completion date: {completionDate?.actual_completion_date ? new Date(completionDate.actual_completion_date).toLocaleDateString() : "unknown"}</p>
-                <p>30-day window expires: {completionDate?.actual_completion_date ? new Date(new Date(completionDate.actual_completion_date).getTime() + 30*24*60*60*1000).toLocaleDateString() : "unknown"}</p>
-                <p>Current date: {new Date().toLocaleDateString()}</p>
+if (!canSubmit) {
+    // Check why – but show friendly message only
+    return (
+        <div className="max-w-2xl mx-auto p-6">
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 text-center space-y-4">
+                <div className="text-amber-800">
+                    <svg className="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h2 className="text-xl font-semibold mb-1">Cannot Submit Feedback</h2>
+                    <p className="text-sm">Feedback has already been submitted for this request, or the 30‑day feedback window has closed.</p>
+                </div>
+                <Link href={`/requester/requests/${id}`}>
+                    <button className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors">
+                        Return to Request
+                    </button>
+                </Link>
             </div>
-        );
-    }
+        </div>
+    );
+}
 
     // If all checks pass, show the form
     return (
