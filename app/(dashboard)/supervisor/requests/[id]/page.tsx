@@ -73,11 +73,15 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
         </div>
       )}
 
-      {/* ADD FEEDBACK PANEL */}
-      <div className="rounded-lg border p-4">
-        <h2 className="text-lg font-semibold mb-2">Requester Feedback</h2>
-        <FeedbackPanel requestId={id} />
-      </div>
+{/* Feedback Panel – only show when request is completed */}
+{currentStatus === 'completed' && (
+  <div className="rounded-lg border p-4">
+    <h2 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">
+      Requester Feedback
+    </h2>
+    <FeedbackPanel requestId={id} />
+  </div>
+)}
 
       {showStatusPanel && (
         <div className="rounded-lg border p-6 shadow-sm">
