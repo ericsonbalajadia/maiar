@@ -6,11 +6,17 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { getRoleDashboard } from '@/lib/rbac'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
 
 export default function PendingApprovalPage() {
   const router = useRouter()
   const supabase = createClient()
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
 
   useEffect(() => {
     const checkApproval = async () => {
@@ -49,14 +55,17 @@ export default function PendingApprovalPage() {
       <CardContent className="text-center">
         <Loader2 className="mx-auto h-12 w-12 animate-spin text-slate-400" />
         <p className="mt-4 text-slate-600">
-          Your account is waiting for administrator approval.
+          Your email has been confirmed. Your account is now awaiting approval.
         </p>
         <p className="mt-2 text-sm text-slate-500">
-          You will be automatically redirected once approved.
+          We will notify you via email once your account has been approved.
         </p>
         <p className="mt-8 text-xs text-slate-400">
           If you believe this is taking too long, please contact the IT department.
         </p>
+        <Button className="mt-6" variant="outline" onClick={handleLogout}>
+          Log out
+        </Button>
       </CardContent>
     </Card>
   )

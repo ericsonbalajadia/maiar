@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getRoleDashboard } from '@/lib/rbac';
+import { notifyAccountByEmail } from '@/lib/notifications/account-email';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest) {
   // 3. Fetch the user's profile from public.users
   const { data: dbUser, error: dbError } = await supabase
     .from('users')
-    .select('role, signup_status')
+    .select('id, role, signup_status')
     .eq('auth_id', user.id)
     .single();
 
@@ -72,7 +73,23 @@ export async function GET(request: NextRequest) {
   }
 
   if (dbUser.signup_status === 'pending') {
-    return NextResponse.redirect(new URL('/pending-approval', request.url));
+    // Send pending-approval notice only after verification link callback.
+    if ((code || token_hash) && user.email_confirmed_at) {
+      try {
+        await notifyAccountByEmail({
+          userId: dbUser.id,
+          event: 'account_pending_approval',
+        });
+      } catch (notifyError) {
+        console.error('auth callback: failed to send pending-approval email', {
+          userId: dbUser.id,
+          error: notifyError,
+        });
+      }
+    }
+
+    await supabase.auth.signOut();
+    return NextResponse.redirect(new URL('/login?verified=1', request.url));
   }
 
   if (dbUser.signup_status === 'rejected') {

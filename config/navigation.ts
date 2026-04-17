@@ -23,20 +23,21 @@ export const NAV_ITEMS: Record<Role, NavItem[]> = {
     { label: 'Notifications',href: '/requester/notifications',icon: 'Bell'            },
   ],
   clerk: [
-    { label: 'Review Queue', href: '/clerk',               icon: 'Inbox'         },
-    { label: 'All Requests', href: '/clerk/requests',      icon: 'ClipboardList' },
-    { label: 'Notifications',href: '/clerk/notifications', icon: 'Bell'          },
+    { label: 'Review Queue', href: '/clerk',                    icon: 'Inbox'         },
+    { label: 'All Requests', href: '/clerk/requests',           icon: 'ClipboardList' },
+    { label: 'Account Requests', href: '/clerk/account-requests', icon: 'UserPlus'   },
+    { label: 'Notifications',href: '/clerk/notifications',      icon: 'Bell'          },
   ],
   technician: [
     { label: 'My Tasks',     href: '/technician',               icon: 'Wrench' },
     { label: 'Notifications',href: '/technician/notifications', icon: 'Bell'   },
   ],
   supervisor: [
-    { label: 'Feedback Analytics', href: '/supervisor/analytics/feedback', icon: 'BarChart2' },
     { label: 'Dashboard',    href: '/supervisor',               icon: 'LayoutDashboard' },
+    { label: 'Feedback Analytics', href: '/supervisor/analytics/feedback', icon: 'BarChart2' },
     { label: 'Requests',     href: '/supervisor/requests',      icon: 'ClipboardList'   },
     { label: 'Notifications',href: '/supervisor/notifications', icon: 'Bell'            },
-    
+    { label: 'Staff Requests', href: '/supervisor/account-requests', icon: 'UserCheck'      },
   ],
   admin: [
     { label: 'Dashboard',         href: '/admin',                icon: 'LayoutDashboard' },
