@@ -1,6 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
+import { Suspense } from 'react'
 import { loginUser, type LoginState } from '@/actions/auth.actions'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -21,7 +22,9 @@ export default function LoginPage() {
         <CardTitle>Sign In</CardTitle>
       </CardHeader>
       <CardContent>
-        <ErrorMessage />
+        <Suspense fallback={null}>
+          <ErrorMessage />
+        </Suspense>
 
         {state.errors?.form && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">
