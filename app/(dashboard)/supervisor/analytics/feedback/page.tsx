@@ -39,8 +39,6 @@ export default async function SupervisorFeedbackAnalyticsPage() {
         .order('submitted_at', { ascending: false })
         .limit(100);
 
-    console.log('[SupervisorFeedback] Number of feedbacks fetched:', feedbacksRaw?.length);
-
     if (!feedbacksRaw || feedbacksRaw.length === 0) {
         return (
             <div className="max-w-6xl mx-auto p-6">
@@ -52,22 +50,15 @@ export default async function SupervisorFeedbackAnalyticsPage() {
 
     // 2. Get unique request IDs
     const requestIds = [...new Set(feedbacksRaw.map(f => f.request_id).filter(Boolean))];
-    console.log('[SupervisorFeedback] Unique request IDs:', requestIds);
 
     // 3. Fetch request details
     let requestMap = new Map<string, { id: string; ticket_number: string }>();
     if (requestIds.length > 0) {
-        const { data: requests, error } = await supabase
+        const { data: requests } = await supabase
             .from('requests')
             .select('id, ticket_number')
             .in('id', requestIds);
-        
-        if (error) {
-            console.error('[SupervisorFeedback] Error fetching requests:', error);
-        } else {
-            console.log('[SupervisorFeedback] Requests fetched:', requests?.length);
-            (requests ?? []).forEach(req => requestMap.set(req.id, req));
-        }
+        (requests ?? []).forEach(req => requestMap.set(req.id, req));
     }
 
     // 4. Combine
@@ -75,11 +66,6 @@ export default async function SupervisorFeedbackAnalyticsPage() {
         ...f,
         request: requestMap.get(f.request_id) ?? null,
     }));
-
-    const missingRequests = feedbacks.filter(f => !f.request);
-    if (missingRequests.length > 0) {
-        console.warn('[SupervisorFeedback] Missing request details for IDs:', missingRequests.map(f => f.request_id));
-    }
 
     const total = feedbacks.length;
 
@@ -202,9 +188,7 @@ export default async function SupervisorFeedbackAnalyticsPage() {
                                                     {f.request.ticket_number}
                                                 </a>
                                             ) : (
-                                                <span className="text-gray-400" title={f.request_id}>
-                                                    Request ID: {f.request_id.slice(0, 8)}...
-                                                </span>
+                                                <span className="text-gray-400 italic">Request unavailable</span>
                                             )}
                                         </span>
                                         <span>•</span>
