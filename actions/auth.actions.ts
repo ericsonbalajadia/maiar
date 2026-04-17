@@ -5,6 +5,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { registerSchema, loginSchema } from '@/lib/validations/user.schema'
 import { getRoleDashboard } from '@/lib/rbac'
+import { notifyAccountByEmail } from '@/lib/notifications/account-email'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export type LoginState = {
   errors?: {
@@ -77,7 +79,32 @@ export async function registerUser(
     return { errors: { form: [error.message] } }
   }
 
-  redirect('/pending-approval')
+  // Try to send account request received email
+  try {
+    const admin = createAdminClient()
+    // Give Supabase a moment to create the user record via on_auth_user_created trigger
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    const { data: newUser } = await admin
+      .from('users')
+      .select('id')
+      .eq('email', result.data.email)
+      .single()
+
+    if (newUser) {
+      await notifyAccountByEmail({
+        userId: newUser.id,
+        event: 'account_request_submitted',
+      })
+    }
+  } catch (emailError) {
+    console.error('registerUser: failed to send account request email', {
+      email: result.data.email,
+      error: emailError,
+    })
+  }
+
+  redirect('/check-email')
 }
 
 export async function loginUser(
@@ -109,6 +136,9 @@ export async function loginUser(
   console.log('signInWithPassword result:', { authData, authError })
 
   if (authError || !authData.user) {
+    if (authError?.message && /email.*confirm|confirm.*email|not confirmed/i.test(authError.message)) {
+      return { errors: { form: ['Please verify your email address. Check your inbox for the confirmation link.'] } }
+    }
     return { errors: { form: ['Invalid email or password'] } }
   }
 
