@@ -527,11 +527,10 @@ const canDelete = ['pending', 'under_review'].includes(currentStatus);
 // Compute total attachments size (same as before)
 const attachments = request.attachments ?? [];
 const totalAttachmentsSize = attachments.reduce((sum, a) => sum + (a.file_size || 0), 0);
-const isActive = !['completed', 'cancelled'].includes(currentStatusName);
-const canUpload = isActive;
-const uploadDisabledReason = !isActive 
-    ? 'Attachments cannot be uploaded after the request is completed or cancelled.'
-    : undefined;
+const canUpload = ['pending', 'under_review'].includes(currentStatusName);
+const uploadDisabledReason = canUpload 
+    ? undefined 
+    : 'Attachments can only be uploaded while the request is pending or under review.';
 
   return (
     <div className="space-y-5">
