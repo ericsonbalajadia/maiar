@@ -7,6 +7,7 @@ import { SupervisorStatusPanel } from "@/components/supervisor/supervisor-status
 import { AssignTechnicianForm } from "@/components/assignments/assign-technician-form";
 import { RequestDetailPanel } from "@/components/clerk/request-detail-panel";
 import { ScheduleForm } from "@/components/assignments/schedule-form";
+import { FeedbackPanel } from "@/components/feedback/feedback-panel";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -41,9 +42,7 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">
-          Request Detail
-        </h1>
+        <h1 className="text-3xl font-bold">Request Detail</h1>
         <Link href="/supervisor">
           <Button variant="outline" size="sm">
             ← Back to Dashboard
@@ -65,16 +64,25 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
 
       {activeAssignment && (
         <div className="rounded-lg border p-4 text-sm">
-          {activeAssignment && (
-            <ScheduleForm
-              assignmentId={activeAssignment.id}
-              scheduledStart={activeAssignment.scheduled_start}
-              scheduledEnd={activeAssignment.scheduled_end}
-              scheduleNotes={activeAssignment.schedule_notes}
-            />
-          )}
+          <ScheduleForm
+            assignmentId={activeAssignment.id}
+            scheduledStart={activeAssignment.scheduled_start}
+            scheduledEnd={activeAssignment.scheduled_end}
+            scheduleNotes={activeAssignment.schedule_notes}
+          />
         </div>
       )}
+
+{/* Feedback Panel – only show when request is completed */}
+{currentStatus === 'completed' && (
+  <div className="rounded-lg border p-4">
+    <h2 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">
+      Requester Feedback
+    </h2>
+    <FeedbackPanel requestId={id} />
+  </div>
+)}
+
       {showStatusPanel && (
         <div className="rounded-lg border p-6 shadow-sm">
           <SupervisorStatusPanel requestId={id} currentStatus={currentStatus} />

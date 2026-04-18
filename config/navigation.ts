@@ -33,18 +33,19 @@ export const NAV_ITEMS: Record<Role, NavItem[]> = {
     { label: 'Notifications',href: '/technician/notifications', icon: 'Bell'   },
   ],
   supervisor: [
-    { label: 'Dashboard',    href: '/supervisor',                    icon: 'LayoutDashboard' },
-    { label: 'Requests',     href: '/supervisor/requests',           icon: 'ClipboardList'   },
+    { label: 'Dashboard',    href: '/supervisor',               icon: 'LayoutDashboard' },
+    { label: 'Feedback Analytics', href: '/supervisor/analytics/feedback', icon: 'BarChart2' },
+    { label: 'Requests',     href: '/supervisor/requests',      icon: 'ClipboardList'   },
+    { label: 'Notifications',href: '/supervisor/notifications', icon: 'Bell'            },
     { label: 'Staff Requests', href: '/supervisor/account-requests', icon: 'UserCheck'      },
-    { label: 'Notifications',href: '/supervisor/notifications',      icon: 'Bell'            },
   ],
   admin: [
     { label: 'Dashboard',         href: '/admin',                icon: 'LayoutDashboard' },
     { label: 'Users',             href: '/admin/users',          icon: 'Users'           },
-    // badgeKey used by sidebar to show pending approval count dynamically
     { label: 'Pending Approvals', href: '/admin/users/pending',  icon: 'UserCheck', badgeKey: 'pendingApprovals' },
     { label: 'All Requests',      href: '/admin/requests',       icon: 'ClipboardList'   },
     { label: 'Settings',          href: '/admin/settings',       icon: 'Settings'        },
-    { label: 'Analytics',         href: '/admin/analytics',      icon: 'BarChart2'       },
-  ],
+    { label: 'Feedback',          href: '/admin/analytics/feedback', icon: 'BarChart2'   },  // only one analytics link
+    // Future: { label: 'Reports', href: '/admin/analytics/reports', icon: 'PieChart' }
+],
 }

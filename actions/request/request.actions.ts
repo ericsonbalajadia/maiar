@@ -336,45 +336,51 @@ export async function getRequesterRequests(
 
 // ─── getRecentRequests (for dashboard home — last 5) ─────────────────────────
 
-export async function getRecentRequests(): Promise<RequestWithRelations[]> {
+export async function getRecentRequests(limit = 10) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUserId(); // adjust to your auth helper
   if (!user) return [];
 
-  const admin = createAdminClient();
-
-  const { data: dbUser } = await admin
-    .from("users")
-    .select("id")
-    .eq("auth_id", user.id)
-    .single();
-  if (!dbUser) return [];
-
-  const { data, error } = await admin
-    .from("requests")
-    .select(
-      `
-      id, ticket_number, title, description, request_type,
-      status_id, category_id, location_id, priority_id, requester_id,
-      created_at, updated_at,
+  const { data, error } = await supabase
+    .from('requests')
+    .select(`
+      id,
+      ticket_number,
+      request_type,
+      title,
+      created_at,
       statuses ( status_name ),
       categories ( category_name ),
-      locations ( building_name, floor_level, room_number ),
-      priorities ( level )
-      `,
-    )
-    .eq("requester_id", dbUser.id)
-    .order("created_at", { ascending: false })
-    .limit(5);
+      locations ( building_name ),
+      feedbacks ( id )
+    `)
+    .eq('requester_id', user)
+    .order('created_at', { ascending: false })
+    .limit(limit);
 
   if (error) {
-    console.error("getRecentRequests error:", error);
+    console.error('getRecentRequests error:', error);
     return [];
   }
 
-  return (data ?? []) as unknown as RequestWithRelations[];
+  // Transform: add hasFeedback flag and remove the feedbacks array
+  const transformed = data.map(req => {
+    const feedbackList = Array.isArray(req.feedbacks)
+      ? req.feedbacks
+      : req.feedbacks
+        ? [req.feedbacks]
+        : [];
+    const hasFeedback = feedbackList.length > 0;
+    // Create a new object without the 'feedbacks' property
+    const { feedbacks, ...rest } = req;
+    return {
+      ...rest,
+      hasFeedback
+    };
+  });
+
+  console.log('Recent requests with hasFeedback:', transformed);
+  return transformed;
 }
 
 // ─── getRequesterStats ────────────────────────────────────────────────────────

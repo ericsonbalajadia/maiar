@@ -1,0 +1,8 @@
+{
+    "crons": [
+        {
+            "path": "/api/cron/feedback-reminder",
+            "schedule": "0 10 * * *"
+        }
+    ]
+}

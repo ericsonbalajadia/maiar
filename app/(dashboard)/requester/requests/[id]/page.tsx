@@ -33,6 +33,8 @@ import {
 } from "lucide-react";
 import type { AssignmentWithTechnician } from "@/lib/queries/request.queries";
 import type { RequestDetail } from "@/types/requests.model";
+import { createServiceClient } from '@/lib/supabase/service';
+import { FeedbackDisplay } from '@/components/feedback/feedback-display';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -492,11 +494,17 @@ async function RequestDetailContent({ id }: { id: string }) {
 
   if (!request) notFound();
 
+  const supabase = createServiceClient();
+  const { data: feedback } = await supabase
+      .from('feedbacks')
+      .select('service_satisfaction, overall_rating, comments, submitted_at, is_anonymous')
+      .eq('request_id', id)
+      .maybeSingle();
+
   const currentStatusName = request.statuses?.status_name ?? "pending";
   const isCompleted = currentStatusName === STATUS_NAMES.COMPLETED;
-  const showFeedback =
-    isCompleted && isWithin30Days(request.actual_completion_date);
-
+  const showFeedback = isCompleted && isWithin30Days(request.actual_completion_date);
+  const hasFeedback = !!feedback;
   const rmr = request.rmr_details;
   const ppsr = request.ppsr_details;
   const hasInspection = rmr && (rmr.inspection_date || rmr.inspector_notes);
@@ -524,8 +532,14 @@ async function RequestDetailContent({ id }: { id: string }) {
         <RequestTypeBadge type={request.request_type} showFull />
       </div>
 
-      {/* ── Feedback prompt (completed only) ── */}
-      {showFeedback && <FeedbackPrompt requestId={request.id} />}
+      {/* ── Feedback display or prompt (completed only) ── */}
+{showFeedback && (
+    hasFeedback ? (
+        <FeedbackDisplay {...feedback!} />
+    ) : (
+        <FeedbackPrompt requestId={request.id} />
+    )
+)}
 
       {/* ── Status stepper ── */}
       <StatusStepper currentStatus={currentStatusName} />
