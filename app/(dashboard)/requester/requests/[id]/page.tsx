@@ -20,6 +20,8 @@ import { StatusTimeline } from "@/components/requests/status-timeline";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { STATUS_NAMES } from "@/lib/constants/statuses";
+import { AttachmentUploader } from "@/components/requests/attachment-uploader";
+import { AttachmentPreview } from "@/components/requests/attachment-preview";
 import {
   ChevronLeft,
   Paperclip,
@@ -33,6 +35,8 @@ import {
 } from "lucide-react";
 import type { AssignmentWithTechnician } from "@/lib/queries/request.queries";
 import type { RequestDetail } from "@/types/requests.model";
+import { createServiceClient } from "@/lib/supabase/service";
+import { FeedbackDisplay } from "@/components/feedback/feedback-display";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -183,7 +187,7 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
 function TechnicianCard({
   assignment,
 }: {
-  assignment: AssignmentWithTechnician | null
+  assignment: AssignmentWithTechnician | null;
 }) {
   return (
     <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl p-5">
@@ -224,7 +228,9 @@ function TechnicianCard({
 
           <div className="divide-y divide-blue-100 dark:divide-blue-800">
             <div className="py-1.5">
-              <span className="text-blue-700 dark:text-blue-400 font-medium text-sm">Assigned on:</span>{' '}
+              <span className="text-blue-700 dark:text-blue-400 font-medium text-sm">
+                Assigned on:
+              </span>{" "}
               <span className="text-blue-900 dark:text-blue-100 text-sm">
                 {formatDate(assignment.assigned_at)}
               </span>
@@ -243,7 +249,7 @@ function TechnicianCard({
         </div>
       )}
     </div>
-  )
+  );
 }
 
 // ─── Scheduled Date Card ──────────────────────────────────────────────────────
@@ -492,11 +498,20 @@ async function RequestDetailContent({ id }: { id: string }) {
 
   if (!request) notFound();
 
+  const supabase = createServiceClient();
+  const { data: feedback } = await supabase
+    .from("feedbacks")
+    .select(
+      "service_satisfaction, overall_rating, comments, submitted_at, is_anonymous",
+    )
+    .eq("request_id", id)
+    .maybeSingle();
+
   const currentStatusName = request.statuses?.status_name ?? "pending";
   const isCompleted = currentStatusName === STATUS_NAMES.COMPLETED;
   const showFeedback =
     isCompleted && isWithin30Days(request.actual_completion_date);
-
+  const hasFeedback = !!feedback;
   const rmr = request.rmr_details;
   const ppsr = request.ppsr_details;
   const hasInspection = rmr && (rmr.inspection_date || rmr.inspector_notes);
@@ -505,6 +520,17 @@ async function RequestDetailContent({ id }: { id: string }) {
 
   // status_history is already embedded in the request object from getRequestById
   const history = (request.status_history ?? []) as any[];
+
+  const currentStatus = request.statuses?.status_name ?? 'pending';
+const canDelete = ['pending', 'under_review'].includes(currentStatus);
+
+// Compute total attachments size (same as before)
+const attachments = request.attachments ?? [];
+const totalAttachmentsSize = attachments.reduce((sum, a) => sum + (a.file_size || 0), 0);
+const canUpload = ['pending', 'under_review'].includes(currentStatusName);
+const uploadDisabledReason = canUpload 
+    ? undefined 
+    : 'Attachments can only be uploaded while the request is pending or under review.';
 
   return (
     <div className="space-y-5">
@@ -524,8 +550,13 @@ async function RequestDetailContent({ id }: { id: string }) {
         <RequestTypeBadge type={request.request_type} showFull />
       </div>
 
-      {/* ── Feedback prompt (completed only) ── */}
-      {showFeedback && <FeedbackPrompt requestId={request.id} />}
+      {/* ── Feedback display or prompt (completed only) ── */}
+      {showFeedback &&
+        (hasFeedback ? (
+          <FeedbackDisplay {...feedback!} />
+        ) : (
+          <FeedbackPrompt requestId={request.id} />
+        ))}
 
       {/* ── Status stepper ── */}
       <StatusStepper currentStatus={currentStatusName} />
@@ -727,43 +758,28 @@ async function RequestDetailContent({ id }: { id: string }) {
 
       {/* ── Attachments ── */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
-        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
-          <Paperclip className="h-4 w-4 text-slate-400" />
-          Attachments
-        </h3>
-        {!request.attachments || request.attachments.length === 0 ? (
-          <p className="text-sm text-slate-400 italic">
-            No attachments uploaded.
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {request.attachments.map((file) => (
-              <a
-                key={file.id}
-                href={file.file_path}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-3 rounded-lg border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group"
-              >
-                <div className="w-8 h-8 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center shrink-0">
-                  <Paperclip className="h-3.5 w-3.5 text-slate-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">
-                    {file.file_name}
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    {formatFileSize(file.file_size)} · {file.mime_type}
-                  </p>
-                </div>
-                <span className="text-xs text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                  Download
-                </span>
-              </a>
-            ))}
-          </div>
-        )}
-      </div>
+    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
+        <Paperclip className="h-4 w-4 text-slate-400" />
+        Attachments
+    </h3>
+    {attachments.length === 0 ? (
+        <p className="text-sm text-slate-400 italic">No attachments uploaded.</p>
+    ) : (
+        <AttachmentPreview
+            attachments={attachments}
+            requestId={id}
+            canDelete={canDelete}
+        />
+    )}
+<div className="mt-4 pt-4 border-t">
+    <AttachmentUploader
+        requestId={id}
+        currentTotalSize={totalAttachmentsSize}
+        canUpload={canUpload}
+        disabledReason={uploadDisabledReason}
+    />
+</div>
+</div>
     </div>
   );
 }

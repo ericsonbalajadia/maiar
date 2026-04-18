@@ -1,72 +1,98 @@
+// app/(dashboard)/requester/requests/[id]/feedback/page.tsx
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getRequestsByRequester } from "@/lib/queries/request.queries";
-import { RequestCard } from "@/components/requests/request-card";
-import Link from "next/link";
+import { notFound } from "next/navigation";
+import { FeedbackForm } from "@/components/feedback/feedback-form";
+import Link from 'next/link'
 
-export default async function RequesterRequestsPage() {
-  const supabase = await createClient();
-  const admin = createAdminClient();
+interface Props {
+    params: Promise<{ id: string }>;
+}
 
-  const { data: { user },} = await supabase.auth.getUser();
-  if (!user) return null; // middleware already redirects
+export default async function RequesterFeedbackPage({ params }: Props) {
+    const { id } = await params;
+    const supabase = await createClient();
+    const admin = createAdminClient();
 
-  const { data: profile } = await admin
-    .from("users")
-    .select("id")
-    .eq("auth_id", user.id)
-    .single();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return <div>Not authenticated</div>;
 
-  const { data: requests } = profile
-    ? await getRequestsByRequester(profile.id)
-    : { data: [] };
+    // Get internal user id
+    const { data: requester } = await admin
+        .from("users")
+        .select("id")
+        .eq("auth_id", user.id)
+        .single();
+    if (!requester) return <div>User profile not found</div>;
 
-  return (
-    <div className="space-y-6">
-      {/* Page header — uses components/layout/page-header.tsx */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">My Requests</h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Track and manage your maintenance requests
-          </p>
+    // Fetch request details (including status and requester_id)
+    const { data: request, error } = await admin
+        .from("requests")
+        .select("id, requester_id, statuses!inner(status_name)")
+        .eq("id", id)
+        .single();
+
+    if (error || !request) notFound();
+
+    // Check ownership
+    if (request.requester_id !== requester.id) return <div>You are not the requester</div>;
+
+    // Only allow feedback if request is completed
+    if (request.statuses?.status_name !== "completed") {
+        return (
+            <div className="p-6">
+                <h1 className="text-xl font-bold text-red-600">Request not completed</h1>
+                <p>Current status: {request.statuses?.status_name}</p>
+                <p>Feedback can only be submitted for completed requests.</p>
+            </div>
+        );
+    }
+
+    // Check the RPC result
+    const { data: canSubmit, error: rpcError } = await admin.rpc("can_submit_feedback", {
+        p_request_id: id,
+        p_user_id: requester.id,
+    });
+
+    if (rpcError) {
+        return (
+            <div className="p-6">
+                <h1 className="text-xl font-bold text-red-600">RPC Error</h1>
+                <pre className="text-sm">{JSON.stringify(rpcError, null, 2)}</pre>
+            </div>
+        );
+    }
+
+if (!canSubmit) {
+    // Check why – but show friendly message only
+    return (
+        <div className="max-w-2xl mx-auto p-6">
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 text-center space-y-4">
+                <div className="text-amber-800">
+                    <svg className="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h2 className="text-xl font-semibold mb-1">Cannot Submit Feedback</h2>
+                    <p className="text-sm">Feedback has already been submitted for this request, or the 30‑day feedback window has closed.</p>
+                </div>
+                <Link href={`/requester/requests/${id}`}>
+                    <button className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors">
+                        Return to Request
+                    </button>
+                </Link>
+            </div>
         </div>
-        <Link
-          href="/requester/new"
-          className="inline-flex items-center gap-2 rounded-lg
-                     bg-teal-600 px-4 py-2 text-sm font-semibold
-                     text-white hover:bg-teal-700 transition-colors"
-        >
-          + New Request
-        </Link>
-      </div>
+    );
+}
 
-      {/* Request list */}
-      {requests && requests.length > 0 ? (
-        <div className="space-y-3">
-          {requests.map((r) => (
-            <RequestCard
-              key={r.id}
-              request={r}
-              href={`/requester/requests/${r.id}`}
-            />
-          ))}
+    // If all checks pass, show the form
+    return (
+        <div className="max-w-2xl mx-auto p-6">
+            <h1 className="text-2xl font-bold mb-2">How Did We Do?</h1>
+            <p className="text-sm text-gray-500 mb-6">
+                Your feedback helps us improve our service.
+            </p>
+            <FeedbackForm requestId={id} />
         </div>
-      ) : (
-        <div
-          className="rounded-xl border-2 border-dashed
-                        border-slate-200 p-16 text-center"
-        >
-          <p className="text-slate-500 font-medium">No requests yet</p>
-          <Link
-            href="/requester/new"
-            className="mt-3 inline-block text-sm font-medium
-                       text-teal-600 hover:underline"
-          >
-            Submit your first request →
-          </Link>
-        </div>
-      )}
-    </div>
-  );
+    );
 }

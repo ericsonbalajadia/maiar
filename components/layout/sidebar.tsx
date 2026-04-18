@@ -22,8 +22,10 @@ const EXACT_MATCH_HREFS = new Set([
   '/requester/requests/new',
   '/admin',
   '/clerk',
+  '/clerk/account-requests',
   '/technician',
   '/supervisor',
+  '/supervisor/account-requests',
 ])
 
 export function Sidebar({ userRole }: SidebarProps) {
@@ -43,8 +45,10 @@ export function Sidebar({ userRole }: SidebarProps) {
         href === '/requester' ||
         href === '/admin' ||
         href === '/clerk' ||
+        href === '/clerk/account-requests' ||
         href === '/technician' ||
-        href === '/supervisor') {
+        href === '/supervisor' ||
+        href === '/supervisor/account-requests') {
       return pathname === href
     }
     // For list/index routes (e.g. My Requests), match exact + direct detail pages

@@ -6,6 +6,15 @@ export function ErrorMessage() {
   const searchParams = useSearchParams()
   const errorParam = searchParams.get('error')
   const errorDesc = searchParams.get('error_description')
+  const verified = searchParams.get('verified')
+
+  if (verified === '1') {
+    return (
+      <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md text-sm text-green-700">
+        Your email has been successfully confirmed. Please log in to continue.
+      </div>
+    )
+  }
 
   if (errorParam === 'verification_failed') {
     return (
