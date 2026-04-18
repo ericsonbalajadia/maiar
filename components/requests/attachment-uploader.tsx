@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Upload } from 'lucide-react';
 
@@ -17,11 +18,11 @@ const ALLOWED_MIME = [
 
 interface Props {
     requestId: string;
-    currentTotalSize: number; // sum of existing attachments file_size
-    onUploaded?: () => void;
+    currentTotalSize: number;
 }
 
-export function AttachmentUploader({ requestId, currentTotalSize, onUploaded }: Props) {
+export function AttachmentUploader({ requestId, currentTotalSize }: Props) {
+    const router = useRouter();
     const [progress, setProgress] = useState<number | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
@@ -105,7 +106,8 @@ export function AttachmentUploader({ requestId, currentTotalSize, onUploaded }: 
                 } else {
                     setProgress(null);
                     setSuccess(true);
-                    onUploaded?.();
+                    // Refresh page data to show new attachment
+                    router.refresh();
                 }
             } else {
                 setError('Upload failed. Please try again.');

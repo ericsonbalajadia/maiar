@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { FileText, Image, File, X, Download, Trash2 } from 'lucide-react';
 
@@ -17,10 +18,10 @@ interface Props {
     attachments: Attachment[];
     requestId: string;
     canDelete?: boolean; // true for requester (own request) or admin
-    onDelete?: () => void;
 }
 
-export function AttachmentPreview({ attachments, requestId, canDelete = false, onDelete }: Props) {
+export function AttachmentPreview({ attachments, requestId, canDelete = false }: Props) {
+    const router = useRouter();
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [previewType, setPreviewType] = useState<string>('');
     const [deleting, setDeleting] = useState<string | null>(null);
@@ -41,7 +42,8 @@ export function AttachmentPreview({ attachments, requestId, canDelete = false, o
         setDeleting(id);
         const { error } = await supabase.from('attachments').delete().eq('id', id);
         if (!error) {
-            onDelete?.();
+            // Refresh page data to reflect deletion
+            router.refresh();
         } else {
             alert('Failed to delete attachment.');
         }
@@ -106,7 +108,7 @@ export function AttachmentPreview({ attachments, requestId, canDelete = false, o
                 ))}
             </div>
 
-            {/* Preview Modal */}
+            {/* Preview Modal (unchanged) */}
             {previewUrl && (
                 <div
                     className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
