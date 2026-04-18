@@ -321,28 +321,33 @@ export default async function RequesterDashboardPage() {
     redirect("/pending-approval");
   if (!isRequesterRole(dbUser.role)) redirect(getRoleDashboard(dbUser.role));
 
+  const firstName = dbUser.full_name?.split(" ")[0] ?? "there";
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-4 md:px-6">
       {/* ── Page header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            My Requests
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            Track and manage your maintenance requests
-          </p>
-        </div>
-        <Button
-          asChild
-          className="bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 gap-2"
-        >
-          <Link href="/requester/requests/new">
-            <Plus className="h-4 w-4" />
-            Submit New Request
-          </Link>
-        </Button>
-      </div>
+<div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+  <div>
+    <p className="text-xs font-semibold uppercase tracking-widest text-blue-500 dark:text-blue-400 mb-1">
+      Dashboard
+    </p>
+    <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+      Welcome back, {firstName} 👋
+    </h1>
+    <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+      Track and manage your maintenance requests below.
+    </p>
+  </div>
+  <Button
+    asChild
+    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20 gap-2 shrink-0 transition-all duration-200"
+  >
+    <Link href="/requester/requests/new">
+      <Plus className="h-4 w-4" />
+      Submit New Request
+    </Link>
+  </Button>
+</div>
 
       {/* ── Stat cards ── */}
       <Suspense fallback={<StatsSkeleton />}>
