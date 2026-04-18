@@ -4,6 +4,16 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { FileText, Image, File, X, Download, Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface Attachment {
     id: string;
@@ -17,7 +27,7 @@ interface Attachment {
 interface Props {
     attachments: Attachment[];
     requestId: string;
-    canDelete?: boolean; // true for requester (own request) or admin
+    canDelete?: boolean;
 }
 
 export function AttachmentPreview({ attachments, requestId, canDelete = false }: Props) {
@@ -25,29 +35,58 @@ export function AttachmentPreview({ attachments, requestId, canDelete = false }:
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [previewType, setPreviewType] = useState<string>('');
     const [deleting, setDeleting] = useState<string | null>(null);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [selectedAttachment, setSelectedAttachment] = useState<Attachment | null>(null);
     const supabase = createClient();
 
     const openPreview = async (att: Attachment) => {
         const { data } = await supabase.storage
             .from('attachments')
-            .createSignedUrl(att.file_path, 60); // 60 seconds expiry
+            .createSignedUrl(att.file_path, 60);
         if (data?.signedUrl) {
             setPreviewUrl(data.signedUrl);
             setPreviewType(att.mime_type ?? '');
         }
     };
 
-    const handleDelete = async (id: string) => {
-        if (!confirm('Delete this attachment? This action cannot be undone.')) return;
-        setDeleting(id);
-        const { error } = await supabase.from('attachments').delete().eq('id', id);
-        if (!error) {
-            // Refresh page data to reflect deletion
-            router.refresh();
+    const handleDeleteClick = (att: Attachment) => {
+        setSelectedAttachment(att);
+        setConfirmOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!selectedAttachment) return;
+        const att = selectedAttachment;
+        setConfirmOpen(false);
+        setDeleting(att.id);
+
+        // Delete from storage
+        const { error: storageError } = await supabase.storage
+            .from('attachments')
+            .remove([att.file_path]);
+
+        if (storageError) {
+            console.error('Storage deletion error:', storageError);
+            alert(`Failed to delete file: ${storageError.message}`);
+            setDeleting(null);
+            setSelectedAttachment(null);
+            return;
+        }
+
+        // Delete from database
+        const { error: dbError } = await supabase
+            .from('attachments')
+            .delete()
+            .eq('id', att.id);
+
+        if (dbError) {
+            console.error('Database deletion error:', dbError);
+            alert(`Failed to delete record: ${dbError.message}`);
         } else {
-            alert('Failed to delete attachment.');
+            router.refresh();
         }
         setDeleting(null);
+        setSelectedAttachment(null);
     };
 
     const getFileIcon = (mime: string | null) => {
@@ -64,6 +103,7 @@ export function AttachmentPreview({ attachments, requestId, canDelete = false }:
 
     return (
         <>
+            {/* Attachment list */}
             <div className="space-y-2">
                 {attachments.map((att) => (
                     <div key={att.id} className="flex items-center justify-between gap-2 border rounded-lg p-3 bg-white dark:bg-slate-900">
@@ -95,7 +135,7 @@ export function AttachmentPreview({ attachments, requestId, canDelete = false }:
                             </a>
                             {canDelete && (
                                 <button
-                                    onClick={() => handleDelete(att.id)}
+                                    onClick={() => handleDeleteClick(att)}
                                     disabled={deleting === att.id}
                                     className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
                                     title="Delete"
@@ -108,7 +148,7 @@ export function AttachmentPreview({ attachments, requestId, canDelete = false }:
                 ))}
             </div>
 
-            {/* Preview Modal (unchanged) */}
+            {/* Preview Modal */}
             {previewUrl && (
                 <div
                     className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
@@ -136,6 +176,24 @@ export function AttachmentPreview({ attachments, requestId, canDelete = false }:
                     </div>
                 </div>
             )}
+
+            {/* Modern Confirmation Dialog */}
+            <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Attachment</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete <span className="font-medium">“{selectedAttachment?.file_name}”</span>? This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700 focus:ring-red-600">
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     );
 }

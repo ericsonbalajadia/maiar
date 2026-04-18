@@ -168,6 +168,20 @@ export function AttachmentUploader({
             className="hidden"
           />
         </label>
+
+        {/* Tooltip icon right after the button */}
+        <div className="relative inline-block group">
+          <Info className="h-4 w-4 text-gray-400 hover:text-gray-500 transition-colors cursor-help" />
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10 whitespace-nowrap">
+            <div className="bg-gray-800 text-white text-xs rounded px-3 py-1.5 relative">
+              Max 5 MB per file.<br />
+              Allowed: JPEG, PNG, GIF, WebP only.<br />
+              Total attachments per request: 20 MB.
+              <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-800 rotate-45"></div>
+            </div>
+          </div>
+        </div>
+
         {uploading && progress !== null && (
           <div className="flex-1">
             <div className="w-full bg-gray-200 rounded-full h-2">
@@ -182,9 +196,6 @@ export function AttachmentUploader({
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
       {success && <p className="text-sm text-green-600">Upload successful!</p>}
-      <p className="text-xs text-gray-400">
-        Max 5 MB per file. Allowed: JPEG, PNG, GIF, WebP only. Total attachments per request: 20 MB.
-      </p>
     </div>
   );
 }
