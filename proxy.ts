@@ -12,11 +12,13 @@ const PUBLIC_ROUTES = [
     '/error',
     '/check-email',
     '/api/auth/callback',
+    '/api/cron/feedback-reminder',
 ]
 
 const PENDING_ALLOWED_ROUTES = [
     '/pending-approval',
     '/api/auth/callback',
+    '/api/cron',
 ]
 
 const DASHBOARD_PREFIXES = [...new Set(Object.values(ROLE_DASHBOARD))]
