@@ -39,78 +39,76 @@ function formatDate(dateStr: string) {
     .replace(/\//g, "-");
 }
 
-// ─── Stat Card ────────────────────────────────────────────────────────────────
+// ─── Stat Card (simplified, always visible) ──────────────────────────────────
 
 function StatCard({
   label,
   value,
   icon: Icon,
-  iconBg,
+  gradient,
   iconColor,
   sub,
 }: {
   label: string;
   value: number;
   icon: React.ElementType;
-  iconBg: string;
+  gradient: string;
   iconColor: string;
   sub?: string;
 }) {
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex items-center gap-4">
-      <div
-        className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}
-      >
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
+      <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${gradient} shadow-sm`}>
         <Icon className={`h-5 w-5 ${iconColor}`} />
       </div>
       <div>
-        <p className="text-2xl font-bold text-slate-900 dark:text-white leading-none">
+        <p className="text-2xl font-bold text-slate-900 dark:text-white leading-none tabular-nums">
           {value}
         </p>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+        <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">
           {label}
         </p>
-        {sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}
+        {sub && <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{sub}</p>}
       </div>
     </div>
   );
 }
 
-// ─── Stats Row ────────────────────────────────────────────────────────────────
+// ─── Stats Row (unchanged, just uses the new StatCard) ────────────────────────
 
 async function StatsRow() {
   const stats = await getRequesterStats();
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <StatCard
         label="Total Requests"
         value={stats.total}
         icon={ClipboardList}
-        iconBg="bg-slate-100 dark:bg-slate-800"
-        iconColor="text-slate-500 dark:text-slate-400"
+        gradient="bg-gradient-to-br from-slate-500 to-slate-700"
+        iconColor="text-white"
       />
       <StatCard
         label="Pending"
         value={stats.pending}
         icon={FileText}
-        iconBg="bg-amber-50 dark:bg-amber-900/20"
-        iconColor="text-amber-500"
+        gradient="bg-gradient-to-br from-amber-400 to-orange-500"
+        iconColor="text-white"
         sub="Awaiting action"
       />
       <StatCard
         label="In Progress"
         value={stats.inProgress}
         icon={Wrench}
-        iconBg="bg-blue-50 dark:bg-blue-900/20"
-        iconColor="text-blue-500"
+        gradient="bg-gradient-to-br from-blue-500 to-indigo-600"
+        iconColor="text-white"
         sub="Being worked on"
       />
       <StatCard
         label="Completed"
         value={stats.completed}
         icon={CheckCircle2}
-        iconBg="bg-emerald-50 dark:bg-emerald-900/20"
-        iconColor="text-emerald-500"
+        gradient="bg-gradient-to-br from-emerald-400 to-teal-600"
+        iconColor="text-white"
       />
     </div>
   );
