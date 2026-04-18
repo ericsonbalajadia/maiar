@@ -104,15 +104,15 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="flex flex-wrap gap-3 items-end">
           {/* Status */}
-          <div className="space-y-1">
+          <div className="flex-1 min-w-[140px] space-y-1">
             <Label className="text-xs text-slate-500 dark:text-slate-400">Status</Label>
             <Select
               value={filters.status ?? 'all'}
               onValueChange={(v) => handleFilterChange('status', v === 'all' ? '' : v)}
             >
-              <SelectTrigger className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl">
+              <SelectTrigger className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl truncate">
                 <SelectValue placeholder="All statuses" />
               </SelectTrigger>
               <SelectContent>
@@ -127,13 +127,13 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
           </div>
 
           {/* Type */}
-          <div className="space-y-1">
+          <div className="flex-[2] min-w-[200px] space-y-1">
             <Label className="text-xs text-slate-500 dark:text-slate-400">Request Type</Label>
             <Select
               value={filters.request_type ?? 'all'}
               onValueChange={(v) => handleFilterChange('request_type', v === 'all' ? '' : v)}
             >
-              <SelectTrigger className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl">
+              <SelectTrigger className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl truncate">
                 <SelectValue placeholder="All types" />
               </SelectTrigger>
               <SelectContent>
@@ -148,7 +148,7 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
           </div>
 
           {/* Date from */}
-          <div className="space-y-1">
+          <div className="flex-1 min-w-[140px] space-y-1">
             <Label className="text-xs text-slate-500 dark:text-slate-400">From</Label>
             <Input
               type="date"
@@ -159,7 +159,7 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
           </div>
 
           {/* Date to */}
-          <div className="space-y-1">
+          <div className="flex-1 min-w-[140px] space-y-1">
             <Label className="text-xs text-slate-500 dark:text-slate-400">To</Label>
             <Input
               type="date"
