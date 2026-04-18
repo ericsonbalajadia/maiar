@@ -11,6 +11,8 @@ import {
   type PpsrServiceType,
 } from '@/lib/constants/ppsr-service-types'
 import type { DbUser } from '@/types/models'
+import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -35,7 +37,7 @@ interface PpsrFormProps {
   dbUser: DbUser
 }
 
-// Icons per service type (keyed to ppsr-service-types.ts)
+// Icons and colors per service type
 const SERVICE_ICONS: Record<string, React.ElementType> = {
   audio_system:             Volume2,
   land_preparation:         Hammer,
@@ -50,14 +52,27 @@ const SERVICE_ICONS: Record<string, React.ElementType> = {
   others:                   MoreHorizontal,
 }
 
+const SERVICE_COLORS: Record<string, string> = {
+  audio_system:             'from-orange-400 to-red-500',
+  land_preparation:         'from-amber-400 to-yellow-500',
+  site_development:         'from-blue-400 to-cyan-500',
+  hauling:                  'from-slate-400 to-slate-600',
+  tent_installation:        'from-green-400 to-emerald-500',
+  fabrication:              'from-violet-400 to-purple-500',
+  installation:             'from-teal-400 to-cyan-600',
+  machining_works:          'from-zinc-400 to-zinc-600',
+  landscaping:              'from-lime-400 to-green-600',
+  plans_layouts_estimates:  'from-indigo-400 to-blue-600',
+  others:                   'from-rose-400 to-pink-500',
+}
+
 const STEPS = [
   { number: 1, label: 'Request Info' },
   { number: 2, label: 'Service Type' },
   { number: 3, label: 'Details' },
-  { number: 4, label: 'Submit' },
+  { number: 4, label: 'Review' },
 ]
 
-// Field label overrides for human-readable display in the form
 const FIELD_LABELS: Record<string, string> = {
   with_lights:               'With Lights?',
   setup_location:            'Setup Location',
@@ -77,17 +92,14 @@ const FIELD_LABELS: Record<string, string> = {
   specify:                   'Please Specify',
 }
 
-// Fields that should render as <select> with Yes/No
 const BOOLEAN_FIELDS = new Set(['with_lights'])
-
-// Fields that should render as <textarea>
 const TEXTAREA_FIELDS = new Set([
   'description_of_work',
   'description_of_installation',
   'specify',
 ])
 
-// ─── Step indicator ───────────────────────────────────────────────────────────
+// ─── Step indicator with progress bar ───────────────────────────────────────
 
 function StepIndicator({ current }: { current: number }) {
   return (
@@ -99,26 +111,30 @@ function StepIndicator({ current }: { current: number }) {
           <div key={step.number} className="flex items-start flex-1 last:flex-none">
             <div className="flex flex-col items-center gap-1.5">
               <div className={cn(
-                'w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all',
-                isPast || isCurrent
-                  ? 'bg-slate-900 dark:bg-white border-slate-900 dark:border-white text-white dark:text-slate-900'
-                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-300 dark:text-slate-600'
+                'w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-200 shadow-sm',
+                isPast
+                  ? 'bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-emerald-200 dark:shadow-emerald-900/30'
+                  : isCurrent
+                  ? 'bg-gradient-to-br from-violet-600 to-purple-600 text-white shadow-violet-200 dark:shadow-violet-900/30'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'
               )}>
                 {isPast ? <Check className="h-4 w-4" /> : step.number}
               </div>
               <span className={cn(
-                'text-xs text-center whitespace-nowrap',
-                isCurrent ? 'font-semibold text-slate-900 dark:text-white'
-                  : isPast ? 'text-slate-500 dark:text-slate-400'
-                  : 'text-slate-300 dark:text-slate-600'
+                'text-xs text-center whitespace-nowrap font-medium',
+                isCurrent ? 'text-violet-600 dark:text-violet-400'
+                  : isPast ? 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-slate-400 dark:text-slate-500'
               )}>
                 {step.label}
               </span>
             </div>
             {index < STEPS.length - 1 && (
               <div className={cn(
-                'flex-1 h-px mt-4 mx-2',
-                step.number < current ? 'bg-slate-900 dark:bg-white' : 'bg-slate-200 dark:bg-slate-700'
+                'flex-1 h-0.5 mt-4 mx-2 rounded-full transition-all duration-300',
+                step.number < current
+                  ? 'bg-gradient-to-r from-emerald-400 to-teal-500'
+                  : 'bg-slate-200 dark:bg-slate-700'
               )} />
             )}
           </div>
@@ -128,7 +144,7 @@ function StepIndicator({ current }: { current: number }) {
   )
 }
 
-// ─── Success Modal ────────────────────────────────────────────────────────────
+// ─── Success Modal (glassmorphic) ───────────────────────────────────────────
 
 function SuccessModal({
   ticketNumber,
@@ -139,17 +155,33 @@ function SuccessModal({
   onAnother: () => void
   onView: () => void
 }) {
-  return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center">
-        <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-          <CheckCircle2 className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div
+        className="rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center border border-white/20 dark:border-slate-700/60"
+        style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(20px)' }}
+      >
+        <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/30">
+          <CheckCircle2 className="h-8 w-8 text-white" />
         </div>
         <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Request Submitted!</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Your request has been received.</p>
-        <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 font-mono mb-6">{ticketNumber}</p>
-        <div className="flex flex-col gap-2">
-          <Button onClick={onView} className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900">
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">
+          Your request has been received and is pending review.
+        </p>
+        <div className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg px-3 py-1.5 mb-6">
+          <span className="text-xs text-slate-400">Ticket</span>
+          <span className="text-sm font-bold font-mono text-slate-800 dark:text-white">{ticketNumber}</span>
+        </div>
+        <div className="flex flex-col gap-2.5">
+          <Button
+            onClick={onView}
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20"
+          >
             View My Requests
           </Button>
           <Button onClick={onAnother} variant="outline" className="w-full">
@@ -157,11 +189,43 @@ function SuccessModal({
           </Button>
         </div>
       </div>
+    </div>,
+    document.body
+  );
+}
+
+// ─── Field wrapper with label and error ──────────────────────────────────────
+
+function Field({
+  label,
+  required,
+  error,
+  children,
+  className,
+}: {
+  label: string
+  required?: boolean
+  error?: string
+  children: React.ReactNode
+  className?: string
+}) {
+  return (
+    <div className={className}>
+      <Label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5 block">
+        {label}{required && <span className="text-rose-500 ml-0.5">*</span>}
+      </Label>
+      {children}
+      {error && (
+        <p className="text-xs text-rose-500 mt-1.5 flex items-center gap-1">
+          <span className="inline-block w-1 h-1 rounded-full bg-rose-500" />
+          {error}
+        </p>
+      )}
     </div>
   )
 }
 
-// ─── Dynamic service fields ───────────────────────────────────────────────────
+// ─── Dynamic service fields (styled) ─────────────────────────────────────────
 
 function ServiceSubFields({
   serviceType,
@@ -176,9 +240,15 @@ function ServiceSubFields({
 
   if (fields.length === 0) {
     return (
-      <p className="text-sm text-slate-400 italic">No additional fields required for this service type.</p>
+      <div className="rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 px-4 py-6 text-center">
+        <p className="text-sm text-slate-400 dark:text-slate-500 italic">
+          No additional fields required for this service type.
+        </p>
+      </div>
     )
   }
+
+  const inputClass = 'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all'
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -188,30 +258,30 @@ function ServiceSubFields({
 
         if (BOOLEAN_FIELDS.has(field)) {
           return (
-            <div key={field}>
-              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">{label}</Label>
+            <Field key={field} label={label}>
               <Select value={value} onValueChange={(v) => onChange(field, v)}>
-                <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
+                <SelectTrigger className={inputClass}>
+                  <SelectValue placeholder="Select..." />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="yes">Yes</SelectItem>
                   <SelectItem value="no">No</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </Field>
           )
         }
 
         if (TEXTAREA_FIELDS.has(field)) {
           return (
-            <div key={field} className="sm:col-span-2">
-              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">{label}</Label>
+            <Field key={field} label={label} className="sm:col-span-2">
               <Textarea
                 placeholder={`Enter ${label.toLowerCase()}...`}
                 value={value}
                 onChange={(e) => onChange(field, e.target.value)}
-                className="resize-none min-h-[100px]"
+                className="resize-none min-h-[100px] bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all"
               />
-            </div>
+            </Field>
           )
         }
 
@@ -220,29 +290,30 @@ function ServiceSubFields({
         const isNumber   = field.includes('trips') || field.includes('tents') || field.includes('hrs')
 
         return (
-          <div key={field}>
-            <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">{label}</Label>
+          <Field key={field} label={label}>
             <Input
               type={isDateTime ? 'datetime-local' : isDate ? 'date' : isNumber ? 'number' : 'text'}
               placeholder={`Enter ${label.toLowerCase()}...`}
               value={value}
               onChange={(e) => onChange(field, e.target.value)}
+              className={inputClass}
             />
-          </div>
+          </Field>
         )
       })}
     </div>
   )
 }
 
-// ─── Main Form ────────────────────────────────────────────────────────────────
+// ─── Main Form Component ──────────────────────────────────────────────────────
 
 export function PpsrForm({ dbUser }: PpsrFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
-  const [step, setStep]     = useState(1)
+  const [step, setStep] = useState(1)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [ticketNumber, setTicketNumber] = useState<string | null>(null)
+  const [requestId, setRequestId] = useState<string | null>(null);
 
   const today = new Date().toISOString().split('T')[0]
 
@@ -293,9 +364,12 @@ export function PpsrForm({ dbUser }: PpsrFormProps) {
     return Object.keys(errs).length === 0
   }
 
-  const next   = () => { if (validateStep(step)) setStep((s) => s + 1) }
-  const back   = () => setStep((s) => s - 1)
+  const next = () => { if (validateStep(step)) setStep((s) => s + 1) }
+  const back = () => setStep((s) => s - 1)
   const cancel = () => router.push('/requester/requests/new')
+
+
+
 
   const handleSubmit = () => {
     if (!validateStep(3)) return
@@ -311,311 +385,403 @@ export function PpsrForm({ dbUser }: PpsrFormProps) {
         service_type:      form.service_type as PpsrServiceType,
         service_data:      form.service_data,
       })
-      if (result.success && result.ticketNumber) {
-        setTicketNumber(result.ticketNumber)
-      } else {
-        setErrors({ submit: result.error ?? 'Submission failed. Please try again.' })
-      }
+if (result.success && result.ticketNumber && result.requestId) {
+  setTicketNumber(result.ticketNumber);
+  setRequestId(result.requestId);
+} else {
+  setErrors({ submit: result.error ?? 'Submission failed. Please try again.' });
+}
     })
   }
 
-  if (ticketNumber) {
-    return (
-      <SuccessModal
-        ticketNumber={ticketNumber}
-        onView={() => router.push('/requester/requests')}
-        onAnother={() => { setTicketNumber(null); setStep(1) }}
-      />
-    )
-  }
+if (ticketNumber && requestId) {
+  return (
+    <SuccessModal
+      ticketNumber={ticketNumber}
+      onView={() => router.push(`/requester/requests/${requestId}`)}
+      onAnother={() => { setTicketNumber(null); setRequestId(null); setStep(1); }}
+    />
+  );
+}
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 max-w-3xl mx-auto">
-      <StepIndicator current={step} />
+    <div
+      className="rounded-2xl border border-white/60 dark:border-slate-700/60 shadow-sm overflow-hidden"
+      style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(12px)' }}
+    >
+      {/* Progress bar */}
+      <div className="h-1 bg-slate-100 dark:bg-slate-800">
+        <div
+          className="h-full bg-gradient-to-r from-violet-500 to-purple-500 transition-all duration-500 ease-out rounded-full"
+          style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%` }}
+        />
+      </div>
 
-      {/* ── Step 1: Request Info ── */}
-      {step === 1 && (
-        <div>
-          <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-6">
-            Step 1: Request Information
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">Date Filled</Label>
-              <Input value={form.date_filled} readOnly className="bg-slate-50 dark:bg-slate-800 text-slate-500" />
-            </div>
-            <div>
-              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
-                Building / Department <span className="text-rose-500">*</span>
-              </Label>
-              <Input
-                placeholder="e.g. Engineering Block A"
-                value={form.building}
-                onChange={(e) => set('building', e.target.value)}
-                className={errors.building ? 'border-rose-400' : ''}
-              />
-              {errors.building && <p className="text-xs text-rose-500 mt-1">{errors.building}</p>}
+      <div className="p-6 sm:p-8">
+        <StepIndicator current={step} />
+
+        {/* Step 1: Request Info */}
+        {step === 1 && (
+          <div className="fade-in">
+            <div className="flex items-start gap-3 mb-6">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                <span className="text-xs font-bold text-white">1</span>
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">Request Information</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                  Tell us who you are and where the service is needed
+                </p>
+              </div>
             </div>
 
-            {/* ── Location: 3 free-text inputs ── */}
-            <div className="sm:col-span-2">
-              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
-                Location <span className="text-rose-500">*</span>
-              </Label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <Input
-                    placeholder="Building name *"
-                    value={form.location_building}
-                    onChange={(e) => set('location_building', e.target.value)}
-                    className={errors.location_building ? 'border-rose-400' : ''}
-                  />
-                  {errors.location_building && (
-                    <p className="text-xs text-rose-500 mt-1">{errors.location_building}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Date Filled">
+                <Input value={form.date_filled} readOnly className="h-10 bg-slate-50/80 dark:bg-slate-800/80 text-slate-500 cursor-default border-slate-200 dark:border-slate-700" />
+              </Field>
+
+              <Field label="Building / Department" required error={errors.building}>
+                <Input
+                  placeholder="e.g. Engineering Block A"
+                  value={form.building}
+                  onChange={(e) => set('building', e.target.value)}
+                  className={cn(
+                    'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                    errors.building && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
                   )}
-                </div>
-                <div>
-                  <Input
-                    placeholder="Floor level (optional)"
-                    value={form.location_floor}
-                    onChange={(e) => set('location_floor', e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Input
-                    placeholder="Room number (optional)"
-                    value={form.location_room}
-                    onChange={(e) => set('location_room', e.target.value)}
-                  />
-                </div>
+                />
+              </Field>
+
+              <div className="sm:col-span-2">
+                <Field label="Location" required error={errors.location_building}>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1.5">
+                    <Input
+                      placeholder="Building name *"
+                      value={form.location_building}
+                      onChange={(e) => set('location_building', e.target.value)}
+                      className={cn(
+                        'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                        errors.location_building && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
+                      )}
+                    />
+                    <Input
+                      placeholder="Floor level (optional)"
+                      value={form.location_floor}
+                      onChange={(e) => set('location_floor', e.target.value)}
+                      className="h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all"
+                    />
+                    <Input
+                      placeholder="Room number (optional)"
+                      value={form.location_room}
+                      onChange={(e) => set('location_room', e.target.value)}
+                      className="h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all"
+                    />
+                  </div>
+                </Field>
+              </div>
+
+              <Field label="Requesting Party Name" required error={errors.requesting_party}>
+                <Input
+                  value={form.requesting_party}
+                  onChange={(e) => set('requesting_party', e.target.value)}
+                  className={cn(
+                    'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                    errors.requesting_party && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
+                  )}
+                />
+              </Field>
+
+              <Field label="Designation / Position" required error={errors.designation}>
+                <Input
+                  placeholder="e.g. Lab Technician"
+                  value={form.designation}
+                  onChange={(e) => set('designation', e.target.value)}
+                  className={cn(
+                    'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                    errors.designation && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
+                  )}
+                />
+              </Field>
+
+              <Field label="Contact Number" required error={errors.contact_number}>
+                <Input
+                  placeholder="09xxxxxxxxx"
+                  value={form.contact_number}
+                  onChange={(e) => set('contact_number', e.target.value)}
+                  className={cn(
+                    'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                    errors.contact_number && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
+                  )}
+                />
+              </Field>
+
+              <Field label="Email Address" required error={errors.email}>
+                <Input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => set('email', e.target.value)}
+                  className={cn(
+                    'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                    errors.email && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
+                  )}
+                />
+              </Field>
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: Service Type */}
+        {step === 2 && (
+          <div className="fade-in">
+            <div className="flex items-start gap-3 mb-6">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                <span className="text-xs font-bold text-white">2</span>
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">Service Type</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                  Select the type of physical plant service you need
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {PPSR_SERVICE_TYPES.map((type) => {
+                const Icon       = SERVICE_ICONS[type] ?? MoreHorizontal
+                const color      = SERVICE_COLORS[type] ?? 'from-slate-400 to-slate-600'
+                const isSelected = form.service_type === type
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setServiceType(type)}
+                    className={cn(
+                      'relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 text-center transition-all duration-200',
+                      isSelected
+                        ? 'border-violet-500 bg-violet-50 dark:bg-violet-900/20 shadow-md shadow-violet-500/10'
+                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white/40 dark:bg-slate-800/40'
+                    )}
+                  >
+                    {isSelected && (
+                      <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-violet-500 flex items-center justify-center">
+                        <Check className="h-2.5 w-2.5 text-white" />
+                      </div>
+                    )}
+                    <div className={cn(
+                      'w-10 h-10 rounded-xl flex items-center justify-center shadow-sm',
+                      `bg-gradient-to-br ${color}`
+                    )}>
+                      <Icon className="h-5 w-5 text-white" />
+                    </div>
+                    <span className={cn(
+                      'text-xs font-semibold leading-tight',
+                      isSelected ? 'text-violet-700 dark:text-violet-300' : 'text-slate-600 dark:text-slate-400'
+                    )}>
+                      {PPSR_SERVICE_LABELS[type]}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+
+            {errors.service_type && (
+              <p className="text-xs text-rose-500 mt-3 flex items-center gap-1">
+                <span className="inline-block w-1 h-1 rounded-full bg-rose-500" />
+                {errors.service_type}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Step 3: Service Details */}
+        {step === 3 && form.service_type && (
+          <div className="fade-in space-y-5">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shrink-0 shadow-sm">
+                <span className="text-xs font-bold text-white">3</span>
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">Service Details</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                  {PPSR_SERVICE_LABELS[form.service_type]}
+                </p>
+              </div>
+              <div className={cn(
+                'ml-auto w-8 h-8 rounded-lg flex items-center justify-center shrink-0',
+                `bg-gradient-to-br ${SERVICE_COLORS[form.service_type] ?? 'from-violet-400 to-purple-500'}`
+              )}>
+                {(() => { const Icon = SERVICE_ICONS[form.service_type] ?? MoreHorizontal; return <Icon className="h-4 w-4 text-white" /> })()}
               </div>
             </div>
 
             <div>
-              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
-                Requesting Party Name <span className="text-rose-500">*</span>
+              <Label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5 block">
+                Request Title <span className="text-rose-500">*</span>
               </Label>
               <Input
-                value={form.requesting_party}
-                onChange={(e) => set('requesting_party', e.target.value)}
-                className={errors.requesting_party ? 'border-rose-400' : ''}
+                placeholder="Brief title for this request"
+                value={form.title}
+                onChange={(e) => set('title', e.target.value)}
+                className={cn(
+                  'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                  errors.title && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
+                )}
               />
-              {errors.requesting_party && <p className="text-xs text-rose-500 mt-1">{errors.requesting_party}</p>}
+              {errors.title && <p className="text-xs text-rose-500 mt-1.5">{errors.title}</p>}
             </div>
+
+            <ServiceSubFields
+              serviceType={form.service_type}
+              serviceData={form.service_data}
+              onChange={setServiceData}
+            />
+
             <div>
-              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
-                Designation / Position <span className="text-rose-500">*</span>
+              <Label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5 block">
+                Additional Notes
               </Label>
-              <Input
-                placeholder="e.g. Lab Technician"
-                value={form.designation}
-                onChange={(e) => set('designation', e.target.value)}
-                className={errors.designation ? 'border-rose-400' : ''}
+              <Textarea
+                placeholder="Any other details the team should know..."
+                value={form.description}
+                onChange={(e) => set('description', e.target.value)}
+                className="resize-none bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all"
               />
-              {errors.designation && <p className="text-xs text-rose-500 mt-1">{errors.designation}</p>}
-            </div>
-            <div>
-              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
-                Contact Number <span className="text-rose-500">*</span>
-              </Label>
-              <Input
-                placeholder="09xxxxxxxxx"
-                value={form.contact_number}
-                onChange={(e) => set('contact_number', e.target.value)}
-                className={errors.contact_number ? 'border-rose-400' : ''}
-              />
-              {errors.contact_number && <p className="text-xs text-rose-500 mt-1">{errors.contact_number}</p>}
-            </div>
-            <div>
-              <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
-                Email Address <span className="text-rose-500">*</span>
-              </Label>
-              <Input
-                type="email"
-                value={form.email}
-                onChange={(e) => set('email', e.target.value)}
-                className={errors.email ? 'border-rose-400' : ''}
-              />
-              {errors.email && <p className="text-xs text-rose-500 mt-1">{errors.email}</p>}
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* ── Step 2: Service Type ── */}
-      {step === 2 && (
-        <div>
-          <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-2">
-            Step 2: Service Type
-          </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
-            Select the type of physical plant service you need:
-          </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {PPSR_SERVICE_TYPES.map((type) => {
-              const Icon       = SERVICE_ICONS[type] ?? MoreHorizontal
-              const isSelected = form.service_type === type
-              return (
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() => setServiceType(type)}
-                  className={cn(
-                    'flex flex-col items-center gap-2 p-4 rounded-xl border-2 text-center transition-all',
-                    isSelected
-                      ? 'border-slate-900 dark:border-white bg-slate-50 dark:bg-slate-800'
-                      : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
-                  )}
-                >
-                  <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center',
-                    isSelected ? 'bg-slate-900 dark:bg-white' : 'bg-slate-100 dark:bg-slate-800'
-                  )}>
-                    <Icon className={cn('h-5 w-5',
-                      isSelected ? 'text-white dark:text-slate-900' : 'text-slate-500 dark:text-slate-400'
-                    )} />
+        {/* Step 4: Review & Submit */}
+        {step === 4 && (
+          <div className="fade-in">
+            <div className="flex items-start gap-3 mb-6">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                <span className="text-xs font-bold text-white">4</span>
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">Review &amp; Submit</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                  Please verify all details before submitting
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3 text-sm">
+              <div className="rounded-xl border border-slate-200/60 dark:border-slate-700/60 overflow-hidden bg-white/40 dark:bg-slate-800/40">
+                {[
+                  ['Building / Dept',  form.building],
+                  ['Location',         form.location_building],
+                  ['Floor Level',      form.location_floor || '—'],
+                  ['Room Number',      form.location_room  || '—'],
+                  ['Requesting Party', form.requesting_party],
+                  ['Service Type',     form.service_type ? PPSR_SERVICE_LABELS[form.service_type] : '—'],
+                ].map(([label, value], i) => (
+                  <div
+                    key={label}
+                    className={cn(
+                      'flex gap-4 px-4 py-2.5',
+                      i % 2 === 0 ? 'bg-transparent' : 'bg-slate-50/50 dark:bg-slate-800/30'
+                    )}
+                  >
+                    <span className="text-slate-400 dark:text-slate-500 min-w-[130px] shrink-0 text-xs font-semibold uppercase tracking-wide">{label}</span>
+                    <span className="font-medium text-slate-700 dark:text-slate-300">{value || '—'}</span>
                   </div>
-                  <span className={cn('text-xs font-medium leading-tight',
-                    isSelected ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400'
-                  )}>
-                    {PPSR_SERVICE_LABELS[type]}
-                  </span>
-                  {isSelected && <Check className="h-4 w-4 text-slate-900 dark:text-white" />}
-                </button>
-              )
-            })}
-          </div>
-          {errors.service_type && <p className="text-xs text-rose-500 mt-3">{errors.service_type}</p>}
-        </div>
-      )}
+                ))}
+              </div>
 
-      {/* ── Step 3: Service Details ── */}
-      {step === 3 && form.service_type && (
-        <div className="space-y-5">
-          <div>
-            <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-              Step 3: Service Details
-            </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-              {PPSR_SERVICE_LABELS[form.service_type]}
-            </p>
-          </div>
-          <div>
-            <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
-              Request Title <span className="text-rose-500">*</span>
-            </Label>
-            <Input
-              placeholder="Brief title for this request"
-              value={form.title}
-              onChange={(e) => set('title', e.target.value)}
-              className={errors.title ? 'border-rose-400' : ''}
-            />
-            {errors.title && <p className="text-xs text-rose-500 mt-1">{errors.title}</p>}
-          </div>
-          <ServiceSubFields
-            serviceType={form.service_type}
-            serviceData={form.service_data}
-            onChange={setServiceData}
-          />
-          <div>
-            <Label className="text-sm text-slate-600 dark:text-slate-400 mb-1.5 block">
-              Additional Notes
-            </Label>
-            <Textarea
-              placeholder="Any other details the team should know..."
-              value={form.description}
-              onChange={(e) => set('description', e.target.value)}
-              className="resize-none"
-            />
-          </div>
-        </div>
-      )}
-
-      {/* ── Step 4: Review ── */}
-      {step === 4 && (
-        <div>
-          <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-6">
-            Step 4: Review &amp; Submit
-          </h2>
-          <div className="space-y-4 text-sm">
-            <div className="rounded-xl border border-slate-200 dark:border-slate-700 divide-y divide-slate-100 dark:divide-slate-800 overflow-hidden">
-              {[
-                ['Building / Dept',  form.building],
-                ['Location',         form.location_building],
-                ['Floor Level',      form.location_floor || '—'],
-                ['Room Number',      form.location_room  || '—'],
-                ['Requesting Party', form.requesting_party],
-                ['Service Type',     form.service_type ? PPSR_SERVICE_LABELS[form.service_type] : '—'],
-              ].map(([label, value]) => (
-                <div key={label} className="flex gap-4 px-4 py-3">
-                  <span className="text-slate-400 dark:text-slate-500 min-w-[140px] shrink-0">{label}</span>
-                  <span className="font-medium text-slate-700 dark:text-slate-300">{value || '—'}</span>
+              {form.service_type && Object.keys(form.service_data).length > 0 && (
+                <div className="rounded-xl border border-slate-200/60 dark:border-slate-700/60 overflow-hidden bg-white/40 dark:bg-slate-800/40">
+                  {Object.entries(form.service_data)
+                    .filter(([, v]) => v)
+                    .map(([key, value], i) => (
+                      <div
+                        key={key}
+                        className={cn(
+                          'flex gap-4 px-4 py-2.5',
+                          i % 2 === 0 ? 'bg-transparent' : 'bg-slate-50/50 dark:bg-slate-800/30'
+                        )}
+                      >
+                        <span className="text-slate-400 dark:text-slate-500 min-w-[130px] shrink-0 text-xs font-semibold uppercase tracking-wide">
+                          {FIELD_LABELS[key] ?? key.replace(/_/g, ' ')}
+                        </span>
+                        <span className="font-medium text-slate-700 dark:text-slate-300">{value}</span>
+                      </div>
+                    ))
+                  }
                 </div>
+              )}
+
+              <div className="rounded-xl border border-slate-200/60 dark:border-slate-700/60 px-4 py-3 bg-white/40 dark:bg-slate-800/40">
+                <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1">Title</p>
+                <p className="font-semibold text-slate-800 dark:text-white">{form.title}</p>
+                {form.description && (
+                  <>
+                    <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mt-3 mb-1">Additional Notes</p>
+                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{form.description}</p>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {errors.submit && (
+              <div className="mt-4 flex items-start gap-2.5 rounded-xl text-sm text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800/60 px-4 py-3">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
+                {errors.submit}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Navigation Buttons */}
+        <div className="flex items-center justify-between mt-8 pt-5 border-t border-slate-100 dark:border-slate-800/60">
+          {step === 1 ? (
+            <Button type="button" variant="outline" onClick={cancel} className="text-slate-500 border-slate-200 dark:border-slate-700">
+              Cancel
+            </Button>
+          ) : (
+            <Button type="button" variant="outline" onClick={back} className="gap-1.5 text-slate-500 border-slate-200 dark:border-slate-700">
+              <ChevronLeft className="h-4 w-4" />
+              Back
+            </Button>
+          )}
+
+          <div className="flex items-center gap-2">
+            {/* Step dots */}
+            <div className="flex items-center gap-1.5 mr-3">
+              {STEPS.map((s) => (
+                <div
+                  key={s.number}
+                  className={cn(
+                    'rounded-full transition-all duration-200',
+                    s.number === step
+                      ? 'w-4 h-2 bg-violet-500'
+                      : s.number < step
+                      ? 'w-2 h-2 bg-emerald-400'
+                      : 'w-2 h-2 bg-slate-200 dark:bg-slate-700'
+                  )}
+                />
               ))}
             </div>
 
-            {/* Service-specific data */}
-            {form.service_type && Object.keys(form.service_data).length > 0 && (
-              <div className="rounded-xl border border-slate-200 dark:border-slate-700 divide-y divide-slate-100 dark:divide-slate-800 overflow-hidden">
-                {Object.entries(form.service_data)
-                  .filter(([, v]) => v)
-                  .map(([key, value]) => (
-                    <div key={key} className="flex gap-4 px-4 py-3">
-                      <span className="text-slate-400 dark:text-slate-500 min-w-[140px] shrink-0">
-                        {FIELD_LABELS[key] ?? key.replace(/_/g, ' ')}
-                      </span>
-                      <span className="font-medium text-slate-700 dark:text-slate-300">{value}</span>
-                    </div>
-                  ))
-                }
-              </div>
+            {step < 4 ? (
+              <Button
+                type="button"
+                onClick={next}
+                className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-md shadow-violet-500/20 gap-1.5 transition-all"
+              >
+                Next <ChevronRight className="h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={handleSubmit}
+                disabled={isPending}
+                className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-md shadow-emerald-500/20 min-w-[130px] transition-all"
+              >
+                {isPending ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Submitting…</> : '✓ Submit Request'}
+              </Button>
             )}
-
-            <div className="rounded-xl border border-slate-200 dark:border-slate-700 px-4 py-3">
-              <p className="text-slate-400 dark:text-slate-500 mb-1">Title</p>
-              <p className="font-medium text-slate-700 dark:text-slate-300">{form.title}</p>
-              {form.description && (
-                <>
-                  <p className="text-slate-400 dark:text-slate-500 mt-3 mb-1">Additional Notes</p>
-                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{form.description}</p>
-                </>
-              )}
-            </div>
           </div>
-          {errors.submit && (
-            <p className="mt-4 text-sm text-rose-500 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-lg px-4 py-3">
-              {errors.submit}
-            </p>
-          )}
         </div>
-      )}
-
-      {/* ── Navigation ── */}
-      <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
-        {step === 1 ? (
-          <Button type="button" variant="outline" onClick={cancel}>Cancel</Button>
-        ) : (
-          <Button type="button" variant="outline" onClick={back} className="gap-1.5">
-            <ChevronLeft className="h-4 w-4" /> Back
-          </Button>
-        )}
-        {step < 4 ? (
-          <Button
-            type="button"
-            onClick={next}
-            className="bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 gap-1.5"
-          >
-            Next <ChevronRight className="h-4 w-4" />
-          </Button>
-        ) : (
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            disabled={isPending}
-            className="bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 min-w-[120px]"
-          >
-            {isPending ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Submitting…</> : 'Submit Request'}
-          </Button>
-        )}
       </div>
     </div>
   )
