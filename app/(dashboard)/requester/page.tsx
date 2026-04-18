@@ -81,7 +81,7 @@ function StatCard({
 async function StatsRow() {
   const stats = await getRequesterStats();
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <StatCard
         label="Total Requests"
         value={stats.total}
@@ -195,35 +195,28 @@ async function RequestHistoryTable() {
                 key={req.id}
                 className="group hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors"
               >
-                {/* Ref # */}
                 <td className="px-3 py-3.5 first:pl-0 font-mono text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
                   {req.ticket_number}
                 </td>
-                {/* Type */}
                 <td className="px-3 py-3.5">
                   <RequestTypeBadge type={req.request_type} />
                 </td>
-                {/* Date */}
                 <td className="px-3 py-3.5 text-slate-500 dark:text-slate-400 whitespace-nowrap">
                   {formatDate(req.created_at)}
                 </td>
-                {/* Nature of Work */}
                 <td className="px-3 py-3.5 max-w-[180px]">
                   <span className="line-clamp-1 text-slate-700 dark:text-slate-300 font-medium">
                     {req.categories?.category_name ?? req.title}
                   </span>
                 </td>
-                {/* Building */}
                 <td className="px-3 py-3.5 text-slate-500 dark:text-slate-400 whitespace-nowrap">
                   {location}
                 </td>
-                {/* Status */}
                 <td className="px-3 py-3.5">
                   <StatusBadge
                     status={req.statuses?.status_name ?? "pending"}
                   />
                 </td>
-                {/* Actions */}
                 <td className="px-3 py-3.5 last:pr-0">
                   <div className="flex items-center gap-1.5">
                     <Button
@@ -272,7 +265,7 @@ async function RequestHistoryTable() {
 
 function StatsSkeleton() {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {[...Array(4)].map((_, i) => (
         <div
           key={i}
@@ -331,9 +324,9 @@ export default async function RequesterDashboardPage() {
   if (!isRequesterRole(dbUser.role)) redirect(getRoleDashboard(dbUser.role));
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto px-4 md:px-6">
       {/* ── Page header ── */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
             My Requests
@@ -360,13 +353,11 @@ export default async function RequesterDashboardPage() {
 
       {/* ── Request History ── */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
-        {/* Table header row */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800 gap-3">
           <h2 className="font-semibold text-slate-900 dark:text-white text-base">
             Request History
           </h2>
           <div className="flex items-center gap-3">
-            {/* Search bar (visual) */}
             <div className="relative hidden sm:block">
               <svg
                 className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400"
@@ -398,7 +389,6 @@ export default async function RequesterDashboardPage() {
           </div>
         </div>
 
-        {/* Table */}
         <div className="px-5 py-2">
           <Suspense fallback={<TableSkeleton />}>
             <RequestHistoryTable />
