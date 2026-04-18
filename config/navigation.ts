@@ -46,6 +46,7 @@ export const NAV_ITEMS: Record<Role, NavItem[]> = {
     { label: 'All Requests',      href: '/admin/requests',       icon: 'ClipboardList'   },
     { label: 'Settings',          href: '/admin/settings',       icon: 'Settings'        },
     { label: 'Feedback',          href: '/admin/analytics/feedback', icon: 'BarChart2'   },  // only one analytics link
+    { label: 'Reports', href: '/admin/analytics/reports', icon: 'BarChart2' }
     // Future: { label: 'Reports', href: '/admin/analytics/reports', icon: 'PieChart' }
 ],
 }
