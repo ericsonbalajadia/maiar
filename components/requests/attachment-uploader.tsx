@@ -19,9 +19,11 @@ const ALLOWED_MIME = [
 interface Props {
     requestId: string;
     currentTotalSize: number;
+    canUpload: boolean;
+    disabledReason?: string;
 }
 
-export function AttachmentUploader({ requestId, currentTotalSize }: Props) {
+export function AttachmentUploader({ requestId, currentTotalSize, canUpload, disabledReason }: Props) {
     const router = useRouter();
     const [progress, setProgress] = useState<number | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -136,7 +138,7 @@ export function AttachmentUploader({ requestId, currentTotalSize }: Props) {
                         type="file"
                         accept={ALLOWED_MIME.join(',')}
                         onChange={handleFileChange}
-                        disabled={uploading}
+                        disabled={uploading || !canUpload}
                         className="hidden"
                     />
                 </label>
