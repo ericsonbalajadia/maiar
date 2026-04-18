@@ -243,7 +243,6 @@ export default async function AdminRequestDetailPage({ params }: Props) {
                         attachments={attachments}
                         requestId={id}
                         canDelete={true}
-                        onDelete={() => window.location.reload()}
                     />
                 )}
             </div>

@@ -766,14 +766,12 @@ async function RequestDetailContent({ id }: { id: string }) {
             attachments={attachments}
             requestId={id}
             canDelete={true}
-            onDelete={() => window.location.reload()}
           />
         )}
         <div className="mt-4 pt-4 border-t">
           <AttachmentUploader
             requestId={id}
             currentTotalSize={totalAttachmentsSize}
-            onUploaded={() => window.location.reload()}
           />
         </div>
       </div>
