@@ -521,11 +521,13 @@ async function RequestDetailContent({ id }: { id: string }) {
   // status_history is already embedded in the request object from getRequestById
   const history = (request.status_history ?? []) as any[];
 
-  const attachments = request.attachments ?? [];
-  const totalAttachmentsSize = attachments.reduce(
-    (sum, a) => sum + (a.file_size || 0),
-    0,
-  );
+  const currentStatus = request.statuses?.status_name ?? 'pending';
+const canUpload = currentStatus === 'pending';
+const canDelete = ['pending', 'under_review'].includes(currentStatus);
+
+// Compute total attachments size (same as before)
+const attachments = request.attachments ?? [];
+const totalAttachmentsSize = attachments.reduce((sum, a) => sum + (a.file_size || 0), 0);
 
   return (
     <div className="space-y-5">
@@ -753,28 +755,28 @@ async function RequestDetailContent({ id }: { id: string }) {
 
       {/* ── Attachments ── */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
-        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
-          <Paperclip className="h-4 w-4 text-slate-400" />
-          Attachments
-        </h3>
-        {attachments.length === 0 ? (
-          <p className="text-sm text-slate-400 italic">
-            No attachments uploaded.
-          </p>
-        ) : (
-          <AttachmentPreview
+    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
+        <Paperclip className="h-4 w-4 text-slate-400" />
+        Attachments
+    </h3>
+    {attachments.length === 0 ? (
+        <p className="text-sm text-slate-400 italic">No attachments uploaded.</p>
+    ) : (
+        <AttachmentPreview
             attachments={attachments}
             requestId={id}
-            canDelete={true}
-          />
-        )}
-        <div className="mt-4 pt-4 border-t">
-          <AttachmentUploader
+            canDelete={canDelete}
+        />
+    )}
+    <div className="mt-4 pt-4 border-t">
+        <AttachmentUploader
             requestId={id}
             currentTotalSize={totalAttachmentsSize}
-          />
-        </div>
-      </div>
+            canUpload={canUpload}
+            disabledReason="Attachments can only be uploaded while the request is pending (before clerk review)."
+        />
+    </div>
+</div>
     </div>
   );
 }
