@@ -522,12 +522,16 @@ async function RequestDetailContent({ id }: { id: string }) {
   const history = (request.status_history ?? []) as any[];
 
   const currentStatus = request.statuses?.status_name ?? 'pending';
-const canUpload = currentStatus === 'pending';
 const canDelete = ['pending', 'under_review'].includes(currentStatus);
 
 // Compute total attachments size (same as before)
 const attachments = request.attachments ?? [];
 const totalAttachmentsSize = attachments.reduce((sum, a) => sum + (a.file_size || 0), 0);
+const isActive = !['completed', 'cancelled'].includes(currentStatusName);
+const canUpload = isActive;
+const uploadDisabledReason = !isActive 
+    ? 'Attachments cannot be uploaded after the request is completed or cancelled.'
+    : undefined;
 
   return (
     <div className="space-y-5">
@@ -768,14 +772,14 @@ const totalAttachmentsSize = attachments.reduce((sum, a) => sum + (a.file_size |
             canDelete={canDelete}
         />
     )}
-    <div className="mt-4 pt-4 border-t">
-        <AttachmentUploader
-            requestId={id}
-            currentTotalSize={totalAttachmentsSize}
-            canUpload={canUpload}
-            disabledReason="Attachments can only be uploaded while the request is pending (before clerk review)."
-        />
-    </div>
+<div className="mt-4 pt-4 border-t">
+    <AttachmentUploader
+        requestId={id}
+        currentTotalSize={totalAttachmentsSize}
+        canUpload={canUpload}
+        disabledReason={uploadDisabledReason}
+    />
+</div>
 </div>
     </div>
   );
