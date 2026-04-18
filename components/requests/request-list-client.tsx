@@ -171,17 +171,7 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
           </div>
         </div>
 
-        {filtersActive > 0 && (
-          <div className="mt-3 flex justify-end">
-            <button
-              onClick={handleClearFilters}
-              className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
-            >
-              <X className="h-3 w-3" />
-              Clear filters
-            </button>
-          </div>
-        )}
+  
       </div>
 
       {/* ── Results header ── */}
