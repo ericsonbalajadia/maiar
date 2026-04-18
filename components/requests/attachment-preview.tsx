@@ -49,6 +49,25 @@ export function AttachmentPreview({ attachments, requestId, canDelete = false }:
         }
     };
 
+    const handleDownload = async (att: Attachment) => {
+        try {
+            const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/attachments/${att.file_path}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Download failed');
+            const blob = await response.blob();
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = att.file_name;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        } catch (err) {
+            console.error('Download error:', err);
+            alert('Failed to download file.');
+        }
+    };
+
     const handleDeleteClick = (att: Attachment) => {
         setSelectedAttachment(att);
         setConfirmOpen(true);
@@ -103,7 +122,6 @@ export function AttachmentPreview({ attachments, requestId, canDelete = false }:
 
     return (
         <>
-            {/* Attachment list */}
             <div className="space-y-2">
                 {attachments.map((att) => (
                     <div key={att.id} className="flex items-center justify-between gap-2 border rounded-lg p-3 bg-white dark:bg-slate-900">
@@ -124,15 +142,13 @@ export function AttachmentPreview({ attachments, requestId, canDelete = false }:
                                     <FileText className="h-4 w-4" />
                                 </button>
                             )}
-                            <a
-                                href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/attachments/${att.file_path}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                            <button
+                                onClick={() => handleDownload(att)}
                                 className="p-1 text-gray-600 hover:bg-gray-100 rounded transition-colors"
                                 title="Download"
                             >
                                 <Download className="h-4 w-4" />
-                            </a>
+                            </button>
                             {canDelete && (
                                 <button
                                     onClick={() => handleDeleteClick(att)}
@@ -148,7 +164,7 @@ export function AttachmentPreview({ attachments, requestId, canDelete = false }:
                 ))}
             </div>
 
-            {/* Preview Modal */}
+            {/* Preview Modal (unchanged) */}
             {previewUrl && (
                 <div
                     className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
@@ -177,7 +193,7 @@ export function AttachmentPreview({ attachments, requestId, canDelete = false }:
                 </div>
             )}
 
-            {/* Modern Confirmation Dialog */}
+            {/* Confirmation Dialog (unchanged) */}
             <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
