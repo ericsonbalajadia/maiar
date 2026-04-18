@@ -3,7 +3,7 @@
 import { getRequestById } from '@/lib/queries/request.queries';
 import { startReview } from '@/actions/review.actions';
 import { notFound } from 'next/navigation';
-import { StatusBadge } from '@/components/requests/statusBadge';
+import { StatusBadge } from '@/components/common/status-badge';
 import { ReviewForm } from '@/components/reviews/review-form';
 import { fetchStatusHistory } from '@/lib/actions/tracking';
 import { RequestTimeline } from '@/components/tracking/requestTimeline';
