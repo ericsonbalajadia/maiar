@@ -22,16 +22,14 @@ export default async function RmrRequestPage() {
   if (!isRequesterRole(dbUser.role)) redirect(getRoleDashboard(dbUser.role))
 
   // Fetch reference data in parallel
-  const [{ data: categories }, { data: locations }] =
-    await Promise.all([
-      supabase.from('categories').select('*').eq('is_active', true).order('category_name'),
-      supabase.from('locations').select('*').eq('is_active', true).order('building_name'),
-    ])
+  const [{ data: categories }, { data: locations }] = await Promise.all([
+    supabase.from('categories').select('*').eq('is_active', true).order('category_name'),
+    supabase.from('locations').select('*').eq('is_active', true).order('building_name'),
+  ])
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-
-      {/* Page header */}
+    <div className="max-w-3xl mx-auto space-y-6 fade-in">
+      {/* Back button */}
       <div className="flex items-center gap-3">
         <Button asChild variant="ghost" size="sm" className="gap-1 text-slate-500 -ml-2 h-8">
           <Link href="/requester/requests/new">
@@ -41,26 +39,26 @@ export default async function RmrRequestPage() {
         </Button>
       </div>
 
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center shrink-0">
-          <Wrench className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+      {/* Glass header */}
+      <div className="flex items-center gap-4">
+        <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shrink-0 shadow-md shadow-blue-500/30">
+          <Wrench className="h-5 w-5 text-white" />
         </div>
-        <div>
+        <div className="flex-1 min-w-0">
           <h1 className="text-xl font-bold text-slate-900 dark:text-white">
             Repair &amp; Maintenance Request
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Fill all steps to submit
+            Fill all steps to submit · FM-GSO-09
           </p>
         </div>
-        {/* Type badge */}
-        <div className="ml-auto flex items-center gap-2">
-          <span className="text-xs font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-2.5 py-1 rounded-md">
-            R&amp;M
-          </span>
-          <span className="text-xs font-bold border border-slate-200 dark:border-slate-700 text-slate-400 px-2.5 py-1 rounded-md">
-            PPSR
-          </span>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-xs font-bold bg-blue-600 text-white px-2.5 py-1 rounded-lg shadow-sm">R&amp;M</span>
+          <Link href="/requester/requests/new/ppsr">
+            <span className="text-xs font-semibold border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 px-2.5 py-1 rounded-lg hover:border-violet-300 dark:hover:border-violet-700 hover:text-violet-500 transition-colors cursor-pointer">
+              PPSR
+            </span>
+          </Link>
         </div>
       </div>
 

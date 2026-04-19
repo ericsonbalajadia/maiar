@@ -4,6 +4,23 @@
 
 @layer base {
   :root {
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --gradient-card: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(248, 250, 252, 0.8) 100%
+    );
+
+    --gradient-card: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255 255, 0.7) 100%
+    );
+    --glass-bg: rgba(255, 255, 255, 0.6);
+
+    --glass-sidebar: rgba(255, 255, 255, 0.75);
+    --glass-header: rgba(255, 255, 255, 0.7);
+
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
@@ -31,6 +48,22 @@
     --radius: 0.5rem;
   }
   .dark {
+    --glass-bg: rgba(15, 23, 42, 0.6);
+    --gradient-card: linear-gradient(
+      135deg,
+      rgba(30, 41, 59, 0.9) 0%,
+      rgba(15, 23, 42, 0.8) 100%
+    );
+    --gradient-card: linear-gradient(
+      135deg,
+      rgba(30, 41, 59, 0.9) 0%,
+      rgba(15, 23, 42, 0.7) 100%
+    );
+    --glass-bg: rgba(15, 23, 42, 0.6);
+
+    --glass-sidebar: rgba(15, 23, 42, 0.85);
+    --glass-header: rgba(15, 23, 42, 0.8);
+
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
     --card: 0 0% 3.9%;
@@ -58,6 +91,24 @@
   }
 }
 
+.sidebar-glass {
+  background: var(--glass-sidebar);
+  backdrop-filter: blur(16px);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+.dark .sidebar-glass {
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.header-glass {
+  background: var(--glass-header);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+.dark .header-glass {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -65,4 +116,88 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.fade-in-delay-1 {
+  animation: fadeIn 0.5s ease-out 0.1s forwards;
+}
+.fade-in-delay-2 {
+  animation: fadeIn 0.5s ease-out 0.2s forwards;
+}
+.fade-in-delay-3 {
+  animation: fadeIn 0.5s ease-out 0.3s forwards;
+}
+
+[data-tooltip] {
+  position: relative;
+  cursor: help;
+}
+
+[data-tooltip]:before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 6px;
+  padding: 4px 8px;
+  background-color: #1e293b;
+  color: #f1f5f9;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  white-space: nowrap;
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 10;
+}
+
+[data-tooltip]:hover:before {
+  opacity: 1;
+}
+
+/* Dark mode tooltip adjustment */
+.dark [data-tooltip]:before {
+  background-color: #334155;
+  color: #e2e8f0;
+}
+
+/* Custom scrollbar for request list */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }
