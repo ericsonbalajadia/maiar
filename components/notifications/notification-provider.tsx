@@ -4,20 +4,25 @@
 import { useEffect } from 'react';
 import { useNotificationStore } from '@/stores/notification.store';
 import { useNotifications } from '@/hooks/useNotifications';
+import { getUnreadCount } from '@/actions/notifications/notifications.actions';
 
 interface Props {
   userId: string;
-  initialCount: number;
 }
 
-export function NotificationProvider({ userId, initialCount }: Props) {
+export function NotificationProvider({ userId }: Props) {
   const setUnreadCount = useNotificationStore((s) => s.setUnreadCount);
 
   useEffect(() => {
-    setUnreadCount(initialCount);
-  }, [initialCount, setUnreadCount]);
+    let isMounted = true;
+    getUnreadCount().then((count) => {
+      if (isMounted) setUnreadCount(count);
+    });
+    return () => { isMounted = false; };
+  }, [userId, setUnreadCount]);
 
-  useNotifications(userId); // starts realtime subscription (gated by feature flag)
+  // Start realtime subscription
+  useNotifications(userId);
 
   return null;
 }

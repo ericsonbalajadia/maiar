@@ -156,6 +156,7 @@ export async function markAllNotificationsRead(): Promise<void> {
 }
 
 export async function getUnreadCount(): Promise<number> {
+  const start = Date.now();
   const userId = await getCurrentUserId();
   if (!userId) return 0;
 
@@ -166,6 +167,7 @@ export async function getUnreadCount(): Promise<number> {
     .eq('user_id', userId)
     .is('read_at', null);
 
+  console.log(`[getUnreadCount] took ${Date.now() - start}ms`);
   return count ?? 0;
 }
 
