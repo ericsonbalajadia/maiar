@@ -1,3 +1,4 @@
+// actions/notifications/notifications.actions.ts
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
@@ -166,4 +167,44 @@ export async function getUnreadCount(): Promise<number> {
     .is('read_at', null);
 
   return count ?? 0;
+}
+
+// Get all user IDs for a given role
+export async function getUserIdsByRole(role: 'clerk' | 'supervisor' | 'admin'): Promise<string[]> {
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from('users')
+    .select('id')
+    .eq('role', role)
+    .eq('signup_status', 'approved');
+  return data?.map(u => u.id) ?? [];
+}
+
+// Send notification to multiple users
+export async function sendBulkNotification({
+  userIds,
+  requestId,
+  type,
+  subject,
+  message,
+}: {
+  userIds: string[];
+  requestId?: string;
+  type: string;
+  subject: string;
+  message: string;
+}) {
+  if (userIds.length === 0) return;
+  const supabase = createServiceClient();
+  const notifications = userIds.map(userId => ({
+    user_id: userId,
+    request_id: requestId || null,
+    type,
+    subject,
+    message,
+    read_at: null,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }));
+  await supabase.from('notifications').insert(notifications);
 }
