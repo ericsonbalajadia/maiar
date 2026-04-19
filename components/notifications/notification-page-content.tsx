@@ -67,17 +67,18 @@ function NotifCard({
   const meta = TYPE_META[notif.type] ?? TYPE_META['system'];
   const Icon = meta.icon;
   const href = notif.request_id ? requestHref(pathname, notif.request_id) : null;
+  const isUnread = notif.read_at === null;
 
   return (
     <div
       className={cn(
         'group relative rounded-xl border transition-all duration-200',
-        notif.read_at === null
+        isUnread
           ? `${meta.border} ${meta.bg} hover:shadow-sm`
           : 'border-slate-100/60 dark:border-slate-800/60 bg-white/60 dark:bg-slate-900/40 hover:bg-white/80 dark:hover:bg-slate-900/60'
       )}
     >
-      {notif.read_at === null && (
+      {isUnread && (
         <div className={`absolute left-0 top-3 bottom-3 w-0.5 rounded-full ${meta.color.replace('text-', 'bg-')} opacity-60`} />
       )}
 
@@ -87,14 +88,14 @@ function NotifCard({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <p className={cn('text-sm leading-snug', notif.read_at === null ? 'font-bold text-slate-900 dark:text-white' : 'font-semibold text-slate-700 dark:text-slate-300')}>
+            <p className={cn('text-sm leading-snug', isUnread ? 'font-bold text-slate-900 dark:text-white' : 'font-semibold text-slate-700 dark:text-slate-300')}>
               {notif.subject}
             </p>
             <div className="flex items-center gap-2 shrink-0">
               <span className="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap">
                 {relativeTime(notif.created_at)}
               </span>
-              {notif.read_at === null && <div className="w-2 h-2 rounded-full bg-blue-500 shadow-sm shadow-blue-500/50" />}
+              {isUnread && <div className="w-2 h-2 rounded-full bg-blue-500 shadow-sm shadow-blue-500/50" />}
             </div>
           </div>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{notif.message}</p>
@@ -104,13 +105,13 @@ function NotifCard({
               <Link
                 href={href}
                 className="inline-flex items-center gap-1 text-[11px] font-mono text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                onClick={() => notif.read_at === null && onRead(notif.id)}
+                onClick={() => isUnread && onRead(notif.id)}
               >
                 {notif.requests.ticket_number}
                 <ExternalLink className="h-2.5 w-2.5" />
               </Link>
             )}
-            {notif.read_at === null && (
+            {isUnread && (
               <button onClick={() => onRead(notif.id)} className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 transition-colors ml-auto">
                 Mark as read
               </button>
@@ -150,7 +151,10 @@ export function NotificationsPageContent() {
   const handleMarkAll = () => {
     startTransition(async () => {
       await markAllNotificationsRead();
-      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true, read_at: new Date().toISOString() })));
+      // Update local state: set read_at to current time
+      setNotifications((prev) =>
+        prev.map((n) => ({ ...n, read_at: new Date().toISOString() }))
+      );
       setUnreadCount(0);
     });
   };
@@ -158,18 +162,23 @@ export function NotificationsPageContent() {
   const handleMarkOne = async (id: string) => {
     await markNotificationRead(id);
     setNotifications((prev) =>
-      prev.map((n) => n.id === id ? { ...n, is_read: true, read_at: new Date().toISOString() } : n)
+      prev.map((n) =>
+        n.id === id ? { ...n, read_at: new Date().toISOString() } : n
+      )
     );
-    setUnreadCount(Math.max(0, notifications.filter((n) => !n.read_at === null).length - 1));
+    // Recalculate unread count
+    const newUnreadCount = notifications.filter((n) => n.read_at === null).length - 1;
+    setUnreadCount(Math.max(0, newUnreadCount));
   };
 
+  // Filter based on read_at
   const filtered = notifications.filter((n) => {
-    if (filter === 'unread') return !n.read_at === null;
-    if (filter === 'read')   return n.read_at === null;
+    if (filter === 'unread') return n.read_at === null;
+    if (filter === 'read')   return n.read_at !== null;
     return true;
   });
 
-  const unreadCount = notifications.filter((n) => !n.read_at === null).length;
+  const unreadCount = notifications.filter((n) => n.read_at === null).length;
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 fade-in">
