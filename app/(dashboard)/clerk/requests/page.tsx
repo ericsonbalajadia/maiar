@@ -1,4 +1,4 @@
-//app
+//app/(dashboard)/clerk/requests/page.tsx
 import { getFilteredRequests } from "@/lib/queries/request.queries";
 import { RequestsTable } from "@/components/requests/requests-table";
 import { error } from "console";

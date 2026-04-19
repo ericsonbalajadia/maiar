@@ -1,3 +1,4 @@
+//app/(dashboard)/clerk/notifications/page.tsx
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { isRequesterRole } from '@/lib/rbac'
