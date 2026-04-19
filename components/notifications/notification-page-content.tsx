@@ -1,3 +1,4 @@
+// components/notifications/notification-page-content.tsx
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -6,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import {
   Bell, CheckCheck, Wrench, ClipboardList, CheckCircle2, XCircle,
   AlertTriangle, Clock, Info, ExternalLink, Filter, Inbox,
+  UserPlus,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -38,17 +40,17 @@ function requestHref(pathname: string, requestId: string): string {
 }
 
 const TYPE_META: Record<string, { icon: React.ElementType; label: string; color: string; bg: string; border: string }> = {
-  request_created:   { icon: ClipboardList, label: 'Submitted',  color: 'text-blue-500',    bg: 'bg-blue-50 dark:bg-blue-900/20',     border: 'border-blue-200 dark:border-blue-800/50' },
-  request_approved:  { icon: CheckCircle2,  label: 'Approved',   color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20', border: 'border-emerald-200 dark:border-emerald-800/50' },
-  request_rejected:  { icon: XCircle,       label: 'Rejected',   color: 'text-rose-500',    bg: 'bg-rose-50 dark:bg-rose-900/20',     border: 'border-rose-200 dark:border-rose-800/50' },
-  request_assigned:  { icon: Wrench,        label: 'Assigned',   color: 'text-indigo-500',  bg: 'bg-indigo-50 dark:bg-indigo-900/20', border: 'border-indigo-200 dark:border-indigo-800/50' },
-  request_completed: { icon: CheckCircle2,  label: 'Completed',  color: 'text-teal-500',    bg: 'bg-teal-50 dark:bg-teal-900/20',     border: 'border-teal-200 dark:border-teal-800/50' },
-  request_cancelled: { icon: XCircle,       label: 'Cancelled',  color: 'text-slate-500',   bg: 'bg-slate-50 dark:bg-slate-800/40',   border: 'border-slate-200 dark:border-slate-700/50' },
-  feedback_requested:{ icon: AlertTriangle, label: 'Feedback',   color: 'text-amber-500',   bg: 'bg-amber-50 dark:bg-amber-900/20',   border: 'border-amber-200 dark:border-amber-800/50' },
-  reminder:          { icon: Clock,         label: 'Reminder',   color: 'text-orange-500',  bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-200 dark:border-orange-800/50' },
-  system:            { icon: Info,          label: 'System',     color: 'text-slate-500',   bg: 'bg-slate-50 dark:bg-slate-800/40',   border: 'border-slate-200 dark:border-slate-700/50' },
+  // Allowed by database constraint
+  new_user_registered: { icon: UserPlus,       label: 'Registration', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20', border: 'border-amber-200 dark:border-amber-800/50' },
+  request_submitted:    { icon: ClipboardList, label: 'Submitted',   color: 'text-blue-500',   bg: 'bg-blue-50 dark:bg-blue-900/20',   border: 'border-blue-200 dark:border-blue-800/50' },
+  request_approved:     { icon: CheckCircle2,  label: 'Approved',    color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20', border: 'border-emerald-200 dark:border-emerald-800/50' },
+  request_rejected:     { icon: XCircle,       label: 'Rejected',    color: 'text-rose-500',    bg: 'bg-rose-50 dark:bg-rose-900/20',   border: 'border-rose-200 dark:border-rose-800/50' },
+  technician_assigned:  { icon: Wrench,        label: 'Assigned',    color: 'text-indigo-500',  bg: 'bg-indigo-50 dark:bg-indigo-900/20', border: 'border-indigo-200 dark:border-indigo-800/50' },
+  status_updated:       { icon: CheckCircle2,  label: 'Updated',     color: 'text-teal-500',    bg: 'bg-teal-50 dark:bg-teal-900/20',   border: 'border-teal-200 dark:border-teal-800/50' },
+  feedback_requested:   { icon: AlertTriangle, label: 'Feedback',    color: 'text-amber-500',   bg: 'bg-amber-50 dark:bg-amber-900/20', border: 'border-amber-200 dark:border-amber-800/50' },
+  // Fallback
+  system:               { icon: Info,          label: 'System',      color: 'text-slate-500',   bg: 'bg-slate-50 dark:bg-slate-800/40', border: 'border-slate-200 dark:border-slate-700/50' },
 };
-
 const FILTER_OPTIONS = [
   { value: 'all',    label: 'All' },
   { value: 'unread', label: 'Unread' },

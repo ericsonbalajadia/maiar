@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useNotificationStore } from '@/stores/notification.store';
-import { Bell, X, CheckCheck, ExternalLink, Clock, Wrench, ClipboardList, CheckCircle2, XCircle, AlertTriangle, Info } from 'lucide-react';
+import { Bell, X, CheckCheck, ExternalLink, Clock, Wrench, ClipboardList, CheckCircle2, XCircle, AlertTriangle, Info, UserPlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { markAllNotificationsRead, markNotificationRead, getNotificationsForPanel } from '@/actions/notifications/notifications.actions';
 
@@ -51,15 +51,18 @@ function relativeTime(dateStr: string): string {
 }
 
 const TYPE_META: Record<string, { icon: React.ElementType; color: string; bg: string }> = {
-  request_created:   { icon: ClipboardList, color: 'text-blue-500',    bg: 'bg-blue-50 dark:bg-blue-900/20' },
-  request_approved:  { icon: CheckCircle2,  color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
-  request_rejected:  { icon: XCircle,       color: 'text-rose-500',    bg: 'bg-rose-50 dark:bg-rose-900/20' },
-  request_assigned:  { icon: Wrench,        color: 'text-indigo-500',  bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
-  request_completed: { icon: CheckCircle2,  color: 'text-teal-500',    bg: 'bg-teal-50 dark:bg-teal-900/20' },
-  request_cancelled: { icon: XCircle,       color: 'text-slate-500',   bg: 'bg-slate-50 dark:bg-slate-800/40' },
-  feedback_requested:{ icon: AlertTriangle, color: 'text-amber-500',   bg: 'bg-amber-50 dark:bg-amber-900/20' },
-  reminder:          { icon: Clock,         color: 'text-orange-500',  bg: 'bg-orange-50 dark:bg-orange-900/20' },
-  system:            { icon: Info,          color: 'text-slate-500',   bg: 'bg-slate-50 dark:bg-slate-800/40' },
+  // Use database constraint values
+  new_user_registered: { icon: UserPlus,       color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20' },
+  request_submitted:    { icon: ClipboardList, color: 'text-blue-500',  bg: 'bg-blue-50 dark:bg-blue-900/20' },
+  request_approved:     { icon: CheckCircle2,  color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
+  request_rejected:     { icon: XCircle,       color: 'text-rose-500',  bg: 'bg-rose-50 dark:bg-rose-900/20' },
+  technician_assigned:  { icon: Wrench,        color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
+  status_updated:       { icon: CheckCircle2,  color: 'text-teal-500',   bg: 'bg-teal-50 dark:bg-teal-900/20' },
+  feedback_requested:   { icon: AlertTriangle, color: 'text-amber-500',  bg: 'bg-amber-50 dark:bg-amber-900/20' },
+  // Keep fallback
+  system:               { icon: Info,          color: 'text-slate-500',  bg: 'bg-slate-50 dark:bg-slate-800/40' },
+  request_completed: { icon: CheckCircle2, color: 'text-teal-500', bg: 'bg-teal-50 dark:bg-teal-900/20' },
+request_cancelled: { icon: XCircle,      color: 'text-slate-500', bg: 'bg-slate-50 dark:bg-slate-800/40' },
 };
 
 function NotifItem({
@@ -73,7 +76,14 @@ function NotifItem({
 }) {
   const meta = TYPE_META[notif.type] ?? TYPE_META['system'];
   const Icon = meta.icon;
-  const href = notif.request_id ? requestHref(pathname, notif.request_id) : null;
+
+  let href: string | null = null;
+if (notif.type === 'new_user_registered') {
+  const base = pathname.startsWith('/admin') ? '/admin/users/pending' : '/clerk/account-requests';
+  href = base;
+} else if (notif.request_id) {
+    href = requestHref(pathname, notif.request_id);
+  }
 
   const handleClick = () => {
     if (notif.read_at === null) onRead(notif.id);
@@ -131,6 +141,7 @@ export function NotificationBell() {
   const panelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
+  // Close panel on outside click
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
@@ -143,6 +154,7 @@ export function NotificationBell() {
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
 
+  // Close on Escape key
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
@@ -150,6 +162,7 @@ export function NotificationBell() {
     return () => document.removeEventListener('keydown', handler);
   }, [open]);
 
+  // Load notifications when panel opens
   useEffect(() => {
     if (!open) return;
     setLoading(true);
@@ -161,21 +174,27 @@ export function NotificationBell() {
 
   const handleMarkAllRead = async () => {
     await markAllNotificationsRead();
-    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-    setUnreadCount(0);
+    setNotifications((prev) =>
+      prev.map((n) => ({ ...n, read_at: new Date().toISOString() }))
+    );
   };
 
   const handleMarkOneRead = async (id: string) => {
     await markNotificationRead(id);
     setNotifications((prev) =>
-      prev.map((n) => n.id === id ? { ...n, is_read: true } : n)
+      prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n))
     );
-    setUnreadCount(Math.max(0, count - 1));
   };
 
-  const unread = notifications.filter((n) => !n.read_at === null);
+  // Compute unread count from current notifications
+  const unread = notifications.filter((n) => n.read_at === null);
 
-return (
+  // Update the global store whenever the local unread count changes
+  useEffect(() => {
+    setUnreadCount(unread.length);
+  }, [unread.length, setUnreadCount]);
+
+  return (
     <div className="relative">
       <button
         ref={buttonRef}
@@ -201,7 +220,7 @@ return (
           {/* Mobile backdrop */}
           <div className="fixed inset-0 z-40 sm:hidden bg-black/20" onClick={() => setOpen(false)} />
 
-          {/* Dropdown panel – enhanced glass styling */}
+          {/* Dropdown panel – glass styling */}
           <div
             ref={panelRef}
             className={cn(
@@ -213,7 +232,7 @@ return (
               'animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200'
             )}
             style={{
-              background: 'var(--glass-sidebar)',      // matches sidebar glass
+              background: 'var(--glass-sidebar)',
               backdropFilter: 'blur(16px)',
               border: '1px solid rgba(255, 255, 255, 0.2)',
             }}
@@ -250,7 +269,6 @@ return (
             {/* Notification list */}
             <div className="max-h-[400px] overflow-y-auto overscroll-contain">
               {loading ? (
-                // Skeleton items (unchanged, but with glassy background)
                 <div className="space-y-0">
                   {[...Array(4)].map((_, i) => (
                     <div key={i} className="flex items-start gap-3 px-4 py-3 border-b border-white/10 dark:border-white/5 last:border-0">
