@@ -31,26 +31,19 @@ function relativeTime(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-function requestHref(pathname: string, requestId: string): string {
-  if (pathname.startsWith('/clerk')) return `/clerk/requests/${requestId}`;
-  if (pathname.startsWith('/supervisor')) return `/supervisor/requests/${requestId}`;
-  if (pathname.startsWith('/technician')) return `/technician/requests/${requestId}`;
-  if (pathname.startsWith('/admin')) return `/admin/requests/${requestId}`;
-  return `/requester/requests/${requestId}`;
-}
-
 const TYPE_META: Record<string, { icon: React.ElementType; label: string; color: string; bg: string; border: string }> = {
-  // Allowed by database constraint
   new_user_registered: { icon: UserPlus,       label: 'Registration', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20', border: 'border-amber-200 dark:border-amber-800/50' },
   request_submitted:    { icon: ClipboardList, label: 'Submitted',   color: 'text-blue-500',   bg: 'bg-blue-50 dark:bg-blue-900/20',   border: 'border-blue-200 dark:border-blue-800/50' },
   request_approved:     { icon: CheckCircle2,  label: 'Approved',    color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20', border: 'border-emerald-200 dark:border-emerald-800/50' },
   request_rejected:     { icon: XCircle,       label: 'Rejected',    color: 'text-rose-500',    bg: 'bg-rose-50 dark:bg-rose-900/20',   border: 'border-rose-200 dark:border-rose-800/50' },
   technician_assigned:  { icon: Wrench,        label: 'Assigned',    color: 'text-indigo-500',  bg: 'bg-indigo-50 dark:bg-indigo-900/20', border: 'border-indigo-200 dark:border-indigo-800/50' },
+  request_completed:    { icon: CheckCircle2,  label: 'Completed',   color: 'text-teal-500',    bg: 'bg-teal-50 dark:bg-teal-900/20',   border: 'border-teal-200 dark:border-teal-800/50' },
+  request_cancelled:    { icon: XCircle,       label: 'Cancelled',   color: 'text-slate-500',   bg: 'bg-slate-50 dark:bg-slate-800/40', border: 'border-slate-200 dark:border-slate-700/50' },
   status_updated:       { icon: CheckCircle2,  label: 'Updated',     color: 'text-teal-500',    bg: 'bg-teal-50 dark:bg-teal-900/20',   border: 'border-teal-200 dark:border-teal-800/50' },
   feedback_requested:   { icon: AlertTriangle, label: 'Feedback',    color: 'text-amber-500',   bg: 'bg-amber-50 dark:bg-amber-900/20', border: 'border-amber-200 dark:border-amber-800/50' },
-  // Fallback
   system:               { icon: Info,          label: 'System',      color: 'text-slate-500',   bg: 'bg-slate-50 dark:bg-slate-800/40', border: 'border-slate-200 dark:border-slate-700/50' },
 };
+
 const FILTER_OPTIONS = [
   { value: 'all',    label: 'All' },
   { value: 'unread', label: 'Unread' },
@@ -68,10 +61,39 @@ function NotifCard({
 }) {
   const meta = TYPE_META[notif.type] ?? TYPE_META['system'];
   const Icon = meta.icon;
-  const href = notif.request_id ? requestHref(pathname, notif.request_id) : null;
   const isUnread = notif.read_at === null;
 
-  return (
+  // Build href based on notification type and user role
+  let href: string | null = null;
+  if (notif.type === 'new_user_registered') {
+    if (pathname.startsWith('/admin')) {
+      href = '/admin/users/pending';
+    } else if (pathname.startsWith('/clerk')) {
+      href = '/clerk/account-requests';
+    } else if (pathname.startsWith('/supervisor')) {
+      href = '/supervisor/account-requests'; // or any appropriate page
+    } else {
+      href = '/';
+    }
+  } else if (notif.request_id) {
+    if (pathname.startsWith('/clerk')) {
+      href = `/clerk/requests/${notif.request_id}`;
+    } else if (pathname.startsWith('/supervisor')) {
+      href = `/supervisor/requests/${notif.request_id}`;
+    } else if (pathname.startsWith('/technician')) {
+      href = `/technician/requests/${notif.request_id}`;
+    } else if (pathname.startsWith('/admin')) {
+      href = `/admin/requests/${notif.request_id}`;
+    } else {
+      href = `/requester/requests/${notif.request_id}`;
+    }
+  }
+
+  const handleClick = () => {
+    if (isUnread) onRead(notif.id);
+  };
+
+  const inner = (
     <div
       className={cn(
         'group relative rounded-xl border transition-all duration-200',
@@ -79,6 +101,7 @@ function NotifCard({
           ? `${meta.border} ${meta.bg} hover:shadow-sm`
           : 'border-slate-100/60 dark:border-slate-800/60 bg-white/60 dark:bg-slate-900/40 hover:bg-white/80 dark:hover:bg-slate-900/60'
       )}
+      onClick={handleClick}
     >
       {isUnread && (
         <div className={`absolute left-0 top-3 bottom-3 w-0.5 rounded-full ${meta.color.replace('text-', 'bg-')} opacity-60`} />
@@ -123,6 +146,11 @@ function NotifCard({
       </div>
     </div>
   );
+
+  if (href) {
+    return <Link href={href} className="block">{inner}</Link>;
+  }
+  return inner;
 }
 
 export function NotificationsPageContent() {
@@ -153,7 +181,6 @@ export function NotificationsPageContent() {
   const handleMarkAll = () => {
     startTransition(async () => {
       await markAllNotificationsRead();
-      // Update local state: set read_at to current time
       setNotifications((prev) =>
         prev.map((n) => ({ ...n, read_at: new Date().toISOString() }))
       );
@@ -168,12 +195,10 @@ export function NotificationsPageContent() {
         n.id === id ? { ...n, read_at: new Date().toISOString() } : n
       )
     );
-    // Recalculate unread count
     const newUnreadCount = notifications.filter((n) => n.read_at === null).length - 1;
     setUnreadCount(Math.max(0, newUnreadCount));
   };
 
-  // Filter based on read_at
   const filtered = notifications.filter((n) => {
     if (filter === 'unread') return n.read_at === null;
     if (filter === 'read')   return n.read_at !== null;
