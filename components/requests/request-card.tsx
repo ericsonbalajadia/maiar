@@ -8,7 +8,7 @@ import { Calendar, MapPin, Hash } from 'lucide-react'
 interface RequestCardProps {
   request: {
     id: string
-    ticket_number: string
+    ticket_number: string | null
     title: string
     request_type: string
     created_at: string
@@ -35,7 +35,7 @@ export function RequestCard({ request, href }: RequestCardProps) {
           <div className="space-y-2 flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-mono text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
-                {request.ticket_number}
+                {request.ticket_number || 'N/A'}
               </span>
               <RequestTypeBadge type={request.request_type} />
             </div>
