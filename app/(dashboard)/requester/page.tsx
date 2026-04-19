@@ -25,6 +25,8 @@ import {
   Star,
   FileText,
   InboxIcon,
+  TrendingUp,  
+  ArrowRight,
 } from "lucide-react";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -39,44 +41,48 @@ function formatDate(dateStr: string) {
     .replace(/\//g, "-");
 }
 
-// ─── Stat Card ────────────────────────────────────────────────────────────────
+// ─── Stat Card (simplified, always visible) ──────────────────────────────────
 
 function StatCard({
   label,
   value,
   icon: Icon,
-  iconBg,
+  gradient,
   iconColor,
   sub,
 }: {
   label: string;
   value: number;
   icon: React.ElementType;
-  iconBg: string;
+  gradient: string;
   iconColor: string;
   sub?: string;
 }) {
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex items-center gap-4">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
       <div
-        className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}
+        className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${gradient} shadow-sm`}
       >
         <Icon className={`h-5 w-5 ${iconColor}`} />
       </div>
       <div>
-        <p className="text-2xl font-bold text-slate-900 dark:text-white leading-none">
+        <p className="text-2xl font-bold text-slate-900 dark:text-white leading-none tabular-nums">
           {value}
         </p>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+        <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">
           {label}
         </p>
-        {sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}
+        {sub && (
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+            {sub}
+          </p>
+        )}
       </div>
     </div>
   );
 }
 
-// ─── Stats Row ────────────────────────────────────────────────────────────────
+// ─── Stats Row (unchanged, just uses the new StatCard) ────────────────────────
 
 async function StatsRow() {
   const stats = await getRequesterStats();
@@ -86,31 +92,31 @@ async function StatsRow() {
         label="Total Requests"
         value={stats.total}
         icon={ClipboardList}
-        iconBg="bg-slate-100 dark:bg-slate-800"
-        iconColor="text-slate-500 dark:text-slate-400"
+        gradient="bg-gradient-to-br from-slate-500 to-slate-700"
+        iconColor="text-white"
       />
       <StatCard
         label="Pending"
         value={stats.pending}
         icon={FileText}
-        iconBg="bg-amber-50 dark:bg-amber-900/20"
-        iconColor="text-amber-500"
+        gradient="bg-gradient-to-br from-amber-400 to-orange-500"
+        iconColor="text-white"
         sub="Awaiting action"
       />
       <StatCard
         label="In Progress"
         value={stats.inProgress}
         icon={Wrench}
-        iconBg="bg-blue-50 dark:bg-blue-900/20"
-        iconColor="text-blue-500"
+        gradient="bg-gradient-to-br from-blue-500 to-indigo-600"
+        iconColor="text-white"
         sub="Being worked on"
       />
       <StatCard
         label="Completed"
         value={stats.completed}
         icon={CheckCircle2}
-        iconBg="bg-emerald-50 dark:bg-emerald-900/20"
-        iconColor="text-emerald-500"
+        gradient="bg-gradient-to-br from-emerald-400 to-teal-600"
+        iconColor="text-white"
       />
     </div>
   );
@@ -159,120 +165,133 @@ async function RequestHistoryTable() {
     );
   }
 
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-slate-100 dark:border-slate-800">
-            {[
-              "Ref #",
-              "Type",
-              "Date",
-              "Nature of Work",
-              "Building",
-              "Status",
-              "Action",
-            ].map((h) => (
-              <th
-                key={h}
-                className="text-left text-xs font-semibold text-slate-500 dark:text-slate-400 px-3 py-3 first:pl-0 last:pr-0 whitespace-nowrap"
-              >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-          {requests.map((req) => {
-            const statusName = req.statuses?.status_name?.toLowerCase() ?? "";
-            const isCompleted = statusName === "completed";
-            const location = req.locations
-              ? [req.locations.building_name].filter(Boolean).join(", ")
-              : "—";
+return (
+  <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
+    <table className="w-full text-sm">
+      <thead>
+        <tr className="border-b border-slate-100 dark:border-slate-800/60 sticky top-0 bg-white dark:bg-slate-900 z-10">
+          {[
+            { label: "Ref #", tip: "Unique ticket reference number" },
+            { label: "Type", tip: "R&M or Physical Plant Service" },
+            { label: "Date", tip: "Date submitted" },
+            { label: "Nature of Work", tip: "Category of the request" },
+            { label: "Building", tip: "Location of the request" },
+            { label: "Status", tip: "Current workflow status" },
+            { label: "Action", tip: "" },
+          ].map(({ label, tip }) => (
+            <th
+              key={label}
+              className="text-left text-xs font-semibold text-slate-400 dark:text-slate-500 px-3 py-3 first:pl-1 last:pr-1 whitespace-nowrap uppercase tracking-wide"
+              {...(tip ? { "data-tooltip": tip } : {})}
+            >
+              {label}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-slate-50 dark:divide-slate-800/30">
+        {requests.map((req, i) => {
+          const statusName = req.statuses?.status_name?.toLowerCase() ?? "";
+          const isCompleted = statusName === "completed";
+          const location = req.locations?.building_name ?? "—";
 
-            return (
-              <tr
-                key={req.id}
-                className="group hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors"
-              >
-                {/* Ref # */}
-                <td className="px-3 py-3.5 first:pl-0 font-mono text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+          return (
+            <tr
+              key={req.id}
+              className="group hover:bg-blue-50/40 dark:hover:bg-blue-900/10 transition-colors duration-150 fade-in"
+              style={{
+                animationDelay: `${i * 40}ms`,
+                animationFillMode: "forwards",
+                opacity: 0,
+              }}
+            >
+              <td className="px-3 py-3.5 first:pl-1">
+                <span
+                  className="font-mono text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md"
+                  data-tooltip={req.ticket_number}
+                >
                   {req.ticket_number}
-                </td>
-                {/* Type */}
-                <td className="px-3 py-3.5">
-                  <RequestTypeBadge type={req.request_type} />
-                </td>
-                {/* Date */}
-                <td className="px-3 py-3.5 text-slate-500 dark:text-slate-400 whitespace-nowrap">
-                  {formatDate(req.created_at)}
-                </td>
-                {/* Nature of Work */}
-                <td className="px-3 py-3.5 max-w-[180px]">
-                  <span className="line-clamp-1 text-slate-700 dark:text-slate-300 font-medium">
-                    {req.categories?.category_name ?? req.title}
-                  </span>
-                </td>
-                {/* Building */}
-                <td className="px-3 py-3.5 text-slate-500 dark:text-slate-400 whitespace-nowrap">
-                  {location}
-                </td>
-                {/* Status */}
-                <td className="px-3 py-3.5">
-                  <StatusBadge
-                    status={req.statuses?.status_name ?? "pending"}
-                  />
-                </td>
-                {/* Actions */}
-                <td className="px-3 py-3.5 last:pr-0">
-                  <div className="flex items-center gap-1.5">
+                </span>
+              </td>
+              <td className="px-3 py-3.5">
+                <RequestTypeBadge type={req.request_type} />
+              </td>
+              <td className="px-3 py-3.5 text-slate-500 dark:text-slate-400 whitespace-nowrap text-xs">
+                {formatDate(req.created_at)}
+              </td>
+              <td className="px-3 py-3.5 max-w-[160px]">
+                <span
+                  className="line-clamp-1 text-slate-700 dark:text-slate-300 font-medium text-sm"
+                  data-tooltip={req.categories?.category_name ?? req.title}
+                >
+                  {req.categories?.category_name ?? req.title}
+                </span>
+              </td>
+              <td className="px-3 py-3.5 whitespace-nowrap">
+                <span
+                  className="text-slate-500 dark:text-slate-400 text-sm"
+                  data-tooltip={location}
+                >
+                  {location.length > 18 ? location.slice(0, 18) + "…" : location}
+                </span>
+              </td>
+              <td className="px-3 py-3.5">
+                <StatusBadge status={req.statuses?.status_name ?? "pending"} />
+              </td>
+              <td className="px-3 py-3.5 last:pr-1">
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2.5 text-xs gap-1 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  >
+                    <Link href={`/requester/requests/${req.id}`}>
+                      <Eye className="h-3 w-3" />
+                      View
+                    </Link>
+                  </Button>
+                  {isCompleted && (
                     <Button
                       asChild
-                      variant="outline"
                       size="sm"
-                      className="h-7 px-2.5 text-xs gap-1.5"
+                      variant="ghost"
+                      className={`h-7 px-2.5 text-xs gap-1 transition-colors ${
+                        req.hasFeedback
+                          ? "text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                          : "hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600"
+                      }`}
+                      data-tooltip={
+                        req.hasFeedback
+                          ? "You've already rated this"
+                          : "Rate this service"
+                      }
                     >
-                      <Link href={`/requester/requests/${req.id}`}>
-                        <Eye className="h-3 w-3" />
-                        View
+                      <Link href={`/requester/requests/${req.id}#feedback`}>
+                        <Star
+                          className="h-3 w-3"
+                          fill={req.hasFeedback ? "currentColor" : "none"}
+                        />
+                        {req.hasFeedback ? "Rated" : "Rate"}
                       </Link>
                     </Button>
-                    {isCompleted && (
-                      <Button
-                        asChild
-                        size="sm"
-                        variant="outline"
-                        className={`h-7 px-2.5 text-xs gap-1.5 ${
-                          req.hasFeedback
-                            ? "bg-yellow-50 border-yellow-300 text-yellow-600 hover:bg-yellow-100"
-                            : ""
-                        }`}
-                      >
-                        <Link href={`/requester/requests/${req.id}#feedback`}>
-                          <Star
-                            className="h-3 w-3"
-                            fill={req.hasFeedback ? "currentColor" : "none"}
-                          />
-                          Rate
-                        </Link>
-                      </Button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
+                  )}
+                </div>
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+);
 }
 
 // ─── Skeletons ────────────────────────────────────────────────────────────────
 
 function StatsSkeleton() {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {[...Array(4)].map((_, i) => (
         <div
           key={i}
@@ -330,21 +349,26 @@ export default async function RequesterDashboardPage() {
     redirect("/pending-approval");
   if (!isRequesterRole(dbUser.role)) redirect(getRoleDashboard(dbUser.role));
 
+  const firstName = dbUser.full_name?.split(" ")[0] ?? "there";
+
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto px-4 md:px-6">
       {/* ── Page header ── */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-blue-500 dark:text-blue-400 mb-1">
+            Dashboard
+          </p>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            My Requests
+            Welcome back, {firstName} 👋
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            Track and manage your maintenance requests
+            Track and manage your maintenance requests below.
           </p>
         </div>
         <Button
           asChild
-          className="bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 gap-2"
+          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20 gap-2 shrink-0 transition-all duration-200"
         >
           <Link href="/requester/requests/new">
             <Plus className="h-4 w-4" />
@@ -359,52 +383,38 @@ export default async function RequesterDashboardPage() {
       </Suspense>
 
       {/* ── Request History ── */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
-        {/* Table header row */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
-          <h2 className="font-semibold text-slate-900 dark:text-white text-base">
-            Request History
-          </h2>
-          <div className="flex items-center gap-3">
-            {/* Search bar (visual) */}
-            <div className="relative hidden sm:block">
-              <svg
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              <input
-                readOnly
-                placeholder="Search requests..."
-                className="h-8 pl-8 pr-3 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-400 placeholder:text-slate-400 cursor-default focus:outline-none w-44"
-              />
-            </div>
-            <Button
-              asChild
-              variant="ghost"
-              size="sm"
-              className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 h-8"
-            >
-              <Link href="/requester/requests">View all</Link>
-            </Button>
-          </div>
-        </div>
-
-        {/* Table */}
-        <div className="px-5 py-2">
-          <Suspense fallback={<TableSkeleton />}>
-            <RequestHistoryTable />
-          </Suspense>
-        </div>
+{/* ── Request History (glass panel) ── */}
+<div
+  className="rounded-2xl border border-white/60 dark:border-slate-700/60 shadow-sm overflow-hidden"
+  style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
+>
+  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-5 py-4 border-b border-slate-100/80 dark:border-slate-800/60 gap-3 bg-white/40 dark:bg-slate-900/40">
+    <div className="flex items-center gap-2.5">
+      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
+        <TrendingUp className="h-3.5 w-3.5 text-white" />
       </div>
+      <h2 className="font-semibold text-slate-900 dark:text-white text-base">
+        Recent Requests
+      </h2>
+    </div>
+    <Button
+      asChild
+      variant="ghost"
+      size="sm"
+      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 h-8 gap-1.5"
+    >
+      <Link href="/requester/requests">
+        View all
+        <ArrowRight className="h-3 w-3" />
+      </Link>
+    </Button>
+  </div>
+  <div className="px-5 py-3">
+    <Suspense fallback={<TableSkeleton />}>
+      <RequestHistoryTable />
+    </Suspense>
+  </div>
+</div>
     </div>
   );
 }

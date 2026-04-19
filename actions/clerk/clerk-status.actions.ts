@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { ClerkStatusUpdateSchema } from '@/lib/validations/clerk-status.schema';
 import { CLERK_ALLOWED_TRANSITIONS } from '@/lib/constants/statuses';
+import { getUserIdsByRole, sendBulkNotification } from '@/actions/notifications/notifications.actions';
 
 export async function updateRequestStatusByClerk(
   requestId: string,
@@ -53,47 +54,62 @@ export async function updateRequestStatusByClerk(
   }
 
   // 5. Approved / Rejected → delegate to review flow
-  if (newStatus === 'approved' || newStatus === 'rejected') {
-    // Get the reviewer_id (current user's id from users table)
-    const { data: reviewer } = await supabase
-      .from('users')
-      .select('id')
-      .eq('auth_id', user.id)
-      .single();
+if (newStatus === 'approved' || newStatus === 'rejected') {
+  const { data: reviewer } = await supabase
+    .from('users')
+    .select('id')
+    .eq('auth_id', user.id)
+    .single();
 
-    if (!reviewer) return { error: 'Reviewer not found.' };
+  if (!reviewer) return { error: 'Reviewer not found.' };
 
-    // Insert review record
-    const { error: reviewError } = await supabase
-      .from('request_reviews')
-      .insert({
-        request_id: requestId,
-        reviewer_id: reviewer.id,
-        decision: newStatus,
-        review_notes: notes ?? null,
-        reviewed_at: new Date().toISOString(),
-      });
+  const { error: reviewError } = await supabase
+    .from('request_reviews')
+    .insert({
+      request_id: requestId,
+      reviewer_id: reviewer.id,
+      decision: newStatus,
+      review_notes: notes ?? null,
+      reviewed_at: new Date().toISOString(),
+    });
 
-    if (reviewError) return { error: `Failed to save review: ${reviewError.message}` };
+  if (reviewError) return { error: `Failed to save review: ${reviewError.message}` };
 
-    // Also update the request status
-    const { data: statusRow } = await supabase
-      .from('statuses')
-      .select('id')
-      .eq('status_name', newStatus)
-      .single();
+  const { data: statusRow } = await supabase
+    .from('statuses')
+    .select('id')
+    .eq('status_name', newStatus)
+    .single();
 
-    if (statusRow) {
-      await supabase
-        .from('requests')
-        .update({ status_id: statusRow.id, updated_at: new Date().toISOString() })
-        .eq('id', requestId);
-    }
-
-    revalidatePath('/clerk');
-    revalidatePath(`/clerk/requests/${requestId}/review`);
-    return { success: true, newStatus };
+  if (statusRow) {
+    await supabase
+      .from('requests')
+      .update({ status_id: statusRow.id, updated_at: new Date().toISOString() })
+      .eq('id', requestId);
   }
+
+  // ✅ Fetch request title and ticket number
+  const { data: requestInfo } = await supabase
+    .from('requests')
+    .select('title, ticket_number')
+    .eq('id', requestId)
+    .single();
+
+  if (requestInfo) {
+    const supervisorIds = await getUserIdsByRole('supervisor');
+    await sendBulkNotification({
+      userIds: supervisorIds,
+      requestId: requestId,
+      type: newStatus === 'approved' ? 'request_approved' : 'request_rejected',
+      subject: `Request ${newStatus} by clerk`,
+      message: `Request "${requestInfo.title}" (${requestInfo.ticket_number}) has been ${newStatus}.`,
+    });
+  }
+
+  revalidatePath('/clerk');
+  revalidatePath(`/clerk/requests/${requestId}/review`);
+  return { success: true, newStatus };
+}
 
   // 6. Fetch target status ID
   const { data: statusRow } = await supabase

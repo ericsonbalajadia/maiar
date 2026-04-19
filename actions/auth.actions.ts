@@ -7,6 +7,7 @@ import { registerSchema, loginSchema } from '@/lib/validations/user.schema'
 import { getRoleDashboard } from '@/lib/rbac'
 import { notifyAccountByEmail } from '@/lib/notifications/account-email'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getUserIdsByRole, sendBulkNotification } from '@/actions/notifications/notifications.actions';
 
 export type LoginState = {
   errors?: {
@@ -33,35 +34,24 @@ export async function registerUser(
   prevState: RegisterState,
   formData: FormData
 ): Promise<RegisterState> {
-  void prevState
+  void prevState;
   const raw = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
     full_name: formData.get('full_name') as string,
     role: formData.get('role') as string,
     department: formData.get('department') as string | undefined,
-  }
+  };
 
-  const result = registerSchema.safeParse(raw)
+  const result = registerSchema.safeParse(raw);
   if (!result.success) {
-    return { errors: result.error.flatten().fieldErrors }
+    return { errors: result.error.flatten().fieldErrors };
   }
 
-  const supabase = await createClient()
+  const supabase = await createClient();
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
-  // const { error } = await supabase.auth.signUp({
-  //   email: result.data.email,
-  //   password: result.data.password,
-  //   options: {
-  //     data: {
-  //       full_name: result.data.full_name,
-  //       role: result.data.role,
-  //       department: result.data.department ?? null,
-  //     },
-  //   },
-  // })
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-
+  // 1. Create the auth user
   const { error } = await supabase.auth.signUp({
     email: result.data.email,
     password: result.data.password,
@@ -73,38 +63,56 @@ export async function registerUser(
       },
       emailRedirectTo: `${appUrl}/api/auth/callback`,
     },
-  })
+  });
 
   if (error) {
-    return { errors: { form: [error.message] } }
+    return { errors: { form: [error.message] } };
   }
 
-  // Try to send account request received email
-  try {
-    const admin = createAdminClient()
-    // Give Supabase a moment to create the user record via on_auth_user_created trigger
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    const { data: newUser } = await admin
-      .from('users')
-      .select('id')
-      .eq('email', result.data.email)
-      .single()
+  // 2. Wait a moment for the database trigger to insert the user record
+  await new Promise(resolve => setTimeout(resolve, 1000));
 
-    if (newUser) {
+  const admin = createAdminClient();
+  const { data: newUser } = await admin
+    .from('users')
+    .select('id')
+    .eq('email', result.data.email)
+    .single();
+
+  if (newUser) {
+    // Send email to the new user
+    try {
       await notifyAccountByEmail({
         userId: newUser.id,
         event: 'account_request_submitted',
-      })
+      });
+    } catch (emailError) {
+      console.error('registerUser: failed to send account request email', {
+        email: result.data.email,
+        error: emailError,
+      });
     }
-  } catch (emailError) {
-    console.error('registerUser: failed to send account request email', {
-      email: result.data.email,
-      error: emailError,
-    })
+
+    // Send in-app notifications to all admins and clerks
+    try {
+      const adminIds = await getUserIdsByRole('admin');
+      const clerkIds = await getUserIdsByRole('clerk');
+      const staffIds = [...adminIds, ...clerkIds];
+
+      if (staffIds.length > 0) {
+        await sendBulkNotification({
+          userIds: staffIds,
+          type: 'new_user_registered',
+          subject: `New account pending approval: ${result.data.full_name}`,
+          message: `${result.data.full_name} (${result.data.email}) has registered and needs account approval.`,
+        });
+      }
+    } catch (notifError) {
+      console.error('registerUser: failed to send staff notifications', notifError);
+    }
   }
 
-  redirect('/check-email')
+  redirect('/check-email');
 }
 
 export async function loginUser(

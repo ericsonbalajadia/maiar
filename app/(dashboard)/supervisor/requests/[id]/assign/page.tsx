@@ -2,7 +2,7 @@ import { getRequestById } from '@/lib/queries/request.queries';
 import { getAvailableTechnicians } from '@/lib/queries/technician.queries'; // changed import
 import { notFound } from 'next/navigation';
 import { AssignTechnicianForm } from '@/components/assignments/assign-technician-form';
-import { StatusBadge } from '@/components/requests/statusBadge';
+import { StatusBadge } from '@/components/common/status-badge';
 import Link from 'next/link';
 
 interface Props {
