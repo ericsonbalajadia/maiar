@@ -4,6 +4,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notifyRequesterByEmail } from '@/lib/notifications/request-email';
+import { getUserIdsByRole, sendBulkNotification } from '@/actions/notifications/notifications.actions';
 import { revalidatePath } from "next/cache";
 import type {
   RmrFormInput,
@@ -156,10 +157,7 @@ export async function createRequest(
   const supabase = await createClient();
   const admin = createAdminClient();
 
-  // Auth & user checks (same as before)
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "You must be logged in to submit a request." };
 
   const { data: dbUser } = await supabase
@@ -170,14 +168,10 @@ export async function createRequest(
   if (!dbUser) return { error: "User record not found." };
 
   const pendingStatusId = await getPendingStatusId();
-  if (!pendingStatusId)
-    return { error: "System error: pending status not found." };
+  if (!pendingStatusId) return { error: "System error: pending status not found." };
 
-  // Resolve or create location ID from free‑text fields (works for both RMR and PPSR)
-  const { location_building, location_floor, location_room } = input as any;
-  if (!location_building || location_building.trim() === "") {
-    return { error: "Building name is required." };
-  }
+  const { location_building, location_floor, location_room } = input;
+  if (!location_building?.trim()) return { error: "Building name is required." };
   const locationId = await resolveOrCreateLocation(
     location_building,
     location_floor ?? "",
@@ -206,7 +200,17 @@ export async function createRequest(
     return { error: requestError?.message ?? "Failed to submit request." };
   }
 
-  // Handle PPSR details if needed (similar to before)
+  // --- INSERT BULK NOTIFICATION AFTER SUCCESSFUL REQUEST CREATION ---
+  const clerkIds = await getUserIdsByRole('clerk');
+  await sendBulkNotification({
+    userIds: clerkIds,
+    requestId: newRequest.id,
+    type: 'request_submitted',
+    subject: `New request: ${newRequest.ticket_number}`,
+    message: `A new ${type.toUpperCase()} request "${newRequest.title}" has been submitted and requires review.`,
+  });
+  // ----------------------------------------------------------------
+
   if (type === "ppsr") {
     const ppsrInput = input as PpsrFormInput;
     const { error: detailError } = await admin.from("ppsr_details").insert({
