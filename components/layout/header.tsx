@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { logoutUser } from '@/actions/auth.actions'
-import { ChevronDown, LogOut, Settings } from 'lucide-react'
+import { ChevronDown, LogOut, Settings, Bell } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -78,6 +78,13 @@ function HeaderSkeleton() {
       </div>
     </header>
   )
+}
+
+function getNotificationPreferencesPath(role: string): string {
+  if (role === 'student' || role === 'staff') {
+    return '/requester/notifications/preferences';
+  }
+  return `/${role}/notifications/preferences`;
 }
 
 // ─── Main Component ──────────────────────────────────────────────────────────
@@ -199,6 +206,14 @@ supabase.auth.getSession().then(({ data: { session } }: { data: { session: Sessi
                 <span className="text-sm font-medium">Profile Settings</span>
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuItem asChild className="rounded-lg gap-2.5 py-2 cursor-pointer text-slate-700 dark:text-slate-200 focus:bg-white/30 dark:focus:bg-white/10 hover:bg-white/30 dark:hover:bg-white/10 transition-colors">
+  <Link href={getNotificationPreferencesPath(user.role)} className="flex items-center gap-2.5">
+    <div className="w-6 h-6 rounded-md bg-white/20 dark:bg-white/10 flex items-center justify-center">
+      <Bell className="h-3.5 w-3.5 text-slate-600 dark:text-slate-300" />
+    </div>
+    <span className="text-sm font-medium">Notification Preferences</span>
+  </Link>
+</DropdownMenuItem>
             <DropdownMenuSeparator className="bg-slate-200/50 dark:bg-slate-700/50" />
             <DropdownMenuItem
               className="rounded-lg gap-2.5 py-2 cursor-pointer text-rose-600 dark:text-rose-400 focus:bg-rose-50/50 dark:focus:bg-rose-950/30 hover:bg-rose-50/50 dark:hover:bg-rose-950/30 transition-colors"

@@ -175,7 +175,7 @@ export function NotificationBell() {
 
   const unread = notifications.filter((n) => !n.read_at === null);
 
-  return (
+return (
     <div className="relative">
       <button
         ref={buttonRef}
@@ -198,23 +198,28 @@ export function NotificationBell() {
 
       {open && (
         <>
+          {/* Mobile backdrop */}
           <div className="fixed inset-0 z-40 sm:hidden bg-black/20" onClick={() => setOpen(false)} />
+
+          {/* Dropdown panel – enhanced glass styling */}
           <div
             ref={panelRef}
             className={cn(
               'absolute right-0 top-full mt-2 z-50',
               'w-[360px] max-w-[calc(100vw-1rem)]',
-              'rounded-2xl border border-slate-200/80 dark:border-slate-700/80',
-              'shadow-2xl shadow-black/10 dark:shadow-black/40',
+              'rounded-2xl',
+              'shadow-2xl shadow-black/20 dark:shadow-black/40',
               'overflow-hidden',
               'animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200'
             )}
             style={{
-              background: 'rgba(255,255,255,0.97)',
-              backdropFilter: 'blur(20px)',
+              background: 'var(--glass-sidebar)',      // matches sidebar glass
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
             }}
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100/60 dark:border-slate-800/60 bg-white/60 dark:bg-slate-900/60">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/20 dark:border-white/5 bg-white/30 dark:bg-slate-900/30">
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">Notifications</h3>
                 {unread.length > 0 && (
@@ -227,7 +232,7 @@ export function NotificationBell() {
                 {unread.length > 0 && (
                   <button
                     onClick={handleMarkAllRead}
-                    className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 px-2 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                    className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 px-2 py-1 rounded-lg hover:bg-blue-50/70 dark:hover:bg-blue-900/20 transition-colors"
                   >
                     <CheckCheck className="h-3.5 w-3.5" />
                     Mark all read
@@ -235,30 +240,32 @@ export function NotificationBell() {
                 )}
                 <button
                   onClick={() => setOpen(false)}
-                  className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition-colors"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
 
+            {/* Notification list */}
             <div className="max-h-[400px] overflow-y-auto overscroll-contain">
               {loading ? (
+                // Skeleton items (unchanged, but with glassy background)
                 <div className="space-y-0">
                   {[...Array(4)].map((_, i) => (
-                    <div key={i} className="flex items-start gap-3 px-4 py-3 border-b border-slate-100/60 dark:border-slate-800/60 last:border-0">
-                      <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 animate-pulse shrink-0" />
+                    <div key={i} className="flex items-start gap-3 px-4 py-3 border-b border-white/10 dark:border-white/5 last:border-0">
+                      <div className="w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-slate-700/60 animate-pulse shrink-0" />
                       <div className="flex-1 space-y-1.5">
-                        <div className="h-3.5 bg-slate-100 dark:bg-slate-800 rounded-full animate-pulse w-3/4" />
-                        <div className="h-3 bg-slate-50 dark:bg-slate-800/60 rounded-full animate-pulse w-full" />
-                        <div className="h-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-full animate-pulse w-1/3" />
+                        <div className="h-3.5 bg-slate-200/60 dark:bg-slate-700/60 rounded-full animate-pulse w-3/4" />
+                        <div className="h-3 bg-slate-100/60 dark:bg-slate-800/60 rounded-full animate-pulse w-full" />
+                        <div className="h-2.5 bg-slate-100/60 dark:bg-slate-800/60 rounded-full animate-pulse w-1/3" />
                       </div>
                     </div>
                   ))}
                 </div>
               ) : notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-100/50 dark:bg-slate-800/50 flex items-center justify-center mb-3">
                     <Bell className="h-5 w-5 text-slate-400" />
                   </div>
                   <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">All caught up!</p>
@@ -271,12 +278,13 @@ export function NotificationBell() {
               )}
             </div>
 
+            {/* Footer */}
             {notifications.length > 0 && (
-              <div className="px-4 py-2.5 border-t border-slate-100/60 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-900/40">
+              <div className="px-4 py-2.5 border-t border-white/20 dark:border-white/5 bg-slate-50/30 dark:bg-slate-900/30">
                 <Link
                   href={allNotifsHref}
                   onClick={() => setOpen(false)}
-                  className="flex items-center justify-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors w-full"
+                  className="flex items-center justify-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 py-1 rounded-lg hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors w-full"
                 >
                   View all notifications
                   <ExternalLink className="h-3 w-3" />
