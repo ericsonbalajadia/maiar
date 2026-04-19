@@ -16,18 +16,20 @@ interface RequestCardProps {
     priority: { level: string }
     location: { building_name: string }
   }
-  href: string
+  fullHref?: string;
 }
 
-export function RequestCard({ request, href }: RequestCardProps) {
+export function RequestCard({ request, fullHref }: RequestCardProps) {
   const formattedDate = new Date(request.created_at).toLocaleDateString('en-PH', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
   })
 
+  const linkHref = fullHref ? fullHref : `/clerk/requests/${request.id}/review`;
+
   return (
-    <Link href={href} className="block">
+    <Link href={linkHref} className="block">
       <div
         className="group relative rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-blue-200 dark:hover:border-blue-800 hover:bg-white dark:hover:bg-slate-900"
       >

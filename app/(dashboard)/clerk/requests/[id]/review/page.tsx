@@ -1,87 +1,42 @@
-//app/(dashboard)/clerk/requests/[id]/review/page.tsx
-
-import { getRequestById } from '@/lib/queries/request.queries';
-import { startReview } from '@/actions/review.actions';
+// app/(dashboard)/clerk/requests/[id]/review/page.tsx
 import { notFound } from 'next/navigation';
-import { StatusBadge } from '@/components/common/status-badge';
-import { ReviewForm } from '@/components/reviews/review-form';
-import { fetchStatusHistory } from '@/lib/actions/tracking';
-import { RequestTimeline } from '@/components/tracking/requestTimeline';
-import { StatusUpdatePanel } from '@/components/clerk/status-update-panel';
+import { createClient } from '@/lib/supabase/server';
+import { getRequestById } from '@/lib/queries/request.queries';
+import { RequestDetailPanel } from '@/components/clerk/request-detail-panel';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft } from 'lucide-react';
 
-interface Props {
+interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-// app/(dashboard)/clerk/requests/[id]/review/page.tsx
-
-export default async function ClerkReviewPage({ params }: Props) {
+export default async function ClerkRequestDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const { data: request } = await getRequestById(id);
-  if (!request) notFound();
+  const supabase = await createClient();
 
-  const history = await fetchStatusHistory(id);
-
-  const currentStatus = request.statuses?.status_name ?? 'pending';
-  const isReviewable = ['pending', 'under_review'].includes(currentStatus);
-  const buildingName = request.locations?.building_name ?? 'Unknown location';
-
-  // Moved startReview inside the conditional – it should not run on every render
-  // Instead, we'll handle it via the ReviewForm action. Remove this automatic call.
+  let request;
+  try {
+    const result = await getRequestById(id);
+    if (!result.data) notFound();
+    request = result.data;
+  } catch {
+    notFound();
+  }
 
   return (
-    <div className="max-w-2xl space-y-6">
-      {/* Breadcrumb */}
-      <nav className="text-sm text-slate-400">
-        <Link href="/clerk" className="hover:text-teal-600">Review Queue</Link>
-        <span className="mx-2">›</span>
-        <span className="text-slate-600">{request.ticket_number}</span>
-      </nav>
-
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-mono text-slate-400">{request.ticket_number}</p>
-          <h1 className="mt-1 text-xl font-bold text-slate-800">{request.title}</h1>
-        </div>
-        <StatusBadge status={currentStatus} />
+    <div className="container mx-auto py-6 max-w-3xl space-y-4">
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="sm" asChild>
+          <Link href="/clerk">
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Back to Dashboard
+          </Link>
+        </Button>
+        {/* Removed the "Open Review Form" button */}
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-5 text-sm space-y-3">
-        <p>
-          <span className="font-medium text-slate-500">Requester:</span>{' '}
-          {request.requester?.full_name ?? 'Unknown'}
-        </p>
-        <p>
-          <span className="font-medium text-slate-500">Location:</span>{' '}
-          {buildingName}
-        </p>
-        <div className="pt-2 border-t border-slate-100">
-          <p className="font-medium text-slate-500 mb-1">Description</p>
-          <p className="text-slate-700 whitespace-pre-wrap">{request.description ?? 'No description provided.'}</p>
-        </div>
-      </div>
-
-      {/* Status History Timeline */}
-      <div className="rounded-xl border border-slate-200 bg-white p-5">
-        <h3 className="text-sm font-semibold text-slate-700 mb-4">Status History</h3>
-        <RequestTimeline history={history} />
-      </div>
-
-      {isReviewable ? (
-        <>
-          <ReviewForm requestId={id} />
-          <StatusUpdatePanel
-            requestId={request.id}
-            currentStatus={currentStatus}
-            ticketNumber={request.ticket_number}
-          />
-        </>
-      ) : (
-        <p className="rounded-lg bg-slate-50 p-4 text-sm text-slate-500">
-          Already reviewed – status: {currentStatus}
-        </p>
-      )}
+      <RequestDetailPanel request={request} />
     </div>
   );
 }

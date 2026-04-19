@@ -62,17 +62,17 @@ function EmptySection({ label }: { label: string }) {
 
 function RequestCardWithActions({
   request,
-  basePath,
+  reviewPath,
 }: {
   request: any;
-  basePath: string;
+  reviewPath: string;
 }) {
   return (
     <div
       className="rounded-2xl border border-white/60 dark:border-slate-700/60 overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
       style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
     >
-      <RequestCard request={request} href={`${basePath}/${request.id}`} />
+      <RequestCard request={request} fullHref={`/clerk/requests/${request.id}/review`} />
       <div className="border-t border-slate-100/80 dark:border-slate-800/60 px-4 py-3 bg-slate-50/40 dark:bg-slate-900/20">
         <StatusUpdatePanel
           requestId={request.id}
@@ -153,7 +153,7 @@ export default async function ClerkDashboardPage() {
                   <RequestCardWithActions
                     key={r.id}
                     request={r}
-                    basePath="/clerk/requests"
+                    reviewPath={`/clerk/requests/${r.id}/review`}
                   />
                 ))}
               </div>
@@ -190,7 +190,7 @@ export default async function ClerkDashboardPage() {
                   <RequestCardWithActions
                     key={r.id}
                     request={r}
-                    basePath="/clerk/requests"
+                    reviewPath={`/clerk/requests/${r.id}/review`}
                   />
                 ))}
               </div>
