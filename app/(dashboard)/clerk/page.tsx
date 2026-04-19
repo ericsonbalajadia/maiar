@@ -6,6 +6,8 @@ import { StatusUpdatePanel } from "@/components/clerk/status-update-panel";
 import { ClipboardCheck, Clock, Eye, InboxIcon, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
+const DISPLAY_LIMIT = 2; // Show only this many requests per column
+
 // ─── Section header ───────────────────────────────────────────────────────────
 
 function SectionHeader({
@@ -62,10 +64,8 @@ function EmptySection({ label }: { label: string }) {
 
 function RequestCardWithActions({
   request,
-  reviewPath,
 }: {
   request: any;
-  reviewPath: string;
 }) {
   return (
     <div
@@ -93,6 +93,8 @@ export default async function ClerkDashboardPage() {
   const underReview = requests?.filter((r) => r.status.status_name === "under_review") ?? [];
 
   const totalActive = pending.length + underReview.length;
+  const pendingToShow = pending.slice(0, DISPLAY_LIMIT);
+  const underReviewToShow = underReview.slice(0, DISPLAY_LIMIT);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto fade-in px-4 md:px-6">
@@ -146,26 +148,27 @@ export default async function ClerkDashboardPage() {
             iconBg="bg-amber-50 dark:bg-amber-900/20"
             iconColor="text-amber-500"
           />
-          {pending.length > 0 ? (
+          {pendingToShow.length > 0 ? (
             <>
               <div className="space-y-4">
-                {pending.map((r) => (
+                {pendingToShow.map((r) => (
                   <RequestCardWithActions
                     key={r.id}
                     request={r}
-                    reviewPath={`/clerk/requests/${r.id}/review`}
                   />
                 ))}
               </div>
-              <div className="mt-4 flex justify-center">
-                <Link
-                  href="/clerk/requests?status=pending"
-                  className="inline-flex items-center gap-1 text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
-                >
-                  View all pending
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
+              {pending.length > DISPLAY_LIMIT && (
+                <div className="mt-4 flex justify-center">
+                  <Link
+                    href="/clerk/requests?status=pending"
+                    className="inline-flex items-center gap-1 text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+                  >
+                    View all pending ({pending.length - DISPLAY_LIMIT} more)
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              )}
             </>
           ) : (
             <EmptySection label="Pending" />
@@ -183,26 +186,27 @@ export default async function ClerkDashboardPage() {
             iconBg="bg-blue-50 dark:bg-blue-900/20"
             iconColor="text-blue-500"
           />
-          {underReview.length > 0 ? (
+          {underReviewToShow.length > 0 ? (
             <>
               <div className="space-y-4">
-                {underReview.map((r) => (
+                {underReviewToShow.map((r) => (
                   <RequestCardWithActions
                     key={r.id}
                     request={r}
-                    reviewPath={`/clerk/requests/${r.id}/review`}
                   />
                 ))}
               </div>
-              <div className="mt-4 flex justify-center">
-                <Link
-                  href="/clerk/requests?status=under_review"
-                  className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-                >
-                  View all under review
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
+              {underReview.length > DISPLAY_LIMIT && (
+                <div className="mt-4 flex justify-center">
+                  <Link
+                    href="/clerk/requests?status=under_review"
+                    className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                  >
+                    View all under review ({underReview.length - DISPLAY_LIMIT} more)
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              )}
             </>
           ) : (
             <EmptySection label="Under Review" />
