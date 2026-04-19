@@ -1,3 +1,4 @@
+//app/(dashboard)/requester/notifications/page.tsx
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { updateNotificationPreferences } from '@/actions/notification-preferences.actions'
@@ -5,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
+import { cn } from '@/lib/utils'
+import { Bell, Mail, Settings2 } from 'lucide-react'
 
 type SearchParams = {
   saved?: string
@@ -31,7 +34,10 @@ function PreferenceRow({
   defaultChecked: boolean
 }) {
   return (
-    <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+    <div className={cn(
+      "flex items-start gap-3 rounded-xl border border-slate-200/60 dark:border-slate-700/60 p-4 transition-all",
+      "bg-white/60 dark:bg-slate-800/40 backdrop-blur-sm hover:bg-white/80 dark:hover:bg-slate-800/60"
+    )}>
       <Checkbox id={id} name={id} defaultChecked={defaultChecked} className="mt-0.5" />
       <div className="grid gap-1.5 leading-none">
         <Label htmlFor={id} className="text-sm font-medium text-slate-900 dark:text-slate-100">
@@ -74,29 +80,33 @@ export default async function RequesterNotificationsPage({
   const prefs = dbUser as unknown as NotificationPreferences & { full_name: string }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-4xl mx-auto fade-in">
       <div className="space-y-2">
-        <p className="text-sm font-medium uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400">
-          Notifications
-        </p>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-950 dark:text-white">
+        <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+          <Bell className="h-4 w-4" />
+          <p className="text-sm font-semibold uppercase tracking-widest">Notifications</p>
+        </div>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
           Notification preferences
         </h1>
-        <p className="max-w-2xl text-sm text-slate-600 dark:text-slate-400">
+        <p className="max-w-2xl text-sm text-slate-500 dark:text-slate-400">
           Control which request updates you receive by email or in-app. Status updates stay on by default so important request changes are never missed.
         </p>
       </div>
 
       {saved === '1' && (
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-300">
+        <div className="rounded-xl border border-emerald-200/60 bg-emerald-50/80 dark:bg-emerald-950/30 backdrop-blur-sm px-4 py-3 text-sm text-emerald-800 dark:text-emerald-300">
           Your notification preferences were saved.
         </div>
       )}
 
       <form action={updateNotificationPreferences} className="space-y-6">
-        <Card>
+        <Card className="border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/40 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>Email preferences</CardTitle>
+            <div className="flex items-center gap-2">
+              <Mail className="h-5 w-5 text-slate-500" />
+              <CardTitle>Email preferences</CardTitle>
+            </div>
             <CardDescription>
               Choose which emails you want to receive for your requests.
             </CardDescription>
@@ -129,9 +139,12 @@ export default async function RequesterNotificationsPage({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/40 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>Notification channels</CardTitle>
+            <div className="flex items-center gap-2">
+              <Settings2 className="h-5 w-5 text-slate-500" />
+              <CardTitle>Notification channels</CardTitle>
+            </div>
             <CardDescription>
               Choose where you want notifications delivered.
             </CardDescription>
@@ -153,7 +166,9 @@ export default async function RequesterNotificationsPage({
         </Card>
 
         <div className="flex justify-end">
-          <Button type="submit">Save preferences</Button>
+          <Button type="submit" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20">
+            Save preferences
+          </Button>
         </div>
       </form>
     </div>
