@@ -1,15 +1,15 @@
-// app/(dashboard)/clerk/page.tsx
-import React from "react";
+//app/(dashboard)/clerk/page.tsx
+import React, { Suspense } from "react";
 import { getRequestsForClerk } from "@/lib/queries/request.queries";
 import { RequestCard } from "@/components/requests/request-card";
 import { StatusUpdatePanel } from "@/components/clerk/status-update-panel";
 import { ClipboardCheck, Clock, Eye, InboxIcon, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { ClerkDashboardSkeleton } from "./skeleton";
 
-const DISPLAY_LIMIT = 2; // Show only this many requests per column
+const DISPLAY_LIMIT = 2;
 
 // ─── Section header ───────────────────────────────────────────────────────────
-
 function SectionHeader({
   label,
   count,
@@ -43,7 +43,6 @@ function SectionHeader({
 }
 
 // ─── Empty state ──────────────────────────────────────────────────────────────
-
 function EmptySection({ label }: { label: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-10 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700/60 text-center">
@@ -61,12 +60,7 @@ function EmptySection({ label }: { label: string }) {
 }
 
 // ─── Request card + status panel wrapped in glass card ────────────────────────
-
-function RequestCardWithActions({
-  request,
-}: {
-  request: any;
-}) {
+function RequestCardWithActions({ request }: { request: any }) {
   return (
     <div
       className="rounded-2xl border border-white/60 dark:border-slate-700/60 overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
@@ -84,9 +78,8 @@ function RequestCardWithActions({
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
-export default async function ClerkDashboardPage() {
+// ─── Async content component ─────────────────────────────────────────────────
+async function ClerkDashboardContent() {
   const { data: requests } = await getRequestsForClerk();
 
   const pending = requests?.filter((r) => r.status.status_name === "pending") ?? [];
@@ -98,44 +91,39 @@ export default async function ClerkDashboardPage() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto fade-in px-4 md:px-6">
-
-      {/* ── Page header ── */}
+      {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-amber-500 dark:text-amber-400 mb-1">
             Clerk · Review Queue
           </p>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Review Queue
-          </h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Review Queue</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
             Requests awaiting review — oldest first (FIFO)
           </p>
         </div>
         <Link
           href="/clerk/requests"
-          className="inline-flex items-center gap-2 self-start rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3.5 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-all shadow-sm"
+          className="inline-flex items-center gap-2 self-start rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3.5 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm"
         >
           <Eye className="h-4 w-4" />
           View All Requests
         </Link>
       </div>
 
-      {/* ── Summary chips ── */}
+      {/* Summary chips */}
       {totalActive > 0 && (
         <div className="flex flex-wrap gap-3">
           <div className="inline-flex items-center gap-2 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-800/40 px-3.5 py-2 text-sm font-semibold text-amber-700 dark:text-amber-300">
-            <Clock className="h-3.5 w-3.5" />
-            {pending.length} pending
+            <Clock className="h-3.5 w-3.5" /> {pending.length} pending
           </div>
           <div className="inline-flex items-center gap-2 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200/60 dark:border-blue-800/40 px-3.5 py-2 text-sm font-semibold text-blue-700 dark:text-blue-300">
-            <ClipboardCheck className="h-3.5 w-3.5" />
-            {underReview.length} under review
+            <ClipboardCheck className="h-3.5 w-3.5" /> {underReview.length} under review
           </div>
         </div>
       )}
 
-      {/* ── Two‑column grid for Pending & Under Review ── */}
+      {/* Two‑column grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left column: Pending */}
         <div>
@@ -152,10 +140,7 @@ export default async function ClerkDashboardPage() {
             <>
               <div className="space-y-4">
                 {pendingToShow.map((r) => (
-                  <RequestCardWithActions
-                    key={r.id}
-                    request={r}
-                  />
+                  <RequestCardWithActions key={r.id} request={r} />
                 ))}
               </div>
               {pending.length > DISPLAY_LIMIT && (
@@ -190,10 +175,7 @@ export default async function ClerkDashboardPage() {
             <>
               <div className="space-y-4">
                 {underReviewToShow.map((r) => (
-                  <RequestCardWithActions
-                    key={r.id}
-                    request={r}
-                  />
+                  <RequestCardWithActions key={r.id} request={r} />
                 ))}
               </div>
               {underReview.length > DISPLAY_LIMIT && (
@@ -214,5 +196,14 @@ export default async function ClerkDashboardPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// ─── Page (with Suspense) ─────────────────────────────────────────────────────
+export default async function ClerkDashboardPage() {
+  return (
+    <Suspense fallback={<ClerkDashboardSkeleton />}>
+      <ClerkDashboardContent />
+    </Suspense>
   );
 }
