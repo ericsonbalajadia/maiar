@@ -204,19 +204,19 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
           className="fade-in"
           style={{ animationDelay: `${idx * 40}ms`, animationFillMode: 'forwards', opacity: 0 }}
         >
-          <RequestCard
-            request={{
-              id: req.id,
-              ticket_number: req.ticket_number,
-              title: req.title,
-              request_type: req.request_type,
-              created_at: req.created_at,
-              status: { status_name: req.statuses?.status_name ?? 'pending' },
-              priority: { level: req.priorities?.level ?? 'normal' },
-              location: { building_name: req.locations?.building_name ?? '—' },
-            }}
-            href={`/requester/requests/${req.id}`}
-          />
+<RequestCard
+  request={{
+    id: req.id,
+    ticket_number: req.ticket_number,
+    title: req.title,
+    request_type: req.request_type,
+    created_at: req.created_at,
+    status: { status_name: req.statuses?.status_name ?? 'pending' },
+    priority: { level: req.priorities?.level ?? 'normal' },
+    location: { building_name: req.locations?.building_name ?? '—' },
+  }}
+  fullHref={`/requester/requests/${req.id}`}
+/>
         </div>
       ))}
     </div>
