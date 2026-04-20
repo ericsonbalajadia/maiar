@@ -34,7 +34,7 @@ export default async function SupervisorDashboardPage() {
         {approved.length > 0 ? (
           <div className="space-y-3">
             {approved.map((r) => (
-              <RequestCard key={r.id} request={r} href={getHref(r.status.status_name, r.id)} />
+              <RequestCard key={r.id} request={r} fullHref={getHref(r.status.status_name, r.id)} />
             ))}
           </div>
         ) : (
@@ -52,7 +52,7 @@ export default async function SupervisorDashboardPage() {
         {assigned.length > 0 ? (
           <div className="space-y-3">
             {assigned.map((r) => (
-              <RequestCard key={r.id} request={r} href={getHref(r.status.status_name, r.id)} />
+              <RequestCard key={r.id} request={r} fullHref={getHref(r.status.status_name, r.id)} />
             ))}
           </div>
         ) : (
@@ -70,7 +70,7 @@ export default async function SupervisorDashboardPage() {
         {inProgress.length > 0 ? (
           <div className="space-y-3">
             {inProgress.map((r) => (
-              <RequestCard key={r.id} request={r} href={getHref(r.status.status_name, r.id)} />
+              <RequestCard key={r.id} request={r} fullHref={getHref(r.status.status_name, r.id)} />
             ))}
           </div>
         ) : (
