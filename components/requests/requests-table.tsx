@@ -3,7 +3,7 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { StatusBadge } from "@/components/common/status-badge";
-import { Search, X, Calendar } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 interface RequestRow {
   id: string;
@@ -193,7 +193,13 @@ export function RequestsTable({
               {requests.map((r) => (
                 <div
                   key={r.id}
-                  onClick={() => router.push(`${detailBasePath}/${r.id}`)}
+                  onClick={() => {
+                    // ✅ Redirect to review page for clerk, otherwise to detail page
+                    const targetPath = detailBasePath.startsWith('/clerk')
+                      ? `${detailBasePath}/${r.id}/review`
+                      : `${detailBasePath}/${r.id}`;
+                    router.push(targetPath);
+                  }}
                   className="grid grid-cols-12 px-4 py-3 items-center cursor-pointer transition-all duration-200 hover:bg-white/20 hover:backdrop-blur-md group"
                 >
                   <div className="col-span-2">
