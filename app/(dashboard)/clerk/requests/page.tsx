@@ -1,7 +1,7 @@
 // app/(dashboard)/clerk/requests/page.tsx
 import { getFilteredRequests } from "@/lib/queries/request.queries";
 import { RequestsTable } from "@/components/requests/requests-table";
-import { ListFilter, ClipboardList } from "lucide-react";
+import { ClipboardList } from "lucide-react";
 import Link from "next/link";
 
 interface Props {
@@ -14,7 +14,7 @@ export default async function ClerkAllRequestsPage({ searchParams }: Props) {
   const month = sp.month;
   const year = sp.year;
 
-  // Convert month/year to date range
+  // Convert month/year to date range (same as before)
   let startDate: string | undefined;
   let endDate: string | undefined;
   if (month && year) {
@@ -56,65 +56,57 @@ export default async function ClerkAllRequestsPage({ searchParams }: Props) {
     requester: item.requester ?? null,
   }));
 
-return (
-  <div className="h-[calc(100vh-80px)] max-w-7xl mx-auto flex flex-col gap-6 fade-in">
-    
-    {/* ── HEADER (fixed height) ── */}
-    <div className="flex items-start justify-between gap-4 shrink-0">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-amber-500 dark:text-amber-400 mb-1">
-          Clerk
-        </p>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-          All Requests
-        </h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-          Browse, filter, and manage all submitted service requests.
-        </p>
+  return (
+    <div className="h-full flex flex-col gap-6 max-w-7xl mx-auto fade-in px-4 md:px-6">
+      {/* Header (fixed) */}
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 shrink-0">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-amber-500 dark:text-amber-400 mb-1">
+            Clerk
+          </p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+            All Requests
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+            Browse, filter, and manage all submitted service requests.
+          </p>
+        </div>
+        <Link
+          href="/clerk"
+          className="inline-flex items-center gap-2 self-start rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3.5 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm shrink-0"
+        >
+          <ClipboardList className="h-4 w-4" />
+          Review Queue
+        </Link>
       </div>
 
-      <Link
-        href="/clerk"
-        className="inline-flex items-center gap-2 self-start rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3.5 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm shrink-0"
+      {/* Main card (flex‑1, takes remaining height) */}
+      <div
+        className="flex-1 min-h-0 rounded-2xl border border-white/60 dark:border-slate-700/60 shadow-sm flex flex-col bg-white/60 dark:bg-slate-800/40 backdrop-blur-sm"
       >
-        <ClipboardList className="h-4 w-4" />
-        Review Queue
-      </Link>
-    </div>
-
-    {/* ── MAIN CARD (takes remaining height) ── */}
-    <div
-      className="flex-1 min-h-0 rounded-2xl border border-white/60 dark:border-slate-700/60 overflow-hidden shadow-sm flex flex-col"
-      style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
-    >
-      
-      {/* CARD HEADER */}
-      <div className="flex items-center gap-2.5 px-5 py-4 border-b border-slate-100/80 dark:border-slate-800/60 bg-white/30 dark:bg-slate-900/30 shrink-0">
-        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-sm">
-          <ClipboardList className="h-3.5 w-3.5 text-white" />
+        {/* Card header */}
+        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-slate-100/80 dark:border-slate-800/60 shrink-0">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-sm">
+            <ClipboardList className="h-3.5 w-3.5 text-white" />
+          </div>
+          <h2 className="text-sm font-bold text-slate-800 dark:text-white">All Requests</h2>
+          {transformedRequests.length > 0 && (
+            <span className="ml-auto text-xs font-medium text-slate-400 dark:text-slate-500">
+              Page {page} · {transformedRequests.length} results
+            </span>
+          )}
         </div>
 
-        <h2 className="text-sm font-bold text-slate-800 dark:text-white">
-          All Requests
-        </h2>
-
-        {transformedRequests.length > 0 && (
-          <span className="ml-auto text-xs font-medium text-slate-400 dark:text-slate-500">
-            Page {page} · {transformedRequests.length} results
-          </span>
-        )}
-      </div>
-
-      {/* TABLE AREA (THIS CONTROLS SCROLL) */}
-      <div className="flex-1 min-h-0 p-4 overflow-hidden">
-        <RequestsTable
-          requests={transformedRequests}
-          totalPages={totalPages}
-          currentPage={page}
-          detailBasePath="/clerk/requests"
-        />
+        {/* Table area (scrolls) */}
+        <div className="flex-1 min-h-0 p-4 overflow-auto">
+          <RequestsTable
+            requests={transformedRequests}
+            totalPages={totalPages}
+            currentPage={page}
+            detailBasePath="/clerk/requests"
+          />
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
 }

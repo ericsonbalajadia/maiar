@@ -1,3 +1,4 @@
+//components/requests/requests-table.tsx
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -54,9 +55,9 @@ export function RequestsTable({
     params.get("year");
 
   return (
-    <div className="space-y-6">
-      {/* Filter bar – glassmorphic */}
-      <div className="rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md shadow-lg p-4 space-y-4">
+    <div className="h-full flex flex-col gap-6">
+      {/* Filter bar (glassmorphic) */}
+      <div className="rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md shadow-lg p-4 shrink-0">
         <div className="flex flex-wrap gap-3 items-end">
           <div className="flex-1 min-w-[200px]">
             <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wide">
@@ -84,12 +85,6 @@ export function RequestsTable({
               defaultValue={params.get("status") ?? ""}
               onChange={(e) => setParam("status", e.target.value)}
               className="w-full px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")`,
-                backgroundPosition: "right 0.75rem center",
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "1.25rem",
-              }}
             >
               <option value="">All</option>
               {[
@@ -116,12 +111,6 @@ export function RequestsTable({
               defaultValue={params.get("priority") ?? ""}
               onChange={(e) => setParam("priority", e.target.value)}
               className="w-full px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")`,
-                backgroundPosition: "right 0.75rem center",
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "1.25rem",
-              }}
             >
               <option value="">All</option>
               {["emergency", "high", "normal", "low"].map((p) => (
@@ -140,12 +129,6 @@ export function RequestsTable({
               defaultValue={params.get("month") ?? ""}
               onChange={(e) => setParam("month", e.target.value)}
               className="w-full px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")`,
-                backgroundPosition: "right 0.75rem center",
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "1.25rem",
-              }}
             >
               <option value="">All</option>
               {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
@@ -166,12 +149,6 @@ export function RequestsTable({
               defaultValue={params.get("year") ?? ""}
               onChange={(e) => setParam("year", e.target.value)}
               className="w-full px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")`,
-                backgroundPosition: "right 0.75rem center",
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "1.25rem",
-              }}
             >
               <option value="">All</option>
               {Array.from(
@@ -197,97 +174,86 @@ export function RequestsTable({
         </div>
       </div>
 
-      {/* Table – glass card style */}
-<div className="rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md shadow-lg overflow-hidden">
-  <div className="max-h-[calc(100vh-260px)] overflow-y-auto">
+      {/* Table container (scrolls) */}
+      <div className="flex-1 min-h-0 rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md shadow-lg flex flex-col overflow-hidden">
+        <div className="flex-1 overflow-auto">
+          <div className="min-w-[800px]">
+            {/* Header */}
+            <div className="sticky top-0 z-10 backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border-b px-4 py-3 grid grid-cols-12 text-xs font-semibold text-gray-600 dark:text-gray-300">
+              <div className="col-span-2">Ticket</div>
+              <div className="col-span-4">Request</div>
+              <div className="col-span-2">Requester</div>
+              <div className="col-span-1">Priority</div>
+              <div className="col-span-2">Status</div>
+              <div className="col-span-1">Date</div>
+            </div>
 
-    {/* Header */}
-    <div className="sticky top-0 z-10 backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border-b px-4 py-3 grid grid-cols-12 text-xs font-semibold text-gray-600 dark:text-gray-300">
-      <div className="col-span-2">Ticket</div>
-      <div className="col-span-4">Request</div>
-      <div className="col-span-2">Requester</div>
-      <div className="col-span-1">Priority</div>
-      <div className="col-span-2">Status</div>
-      <div className="col-span-1">Date</div>
-    </div>
+            {/* Rows */}
+            <div className="divide-y divide-white/10">
+              {requests.map((r) => (
+                <div
+                  key={r.id}
+                  onClick={() => router.push(`${detailBasePath}/${r.id}`)}
+                  className="grid grid-cols-12 px-4 py-3 items-center cursor-pointer transition-all duration-200 hover:bg-white/20 hover:backdrop-blur-md group"
+                >
+                  <div className="col-span-2">
+                    <p className="font-mono text-xs text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-200">
+                      {r.ticket_number}
+                    </p>
+                  </div>
+                  <div className="col-span-4 min-w-0">
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
+                      {r.title}
+                    </p>
+                    <p className="text-xs text-gray-400 truncate">
+                      {r.category?.category_name ?? "No category"}
+                    </p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-sm text-gray-700 dark:text-gray-300 truncate">
+                      {r.requester?.full_name ?? "—"}
+                    </p>
+                  </div>
+                  <div className="col-span-1">
+                    <span
+                      className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                        r.priority?.level === "emergency"
+                          ? "bg-red-100 text-red-600"
+                          : r.priority?.level === "high"
+                          ? "bg-orange-100 text-orange-600"
+                          : r.priority?.level === "normal"
+                          ? "bg-blue-100 text-blue-600"
+                          : "bg-gray-100 text-gray-500"
+                      }`}
+                    >
+                      {r.priority?.level ?? "—"}
+                    </span>
+                  </div>
+                  <div className="col-span-2">
+                    <StatusBadge status={r.status?.status_name ?? ""} />
+                  </div>
+                  <div className="col-span-1 text-xs text-gray-500 whitespace-nowrap">
+                    {new Date(r.created_at).toLocaleDateString("en-PH", {
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </div>
+                </div>
+              ))}
 
-    {/* Rows */}
-    <div className="divide-y divide-white/10">
-      {requests.map((r) => (
-        <div
-          key={r.id}
-          onClick={() => router.push(`${detailBasePath}/${r.id}`)}
-          className="grid grid-cols-12 px-4 py-3 items-center cursor-pointer transition-all duration-200 hover:bg-white/20 hover:backdrop-blur-md group"
-        >
-          {/* Ticket */}
-          <div className="col-span-2">
-            <p className="font-mono text-xs text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-200">
-              {r.ticket_number}
-            </p>
-          </div>
-
-          {/* Title + Category */}
-          <div className="col-span-4 min-w-0">
-            <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
-              {r.title}
-            </p>
-            <p className="text-xs text-gray-400 truncate">
-              {r.category?.category_name ?? "No category"}
-            </p>
-          </div>
-
-          {/* Requester */}
-          <div className="col-span-2">
-            <p className="text-sm text-gray-700 dark:text-gray-300 truncate">
-              {r.requester?.full_name ?? "—"}
-            </p>
-          </div>
-
-          {/* Priority */}
-          <div className="col-span-1">
-            <span
-              className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                r.priority?.level === "emergency"
-                  ? "bg-red-100 text-red-600"
-                  : r.priority?.level === "high"
-                  ? "bg-orange-100 text-orange-600"
-                  : r.priority?.level === "normal"
-                  ? "bg-blue-100 text-blue-600"
-                  : "bg-gray-100 text-gray-500"
-              }`}
-            >
-              {r.priority?.level ?? "—"}
-            </span>
-          </div>
-
-          {/* Status */}
-          <div className="col-span-2">
-            <StatusBadge status={r.status?.status_name ?? ""} />
-          </div>
-
-          {/* Date */}
-          <div className="col-span-1 text-xs text-gray-500 whitespace-nowrap">
-            {new Date(r.created_at).toLocaleDateString("en-PH", {
-              month: "short",
-              day: "numeric",
-            })}
+              {requests.length === 0 && (
+                <div className="py-16 text-center text-gray-400">
+                  No requests found. Adjust filters.
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      ))}
+      </div>
 
-      {/* Empty */}
-      {requests.length === 0 && (
-        <div className="py-16 text-center text-gray-400">
-          No requests found. Adjust filters.
-        </div>
-      )}
-    </div>
-  </div>
-</div>
-
-      {/* Pagination – glass style */}
+      {/* Pagination (sticky at bottom) */}
       {totalPages > 1 && (
-        <div className="flex justify-end items-center gap-2">
+        <div className="flex justify-end items-center gap-2 shrink-0 pt-2">
           <button
             onClick={() => setParam("page", String(currentPage - 1))}
             disabled={currentPage === 1}
