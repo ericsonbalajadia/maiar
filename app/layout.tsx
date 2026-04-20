@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import { AuthProvider } from '@/components/auth/auth-provider'
+import { AuthProvider } from "@/components/auth/auth-provider";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -23,14 +23,16 @@ const geistSans = Geist({
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body className={`${geistSans.variable} h-screen overflow-hidden`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
-            {children}
+            <div className="h-full flex flex-col overflow-hidden">
+              {children}
+            </div>
           </AuthProvider>
         </ThemeProvider>
       </body>

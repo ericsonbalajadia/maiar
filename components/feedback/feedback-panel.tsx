@@ -1,3 +1,4 @@
+//components/feedback/feedback-panel.tsx
 import { createServiceClient } from '@/lib/supabase/service';
 import { StarRating } from './star-rating';
 

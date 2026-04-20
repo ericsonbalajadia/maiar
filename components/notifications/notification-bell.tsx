@@ -46,11 +46,9 @@ function notificationHref(pathname: string): string {
 }
 
 function requestHref(pathname: string, requestId: string): string {
-  if (pathname.startsWith("/clerk")) return `/clerk/requests/${requestId}`;
-  if (pathname.startsWith("/supervisor"))
-    return `/supervisor/requests/${requestId}`;
-  if (pathname.startsWith("/technician"))
-    return `/technician/requests/${requestId}`;
+  if (pathname.startsWith("/clerk")) return `/clerk/requests/${requestId}/review`;
+  if (pathname.startsWith("/supervisor")) return `/supervisor/requests/${requestId}`;
+  if (pathname.startsWith("/technician")) return `/technician/requests/${requestId}`;
   if (pathname.startsWith("/admin")) return `/admin/requests/${requestId}`;
   return `/requester/requests/${requestId}`;
 }
@@ -76,7 +74,6 @@ const TYPE_META: Record<
   string,
   { icon: React.ElementType; color: string; bg: string }
 > = {
-  // Use database constraint values
   new_user_registered: {
     icon: UserPlus,
     color: "text-amber-500",
@@ -112,7 +109,6 @@ const TYPE_META: Record<
     color: "text-amber-500",
     bg: "bg-amber-50 dark:bg-amber-900/20",
   },
-  // Keep fallback
   system: {
     icon: Info,
     color: "text-slate-500",
@@ -144,7 +140,7 @@ function NotifItem({
 
   let href: string | null = null;
 
-  // 1. Special case: new_user_registered notifications
+  // Special case: new_user_registered notifications
   if (notif.type === "new_user_registered") {
     if (pathname.startsWith("/admin")) {
       href = "/admin/users/pending";
@@ -156,19 +152,9 @@ function NotifItem({
       href = "/";
     }
   }
-  // 2. Normal request‑linked notifications
+  // Normal request‑linked notifications
   else if (notif.request_id) {
-    if (pathname.startsWith("/clerk")) {
-      href = `/clerk/requests/${notif.request_id}`;
-    } else if (pathname.startsWith("/supervisor")) {
-      href = `/supervisor/requests/${notif.request_id}`;
-    } else if (pathname.startsWith("/technician")) {
-      href = `/technician/requests/${notif.request_id}`;
-    } else if (pathname.startsWith("/admin")) {
-      href = `/admin/requests/${notif.request_id}`;
-    } else {
-      href = `/requester/requests/${notif.request_id}`;
-    }
+    href = requestHref(pathname, notif.request_id);
   }
 
   const handleClick = () => {
@@ -248,7 +234,6 @@ export function NotificationBell() {
   const panelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // Close panel on outside click
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
@@ -265,7 +250,6 @@ export function NotificationBell() {
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  // Close on Escape key
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
@@ -275,7 +259,6 @@ export function NotificationBell() {
     return () => document.removeEventListener("keydown", handler);
   }, [open]);
 
-  // Load notifications when panel opens
   useEffect(() => {
     if (!open) return;
     setLoading(true);
@@ -301,10 +284,8 @@ export function NotificationBell() {
     );
   };
 
-  // Compute unread count from current notifications
   const unread = notifications.filter((n) => n.read_at === null);
 
-  // Update the global store whenever the local unread count changes
   useEffect(() => {
     setUnreadCount(unread.length);
   }, [unread.length, setUnreadCount]);
@@ -332,13 +313,11 @@ export function NotificationBell() {
 
       {open && (
         <>
-          {/* Mobile backdrop */}
           <div
             className="fixed inset-0 z-40 sm:hidden bg-black/20"
             onClick={() => setOpen(false)}
           />
 
-          {/* Dropdown panel – glass styling */}
           <div
             ref={panelRef}
             className={cn(
@@ -355,7 +334,6 @@ export function NotificationBell() {
               border: "1px solid rgba(255, 255, 255, 0.2)",
             }}
           >
-            {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/20 dark:border-white/5 bg-white/30 dark:bg-slate-900/30">
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">
@@ -386,7 +364,6 @@ export function NotificationBell() {
               </div>
             </div>
 
-            {/* Notification list */}
             <div className="max-h-[400px] overflow-y-auto overscroll-contain">
               {loading ? (
                 <div className="space-y-0">
@@ -428,7 +405,6 @@ export function NotificationBell() {
               )}
             </div>
 
-            {/* Footer */}
             {notifications.length > 0 && (
               <div className="px-4 py-2.5 border-t border-white/20 dark:border-white/5 bg-slate-50/30 dark:bg-slate-900/30">
                 <Link
