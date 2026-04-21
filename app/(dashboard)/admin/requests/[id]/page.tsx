@@ -1,3 +1,4 @@
+//app/(dashboard)/admin/requests/[id]/page.tsx
 import { createServiceClient } from '@/lib/supabase/service';
 import { notFound } from 'next/navigation';
 import { StatusBadge } from '@/components/common/status-badge';

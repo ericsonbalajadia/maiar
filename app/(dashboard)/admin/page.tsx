@@ -1,3 +1,4 @@
+//app/(dashboard)/admin/page.tsx
 import { getAuthUser } from '@/lib/auth'
 import { ROLES } from '@/lib/rbac'
 
