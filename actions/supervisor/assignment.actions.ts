@@ -12,7 +12,7 @@ type ActionResult = { success: boolean; error?: string };
  * - Only supervisor / admin may call this.
  * - Creates a request_assignments row.
  * - Updates request status to 'assigned' if currently 'approved'.
- * - Queues an in-app notification for the technician.
+ * - Queues in-app notifications for the requester and the technician.
  */
 export async function assignTechnician(
   _prev: ActionResult,
@@ -59,15 +59,15 @@ export async function assignTechnician(
     return { success: false, error: `Request must be approved or assigned to reassign. Current: ${currentStatus}` };
   }
 
-// 5. Mark any existing active assignment as not current and completed
-await serviceSupabase
-  .from('request_assignments')
-  .update({ 
-    completed_at: new Date().toISOString(),
-    is_current_assignment: false 
-  })
-  .eq('request_id', requestId)
-  .eq('is_current_assignment', true);
+  // 5. Mark any existing active assignment as not current and completed
+  await serviceSupabase
+    .from('request_assignments')
+    .update({ 
+      completed_at: new Date().toISOString(),
+      is_current_assignment: false 
+    })
+    .eq('request_id', requestId)
+    .eq('is_current_assignment', true);
 
   // 6. Create new assignment
   const { error: insertError } = await serviceSupabase
@@ -104,22 +104,45 @@ await serviceSupabase
       .eq('id', requestId);
   }
 
-  // 8. Queue in-app notification for technician (non-blocking)
-  try {
-    const { data: reqInfo } = await serviceSupabase
-      .from('requests')
-      .select('ticket_number, title, requester_id')
-      .eq('id', requestId)
-      .single();
+  // 8. Get request details for notifications (ticket, title)
+  const { data: reqInfo } = await serviceSupabase
+    .from('requests')
+    .select('ticket_number, title, requester_id')
+    .eq('id', requestId)
+    .single();
 
+  // 9. Send notifications (non-blocking, fire-and-forget)
+  try {
+    // Notify requester
+    if (reqInfo?.requester_id) {
+      await serviceSupabase.from('notifications').insert({
+        user_id: reqInfo.requester_id,
+        request_id: requestId,
+        type: 'technician_assigned',
+        subject: `Technician assigned: ${reqInfo.ticket_number}`,
+        message: `A technician has been assigned to your request "${reqInfo.title}".`,
+      });
+    }
+
+    // Notify the assigned technician
     await serviceSupabase.from('notifications').insert({
-      user_id: reqInfo?.requester_id, 
+      user_id: technicianId,
       request_id: requestId,
-      type: 'request_assigned',
-      subject: `New Assignment: ${reqInfo?.ticket_number}`,
+      type: 'technician_assigned',
+      subject: `New assignment: ${reqInfo?.ticket_number}`,
       message: `You have been assigned to "${reqInfo?.title}". Please review and schedule.`,
-      status: 'pending',
     });
+
+    // (Optional) Notify all supervisors – uncomment if needed
+    // const { getUserIdsByRole, sendBulkNotification } = await import('@/actions/notifications/notifications.actions');
+    // const supervisorIds = await getUserIdsByRole('supervisor');
+    // await sendBulkNotification({
+    //   userIds: supervisorIds,
+    //   requestId: requestId,
+    //   type: 'technician_assigned',
+    //   subject: `Technician assigned: ${reqInfo?.ticket_number}`,
+    //   message: `A technician has been assigned to "${reqInfo?.title}".`,
+    // });
   } catch (notifErr) {
     console.warn('[assignTechnician] notification insert failed (non-fatal):', notifErr);
   }

@@ -2,7 +2,7 @@
 'use client';
 
 import { useRequestStatus } from '@/hooks/useRequestStatus';
-import { StatusBadge } from '@/components/requests/statusBadge';
+import { StatusBadge } from '@/components/common/status-badge';
 
 interface RequestDetailRealtimeProps {
   requestId: string;

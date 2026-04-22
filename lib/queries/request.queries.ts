@@ -332,3 +332,88 @@ export async function getFilteredRequests(filter: RequestFilter) {
     totalPages: Math.ceil((count ?? 0) / pageSize),
   };
 }
+
+// Get backlog counts for admin dashboard
+type BacklogCounts = {
+  pending: number;
+  under_review: number;
+  approved: number;
+  assigned: number;
+  in_progress: number;
+  completed: number;
+  cancelled: number;
+};
+
+export async function getBacklogCounts(): Promise<{ data: BacklogCounts | null; error: Error | null }> {
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from('requests')
+    .select('statuses!inner(status_name)');
+
+  if (error) return { data: null, error };
+
+  const counts: BacklogCounts = {
+    pending: 0,
+    under_review: 0,
+    approved: 0,
+    assigned: 0,
+    in_progress: 0,
+    completed: 0,
+    cancelled: 0,
+  };
+
+  data?.forEach((row: any) => {
+    const statusName = row.statuses?.status_name;
+    if (statusName && statusName in counts) {
+      counts[statusName as keyof BacklogCounts]++;
+    }
+  });
+
+  return { data: counts, error: null };
+}
+
+// Get technician current active assignments
+export async function getTechnicianWorkload() {
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from('users')
+    .select(`
+      id,
+      full_name,
+      email,
+      technician_info!inner ( specialization ),
+      request_assignments!assigned_user_id (
+        id,
+        completed_at,
+        is_current_assignment
+      )
+    `)
+    .eq('role', 'technician')
+    .eq('request_assignments.is_current_assignment', true)
+    .is('request_assignments.completed_at', null);
+
+  if (error) return { data: null, error };
+  // Transform to get count per technician
+  const workload = data.map((tech: any) => ({
+    id: tech.id,
+    name: tech.full_name,
+    email: tech.email,
+    specialization: tech.technician_info?.specialization || 'General',
+    activeAssignments: tech.request_assignments?.length || 0,
+  }));
+  return { data: workload, error: null };
+}
+
+// Get user summary (total users, per role, pending approvals)
+export async function getUserSummary() {
+  const supabase = createServiceClient();
+  const { data: allUsers } = await supabase.from('users').select('role, signup_status');
+  const total = allUsers?.length || 0;
+  const byRole: Record<string, number> = {};
+  let pendingApprovals = 0;
+  allUsers?.forEach((u: any) => {
+    byRole[u.role] = (byRole[u.role] || 0) + 1;
+    if (u.signup_status === 'pending') pendingApprovals++;
+  });
+  return { total, byRole, pendingApprovals };
+}

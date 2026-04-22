@@ -1,9 +1,10 @@
+//app/(dashboard)/clerk/notifications/page.tsx
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { isRequesterRole } from '@/lib/rbac'
 import { NotificationsPageContent } from '@/components/notifications/notification-page-content'
 
-export default async function RequesterNotificationsPage() {
+export default async function ClerkNotificationsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -12,7 +13,7 @@ export default async function RequesterNotificationsPage() {
     .from('users').select('role, signup_status').eq('auth_id', user.id).single()
 
   if (!dbUser || dbUser.signup_status !== 'approved') redirect('/pending-approval')
-  if (!isRequesterRole(dbUser.role)) redirect('/')
+  if (dbUser.role !== 'clerk') redirect('/')
 
   return <NotificationsPageContent />
 }

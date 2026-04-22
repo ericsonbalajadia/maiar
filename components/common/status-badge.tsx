@@ -3,35 +3,12 @@ import { cn } from '@/lib/utils'
 import { STATUS_STYLES, PRIORITY_STYLES } from '@/lib/utils/status'
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
-// Maps status_name from DB (snake_case) to styled pill
 
 interface StatusBadgeProps {
   status: string
   className?: string
 }
 
-export function StatusBadge({ status, className }: StatusBadgeProps) {
-  const key = status.toLowerCase().replace(/\s+/g, '_')
-  const style = STATUS_STYLES[key] ?? {
-    bg: 'bg-slate-100',
-    text: 'text-slate-600',
-    dot: 'bg-slate-400',
-  }
-
-  const label = STATUS_DISPLAY_LABELS[key] ?? humanise(status)
-
-  return (
-    <span className={cn(
-      'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap',
-      style.bg, style.text, className
-    )}>
-      <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', style.dot)} />
-      {label}
-    </span>
-  )
-}
-
-// Human-readable overrides for DB status_name values
 const STATUS_DISPLAY_LABELS: Record<string, string> = {
   pending:      'Pending',
   under_review: 'Under Review',
@@ -44,6 +21,26 @@ const STATUS_DISPLAY_LABELS: Record<string, string> = {
 
 function humanise(s: string) {
   return s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
+export function StatusBadge({ status, className }: StatusBadgeProps) {
+  const key = status.toLowerCase().replace(/\s+/g, '_')
+  const style = STATUS_STYLES[key] ?? {
+    bg: 'bg-slate-100',
+    text: 'text-slate-600',
+    dot: 'bg-slate-400',
+  }
+  const label = STATUS_DISPLAY_LABELS[key] ?? humanise(status)
+
+  return (
+    <span className={cn(
+      'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap',
+      style.bg, style.text, className
+    )}>
+      <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', style.dot)} />
+      {label}
+    </span>
+  )
 }
 
 // ─── Priority Badge ───────────────────────────────────────────────────────────
@@ -61,7 +58,6 @@ export function PriorityBadge({ level, className }: PriorityBadgeProps) {
     <span className={cn(
       'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap border',
       style.bg, style.text,
-      // Border colour matches text
       key === 'emergency' ? 'border-red-200'
         : key === 'high' ? 'border-amber-200'
         : key === 'normal' ? 'border-blue-200'

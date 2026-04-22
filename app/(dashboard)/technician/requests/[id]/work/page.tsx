@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { AcceptanceForm } from '@/components/assignments/acceptance-form';
 import { AccomplishmentForm } from '@/components/assignments/accomplishment-form';
-import { StatusBadge } from '@/components/requests/statusBadge';
+import { StatusBadge } from '@/components/common/status-badge';
 import Link from 'next/link';
 
 interface Props {

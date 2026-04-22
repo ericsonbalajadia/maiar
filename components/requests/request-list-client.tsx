@@ -1,9 +1,5 @@
+//components/requests/request-list-client.tsx
 'use client'
-
-// components/requests/request-list-client.tsx
-// Handles filter UI, pagination controls, and empty states.
-// Receives server-fetched initial data; uses router.push for filter changes
-// so the server page re-fetches with new searchParams (no client-side refetch).
 
 import { useRouter, usePathname } from 'next/navigation'
 import { useTransition, useCallback } from 'react'
@@ -66,7 +62,6 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
   const { data: requests, count, page, pageSize, totalPages } = initialData
   const filters = initialFilters
 
-  // Navigate to new URL — server will re-fetch
   const navigate = useCallback(
     (newFilters: Record<string, string | number | undefined>) => {
       const qs = buildSearchParams(newFilters)
@@ -92,28 +87,33 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
   const filtersActive = activeFilterCount(filters)
 
   return (
-    <div className="space-y-4">
-      {/* ── Filter bar ── */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+    <div className="space-y-5 fade-in">
+      {/* ── Glassmorphic Filter Bar ── */}
+      <div
+        className="rounded-2xl border border-white/60 dark:border-slate-700/60 shadow-sm p-4"
+        style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
+      >
         <div className="flex items-center gap-2 mb-3">
-          <SlidersHorizontal className="h-4 w-4 text-slate-400" />
-          <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Filters</span>
+          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
+            <SlidersHorizontal className="h-3 w-3 text-white" />
+          </div>
+          <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Filters</span>
           {filtersActive > 0 && (
-            <Badge variant="secondary" className="text-xs px-1.5 py-0 h-4">
+            <Badge variant="secondary" className="text-xs px-1.5 py-0 h-4 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">
               {filtersActive}
             </Badge>
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="flex flex-wrap gap-3 items-end">
           {/* Status */}
-          <div className="space-y-1">
-            <Label className="text-xs text-slate-500">Status</Label>
+          <div className="flex-1 min-w-[140px] space-y-1">
+            <Label className="text-xs text-slate-500 dark:text-slate-400">Status</Label>
             <Select
               value={filters.status ?? 'all'}
               onValueChange={(v) => handleFilterChange('status', v === 'all' ? '' : v)}
             >
-              <SelectTrigger className="h-8 text-xs">
+              <SelectTrigger className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl truncate">
                 <SelectValue placeholder="All statuses" />
               </SelectTrigger>
               <SelectContent>
@@ -128,13 +128,13 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
           </div>
 
           {/* Type */}
-          <div className="space-y-1">
-            <Label className="text-xs text-slate-500">Request Type</Label>
+          <div className="flex-[2] min-w-[200px] space-y-1">
+            <Label className="text-xs text-slate-500 dark:text-slate-400">Request Type</Label>
             <Select
               value={filters.request_type ?? 'all'}
               onValueChange={(v) => handleFilterChange('request_type', v === 'all' ? '' : v)}
             >
-              <SelectTrigger className="h-8 text-xs">
+              <SelectTrigger className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl truncate">
                 <SelectValue placeholder="All types" />
               </SelectTrigger>
               <SelectContent>
@@ -149,44 +149,32 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
           </div>
 
           {/* Date from */}
-          <div className="space-y-1">
-            <Label className="text-xs text-slate-500">From</Label>
+          <div className="flex-1 min-w-[140px] space-y-1">
+            <Label className="text-xs text-slate-500 dark:text-slate-400">From</Label>
             <Input
               type="date"
-              className="h-8 text-xs"
+              className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl"
               value={filters.date_from ?? ''}
               onChange={(e) => handleFilterChange('date_from', e.target.value)}
             />
           </div>
 
           {/* Date to */}
-          <div className="space-y-1">
-            <Label className="text-xs text-slate-500">To</Label>
+          <div className="flex-1 min-w-[140px] space-y-1">
+            <Label className="text-xs text-slate-500 dark:text-slate-400">To</Label>
             <Input
               type="date"
-              className="h-8 text-xs"
+              className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl"
               value={filters.date_to ?? ''}
               onChange={(e) => handleFilterChange('date_to', e.target.value)}
             />
           </div>
         </div>
-
-        {filtersActive > 0 && (
-          <div className="mt-3 flex justify-end">
-            <button
-              onClick={handleClearFilters}
-              className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
-            >
-              <X className="h-3 w-3" />
-              Clear filters
-            </button>
-          </div>
-        )}
       </div>
 
       {/* ── Results header ── */}
       <div className="flex items-center justify-between">
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-slate-500 dark:text-slate-400">
           {isPending ? (
             <span className="flex items-center gap-1.5">
               <Loader2 className="h-3 w-3 animate-spin" />
@@ -202,32 +190,40 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
         </p>
       </div>
 
-      {/* ── Request cards ── */}
-      {requests.length === 0 ? (
-        <EmptyState hasFilters={filtersActive > 0} onClear={handleClearFilters} />
-      ) : (
-        <div className={`space-y-3 transition-opacity duration-150 ${isPending ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
-          {requests.map((req) => (
-            <RequestCard
-              key={req.id}
-              request={{
-                id: req.id,
-                ticket_number: req.ticket_number,
-                title: req.title,
-                request_type: req.request_type,
-                created_at: req.created_at,
-                // RequestSummary shape — map from RequestWithRelations
-                status: { status_name: req.statuses?.status_name ?? 'pending' },
-                priority: { level: req.priorities?.level ?? 'normal' },
-                location: { building_name: req.locations?.building_name ?? '—' },
-              }}
-              href={`/requester/requests/${req.id}`}
-            />
-          ))}
+      {/* ── Scrollable Request Cards Container ── */}
+<div
+  className={`transition-opacity duration-150 ${isPending ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
+>
+  {requests.length === 0 ? (
+    <EmptyState hasFilters={filtersActive > 0} onClear={handleClearFilters} />
+  ) : (
+    <div className="max-h-[600px] overflow-y-auto pr-2 space-y-4 pb-2 pt-2 mt-4 custom-scrollbar">
+      {requests.map((req, idx) => (
+        <div
+          key={req.id}
+          className="fade-in"
+          style={{ animationDelay: `${idx * 40}ms`, animationFillMode: 'forwards', opacity: 0 }}
+        >
+<RequestCard
+  request={{
+    id: req.id,
+    ticket_number: req.ticket_number,
+    title: req.title,
+    request_type: req.request_type,
+    created_at: req.created_at,
+    status: { status_name: req.statuses?.status_name ?? 'pending' },
+    priority: { level: req.priorities?.level ?? 'normal' },
+    location: { building_name: req.locations?.building_name ?? '—' },
+  }}
+  fullHref={`/requester/requests/${req.id}`}
+/>
         </div>
-      )}
+      ))}
+    </div>
+  )}
+</div>
 
-      {/* ── Pagination ── */}
+      {/* ── Pagination (styled) ── */}
       {totalPages > 1 && (
         <Pagination
           page={page}
@@ -240,19 +236,13 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
   )
 }
 
-// ─── Empty state ──────────────────────────────────────────────────────────────
+// ─── Empty state (without redundant clear button) ─────────────────────────────
 
-function EmptyState({
-  hasFilters,
-  onClear,
-}: {
-  hasFilters: boolean
-  onClear: () => void
-}) {
+function EmptyState({ hasFilters, onClear }: { hasFilters: boolean; onClear: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-      <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-        <FileX className="h-5 w-5 text-slate-400" />
+      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center shadow-inner">
+        <FileX className="h-6 w-6 text-slate-400 dark:text-slate-500" />
       </div>
       <div>
         <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -264,19 +254,12 @@ function EmptyState({
             : 'Submit your first request to get started.'}
         </p>
       </div>
-      {hasFilters && (
-        <button
-          onClick={onClear}
-          className="text-xs font-medium text-slate-600 dark:text-slate-300 hover:underline"
-        >
-          Clear all filters
-        </button>
-      )}
+      {/* Clear button removed – use the global "Clear all" link in the page header */}
     </div>
   )
 }
 
-// ─── Pagination ───────────────────────────────────────────────────────────────
+// ─── Pagination with gradient active page ─────────────────────────────────────
 
 function Pagination({
   page,
@@ -289,7 +272,6 @@ function Pagination({
   isPending: boolean
   onPageChange: (p: number) => void
 }) {
-  // Build a compact page window: always show first, last, current ±1
   const pages: (number | 'ellipsis')[] = []
   const add = (n: number) => {
     if (!pages.includes(n)) pages.push(n)
@@ -308,7 +290,7 @@ function Pagination({
       <Button
         variant="outline"
         size="icon"
-        className="h-8 w-8"
+        className="h-8 w-8 rounded-xl border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700"
         disabled={page <= 1 || isPending}
         onClick={() => onPageChange(page - 1)}
         aria-label="Previous page"
@@ -326,9 +308,9 @@ function Pagination({
             key={p}
             onClick={() => onPageChange(p as number)}
             disabled={isPending}
-            className={`h-8 w-8 rounded-md text-xs font-medium transition-colors ${
+            className={`h-8 w-8 rounded-xl text-xs font-medium transition-all duration-200 ${
               p === page
-                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
@@ -340,7 +322,7 @@ function Pagination({
       <Button
         variant="outline"
         size="icon"
-        className="h-8 w-8"
+        className="h-8 w-8 rounded-xl border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700"
         disabled={page >= totalPages || isPending}
         onClick={() => onPageChange(page + 1)}
         aria-label="Next page"

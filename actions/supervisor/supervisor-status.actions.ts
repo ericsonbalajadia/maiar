@@ -1,3 +1,4 @@
+//actions/supervisor/supervisor-status.actions.ts
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
@@ -8,14 +9,21 @@ import { SupervisorStatusUpdateSchema } from '@/lib/validations/supervisor-statu
 
 type ActionResult = { success: boolean; error?: string };
 
+// Helper to get all user IDs for a given role
+async function getUserIdsByRole(role: 'clerk' | 'supervisor' | 'admin'): Promise<string[]> {
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from('users')
+    .select('id')
+    .eq('role', role)
+    .eq('signup_status', 'approved');
+  return data?.map(u => u.id) ?? [];
+}
+
 export async function updateRequestStatusBySupervisor(
   _prev: ActionResult,
   formData: FormData
 ): Promise<ActionResult> {
-    console.log('[Action] FormData entries:');
-  for (const [key, value] of formData.entries()) {
-    console.log(`  ${key}:`, value);
-  }
   const supabase = await createClient();
   const serviceSupabase = createServiceClient();
 
@@ -33,23 +41,20 @@ export async function updateRequestStatusBySupervisor(
   }
 
   const raw = {
-  requestId: formData.get('requestId') as string | null,
-  newStatus: formData.get('newStatus') as string | null,
-  notes: formData.get('notes') as string | null | undefined,
-};
+    requestId: formData.get('requestId') as string | null,
+    newStatus: formData.get('newStatus') as string | null,
+    notes: formData.get('notes') as string | null | undefined,
+  };
 
-console.log('[Action] Raw extracted values:', raw);
+  if (!raw.requestId || !raw.newStatus) {
+    return { success: false, error: 'Request ID and new status are required' };
+  }
 
-if (!raw.requestId || !raw.newStatus) {
-  return { success: false, error: 'Request ID and new status are required' };
-}
-
-// Then parse with Zod, but ensure strings are not empty
-const parsed = SupervisorStatusUpdateSchema.safeParse({
-  requestId: raw.requestId,
-  newStatus: raw.newStatus,
-  notes: raw.notes ?? undefined,
-});
+  const parsed = SupervisorStatusUpdateSchema.safeParse({
+    requestId: raw.requestId,
+    newStatus: raw.newStatus,
+    notes: raw.notes ?? undefined,
+  });
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0].message };
   }
@@ -104,11 +109,8 @@ const parsed = SupervisorStatusUpdateSchema.safeParse({
       .is('completed_at', null);
   }
 
-  // Notify requester of status change
+  // ─── 1. Notify the requester of status change ────────────────────────────
   try {
-    console.log('[Action] Attempting to send notification for status:', newStatus);
-    console.log('[Action] Requester ID:', request?.requester_id);
-    
     const typeMap: Record<string, string> = {
       in_progress: 'request_assigned',
       completed: 'request_completed',
@@ -120,27 +122,53 @@ const parsed = SupervisorStatusUpdateSchema.safeParse({
       cancelled: `Your request "${request?.title}" has been cancelled.${notes ? ` Reason: ${notes}` : ''}`,
     };
 
-    console.log('[Action] Type map value:', typeMap[newStatus]);
-    console.log('[Action] Message map value:', msgMap[newStatus]);
     if (request?.requester_id && typeMap[newStatus]) {
       await serviceSupabase.from('notifications').insert({
         user_id: request.requester_id,
         request_id: requestId,
         type: typeMap[newStatus],
-        subject: `Request ${request?.ticket_number} -- ${newStatus.replace('_', ' ')}`,
+        subject: `Request ${request?.ticket_number} – ${newStatus.replace('_', ' ')}`,
         message: msgMap[newStatus] ?? `Status updated to ${newStatus}.`,
-        status: 'pending',
+        read_at: null,   // unread
+        created_at: new Date().toISOString(),
       });
     }
   } catch (e) {
-    console.error('[Action] Notification failed:', e);
-    console.warn('[updateRequestStatusBySupervisor] notification failed:', e);
+    console.warn('[updateRequestStatusBySupervisor] requester notification failed:', e);
   }
 
+  // ─── 2. Notify all clerks when request is completed or cancelled ─────────
+  if (newStatus === 'completed' || newStatus === 'cancelled') {
+    try {
+      const clerkIds = await getUserIdsByRole('clerk');
+      if (clerkIds.length > 0) {
+        const typeForStaff = newStatus === 'completed' ? 'request_completed' : 'request_cancelled';
+        const staffMsg = newStatus === 'completed'
+          ? `Request ${request?.ticket_number} has been completed.`
+          : `Request ${request?.ticket_number} has been cancelled.${notes ? ` Reason: ${notes}` : ''}`;
+        await serviceSupabase.from('notifications').insert(
+          clerkIds.map(userId => ({
+            user_id: userId,
+            request_id: requestId,
+            type: typeForStaff,
+            subject: `Request ${request?.ticket_number} – ${newStatus}`,
+            message: staffMsg,
+            read_at: null,
+            created_at: new Date().toISOString(),
+          }))
+        );
+      }
+    } catch (e) {
+      console.warn('[updateRequestStatusBySupervisor] clerk notification failed:', e);
+    }
+  }
+
+  // Revalidate paths
   revalidatePath('/supervisor');
   revalidatePath(`/supervisor/requests/${requestId}`);
+  revalidatePath('/clerk');
+  revalidatePath(`/clerk/requests/${requestId}`);
   revalidatePath(`/requester/requests/${requestId}`);
 
-  console.log('[Action] Status update successful for request:', requestId, 'new status:', newStatus);
   return { success: true };
 }
