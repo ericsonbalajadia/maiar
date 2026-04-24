@@ -175,11 +175,11 @@ export function RequestsTable({
       </div>
 
       {/* Table container (scrolls) */}
-      <div className="flex-1 min-h-0 rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md shadow-lg flex flex-col overflow-hidden">
+      <div className="flex-1 min-h-0 rounded-2xl border border-white/10 bg-white/10 backdrop-blur-md shadow-lg flex flex-col overflow-hidden">
         <div className="flex-1 overflow-auto">
           <div className="min-w-[800px]">
             {/* Header */}
-            <div className="sticky top-0 z-10 backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border-b px-4 py-3 grid grid-cols-12 text-xs font-semibold text-gray-600 dark:text-gray-300">
+            <div className="sticky top-0 z-10 backdrop-blur-sm bg-white/80 dark:bg-gray-900/10 border-b px-4 py-3 grid grid-cols-12 text-sm font-bold text-white dark:text-white-600">
               <div className="col-span-2">Ticket</div>
               <div className="col-span-4">Request</div>
               <div className="col-span-2">Requester</div>
@@ -200,7 +200,7 @@ export function RequestsTable({
                       : `${detailBasePath}/${r.id}`;
                     router.push(targetPath);
                   }}
-                  className="grid grid-cols-12 px-4 py-3 items-center cursor-pointer transition-all duration-200 hover:bg-white/20 hover:backdrop-blur-md group"
+                  className="grid grid-cols-12 px-4 py-3 items-center cursor-pointer transition-all duration-200 hover:bg-white/10 hover:backdrop-blur-md group"
                 >
                   <div className="col-span-2">
                     <p className="font-mono text-xs text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-200">
