@@ -17,6 +17,7 @@ import {
   Star,
   CheckCircle2,
   ArrowRight,
+   Info,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -238,27 +239,35 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
         </div>
       </GlassSection>
 
-      {/* ── 5. Status update panel ── */}
-      {showStatusPanel && (
-        <GlassSection>
-          <GlassSectionHeader
-            icon={CheckCircle2}
-            iconGradient="bg-gradient-to-br from-violet-500 to-purple-600"
-            title="Update Status"
-            badge={
-              <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
-                On behalf of technician
-              </span>
-            }
-          />
-          <div className="p-5">
-            <SupervisorStatusPanel
-              requestId={id}
-              currentStatus={currentStatus}
-            />
-          </div>
-        </GlassSection>
-      )}
+{/* ── 5. Status update panel ── */}
+{showStatusPanel && (
+  <GlassSection>
+    <GlassSectionHeader
+      icon={CheckCircle2}
+      iconGradient="bg-gradient-to-br from-violet-500 to-purple-600"
+      title="Update Status"
+      badge={
+        <div className="flex items-center gap-1">
+          <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+            On behalf of technician
+          </span>
+          <span
+            className="cursor-help"
+            title="Technicians do not log into the system. As a supervisor, you update the request status on their behalf after in‑person reporting."
+          >
+            <Info className="h-3.5 w-3.5 text-slate-400" />
+          </span>
+        </div>
+      }
+    />
+    <div className="p-5">
+      <SupervisorStatusPanel
+        requestId={id}
+        currentStatus={currentStatus}
+      />
+    </div>
+  </GlassSection>
+)}
 
       {/* ── 6. Feedback (completed only) ── */}
       {isCompleted && (
