@@ -116,7 +116,7 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
       {/* ── Page header ── */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-lg font-semibold uppercase tracking-widest text-violet-500 dark:text-violet-400 mb-1">
+          <p className="text-lg font-bold uppercase tracking-widest text-violet-500 dark:text-violet-400 mb-1">
             Request Detail
           </p>
           {/* <h1 className="text-xl font-bold text-slate-900 dark:text-white line-clamp-2">
@@ -129,10 +129,10 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
           asChild
           className="gap-1.5 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 shrink-0"
         >
-          <Link href="/supervisor">
+          {/* <Link href="/supervisor">
             <ChevronLeft className="h-4 w-4" />
             Back
-          </Link>
+          </Link> */}
         </Button>
       </div>
 
