@@ -128,7 +128,7 @@ export function ScrollableRow({ items, sectionKey }: ScrollableRowProps) {
               style={{ animationDelay: `${i * 50}ms` }}
             >
               <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800/50 transition-all duration-200 hover:shadow-md">
-                <RequestCard request={r} fullHref={`/supervisor/requests/${r.id}`} />
+                <RequestCard request={r} fullHref={`/supervisor/requests/${r.id}`} hideStatus={true} />
               </div>
             </div>
           ))}
