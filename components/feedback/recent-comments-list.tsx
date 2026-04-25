@@ -17,6 +17,7 @@ interface CommentItem {
 interface Props {
   comments: CommentItem[];
   pageSize?: number;
+   basePath?: string;
 }
 
 export function RecentCommentsList({ comments, pageSize = 5 }: Props) {
