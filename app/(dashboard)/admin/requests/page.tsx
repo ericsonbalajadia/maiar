@@ -1,5 +1,7 @@
 import { getFilteredRequests } from '@/lib/queries/request.queries';
 import { RequestsTable } from '@/components/requests/requests-table';
+import Link from 'next/link';
+import { ChevronRight, Home } from 'lucide-react';
 
 interface Props {
   searchParams: Promise<Record<string, string>>;
@@ -55,6 +57,15 @@ export default async function AdminAllRequestsPage({ searchParams }: Props) {
 
   return (
     <div className="h-full flex flex-col max-w-7xl mx-auto px-6 py-4">
+      {/* Breadcrumb */}
+      <div className="flex items-center text-sm text-slate-500 mb-4">
+        <Link href="/admin" className="hover:text-slate-700 flex items-center gap-1">
+          <Home className="h-3.5 w-3.5" />
+          Dashboard
+        </Link>
+        <ChevronRight className="h-3.5 w-3.5 mx-1" />
+        <span className="font-medium text-slate-700">All Requests</span>
+      </div>
       <div className="shrink-0 mb-4">
         <h1 className="text-2xl font-bold">All Requests</h1>
       </div>
