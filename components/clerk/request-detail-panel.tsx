@@ -6,16 +6,11 @@ import { StatusBadge } from "@/components/common/status-badge";
 import type { RequestDetail } from "@/types/requests.model";
 import type { StatusHistoryEntry } from "@/lib/types/tracking";
 import {
-  Tag, MapPin, Calendar, User, Mail, Building2, Paperclip,
+  Tag, MapPin, Calendar, User, Mail, Paperclip,
   ClipboardCheck, History, CheckCircle2, Clock, Hash,
 } from "lucide-react";
 
-interface RequestDetailPanelProps {
-  request: RequestDetail;
-  hideStatusPanel?: boolean;
-}
-
-// ─── Type mapper (unchanged) ───────────────────────────────────────────────
+// ─── Helper (unchanged) ───────────────────────────────────────────────────────
 
 function mapToStatusHistoryEntry(
   history: NonNullable<RequestDetail["status_history"]>
@@ -41,7 +36,7 @@ function mapToStatusHistoryEntry(
   }));
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────
+// ─── Sub-components ───────────────────────────────────────────────────────────
 
 function SectionHeader({
   icon: Icon,
@@ -100,15 +95,18 @@ function InfoCell({
   );
 }
 
-function Divider() {
-  return <div className="h-px bg-slate-100 dark:bg-slate-800/60 my-6" />;
-}
+// ─── Main component ───────────────────────────────────────────────────────────
 
-// ─── Main component ───────────────────────────────────────────────────────
+interface RequestDetailPanelProps {
+  request: RequestDetail;
+  hideStatusPanel?: boolean;
+  variant?: "glass" | "plain";
+}
 
 export function RequestDetailPanel({
   request,
   hideStatusPanel = false,
+  variant = "glass",
 }: RequestDetailPanelProps) {
   const status = request.statuses?.status_name ?? "unknown";
   const priority = request.priorities?.level ?? "unknown";
@@ -118,7 +116,6 @@ export function RequestDetailPanel({
   const mappedHistory = mapToStatusHistoryEntry(request.status_history ?? []);
   const attachments = request.attachments ?? [];
 
-  // Clerk can update status only if request is pending or under review
   const canUpdate = ["pending", "under_review"].includes(status);
   const showStatusActions = !hideStatusPanel && canUpdate;
 
@@ -129,48 +126,36 @@ export function RequestDetailPanel({
     .filter(Boolean)
     .join(", ");
 
-return (
-  <div
-    className="rounded-2xl border border-white/60 dark:border-slate-700/60 p-6"
-    style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
-  >
-    {/* ───────────────────────────────────────── */}
-    {/* TOP SUMMARY BAR */}
-    {/* ───────────────────────────────────────── */}
-    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
-      <div>
-        <div className="flex items-center gap-2 flex-wrap mb-1">
-          <span className="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
-            {request.ticket_number}
-          </span>
-          <StatusBadge status={status} />
+  const containerClasses =
+    variant === "glass"
+      ? "rounded-2xl border border-white/60 dark:border-slate-700/60 p-6"
+      : "";
+
+  const containerStyle =
+    variant === "glass"
+      ? { background: "var(--glass-bg)", backdropFilter: "blur(12px)" }
+      : {};
+
+  return (
+    <div className={containerClasses} style={containerStyle}>
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap mb-1">
+            <span className="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+              {request.ticket_number}
+            </span>
+            <StatusBadge status={status} />
+          </div>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+            {request.title}
+          </h2>
         </div>
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-          {request.title}
-        </h2>
       </div>
 
-      {/* Quick meta
-      <div className="flex flex-wrap gap-3 text-xs">
-        <span className="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800">
-          Priority: {priority}
-        </span>
-        <span className="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800">
-          {locationFull || "No location"}
-        </span>
-      </div>
-      */}
-    </div> 
-
-    {/* ───────────────────────────────────────── */}
-    {/* MAIN GRID */}
-    {/* ───────────────────────────────────────── */}
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-      
-      {/* LEFT COLUMN (MAIN DETAILS) */}
-      <div className="xl:col-span-2 space-y-6">
-
-        {/* REQUEST DETAILS */}
+      {/* Two‑column: Request Details + Timeline */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Left: Request Details */}
         <div className="rounded-xl border p-5 bg-white/40 dark:bg-slate-900/40">
           <SectionHeader
             icon={Tag}
@@ -184,7 +169,6 @@ return (
             <InfoCell icon={Calendar} label="Submitted" value={new Date(request.created_at).toLocaleString()} />
             <InfoCell icon={Hash} label="Type" value={request.request_type} />
           </InfoGrid>
-
           {request.description && (
             <div className="mt-4">
               <p className="text-xs font-semibold text-slate-400 mb-1">Description</p>
@@ -195,7 +179,7 @@ return (
           )}
         </div>
 
-        {/* TIMELINE */}
+        {/* Right: Timeline */}
         <div className="rounded-xl border p-5 bg-white/40 dark:bg-slate-900/40">
           <SectionHeader
             icon={History}
@@ -204,33 +188,31 @@ return (
           />
           <RequestTimeline history={mappedHistory} />
         </div>
-
-        {/* ATTACHMENTS */}
-        {attachments.length > 0 && (
-          <div className="rounded-xl border p-5 bg-white/40 dark:bg-slate-900/40">
-            <SectionHeader
-              icon={Paperclip}
-              iconGradient="bg-gradient-to-br from-slate-500 to-slate-700"
-              title={`Attachments (${attachments.length})`}
-            />
-            <div className="grid sm:grid-cols-2 gap-3">
-              {attachments.map((a) => (
-                <div key={a.id} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 p-2 rounded-lg">
-                  <Paperclip className="h-4 w-4 text-slate-400" />
-                  <span className="text-sm truncate">{a.file_name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
       </div>
 
-      {/* RIGHT SIDEBAR */}
-      <div className="space-y-6 xl:sticky xl:top-6">
+      {/* Attachments (if any) – full width */}
+      {attachments.length > 0 && (
+        <div className="rounded-xl border p-5 bg-white/40 dark:bg-slate-900/40 mb-6">
+          <SectionHeader
+            icon={Paperclip}
+            iconGradient="bg-gradient-to-br from-slate-500 to-slate-700"
+            title={`Attachments (${attachments.length})`}
+          />
+          <div className="grid sm:grid-cols-2 gap-3">
+            {attachments.map((a) => (
+              <div key={a.id} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 p-2 rounded-lg">
+                <Paperclip className="h-4 w-4 text-slate-400" />
+                <span className="text-sm truncate">{a.file_name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
-        {/* REQUESTER */}
-        <div className="rounded-xl border p-5 bg-white/40 dark:bg-slate-900/40">
+      {/* Vertical stack of info cards (Requester, Technician, Review, Actions) */}
+      <div className="space-y-4">
+        {/* Requester card */}
+        <div className="rounded-xl border p-4 bg-white/40 dark:bg-slate-900/40">
           <SectionHeader
             icon={User}
             iconGradient="bg-gradient-to-br from-blue-500 to-indigo-600"
@@ -242,9 +224,9 @@ return (
           </InfoGrid>
         </div>
 
-        {/* TECHNICIAN */}
+        {/* Technician card (if assigned) */}
         {request.assigned_technician && (
-          <div className="rounded-xl border p-5 bg-white/40 dark:bg-slate-900/40">
+          <div className="rounded-xl border p-4 bg-white/40 dark:bg-slate-900/40">
             <SectionHeader
               icon={User}
               iconGradient="bg-gradient-to-br from-teal-400 to-emerald-600"
@@ -257,9 +239,9 @@ return (
           </div>
         )}
 
-        {/* REVIEW */}
+        {/* Review card (if exists) */}
         {review && (
-          <div className="rounded-xl border p-5 bg-white/40 dark:bg-slate-900/40">
+          <div className="rounded-xl border p-4 bg-white/40 dark:bg-slate-900/40">
             <SectionHeader
               icon={ClipboardCheck}
               iconGradient="bg-gradient-to-br from-emerald-400 to-teal-600"
@@ -272,9 +254,9 @@ return (
           </div>
         )}
 
-        {/* STATUS ACTIONS */}
+        {/* Status Actions card (if applicable) */}
         {showStatusActions && (
-          <div className="rounded-xl border p-5 bg-white/40 dark:bg-slate-900/40">
+          <div className="rounded-xl border p-4 bg-white/40 dark:bg-slate-900/40">
             <SectionHeader
               icon={CheckCircle2}
               iconGradient="bg-gradient-to-br from-amber-400 to-orange-500"
@@ -287,9 +269,7 @@ return (
             />
           </div>
         )}
-
       </div>
     </div>
-  </div>
-);
+  );
 }

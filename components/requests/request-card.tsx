@@ -1,4 +1,3 @@
-// components/requests/request-card.tsx
 import Link from 'next/link'
 import { StatusBadge } from '@/components/common/status-badge'
 import { PriorityBadge } from '@/components/common/status-badge'
@@ -17,9 +16,10 @@ interface RequestCardProps {
     location: { building_name: string }
   }
   fullHref?: string;
+  hideStatus?: boolean; // new – hides the status badge when true
 }
 
-export function RequestCard({ request, fullHref }: RequestCardProps) {
+export function RequestCard({ request, fullHref, hideStatus = false }: RequestCardProps) {
   const formattedDate = new Date(request.created_at).toLocaleDateString('en-PH', {
     year: 'numeric',
     month: 'short',
@@ -55,11 +55,12 @@ export function RequestCard({ request, fullHref }: RequestCardProps) {
               </span>
             </div>
           </div>
-          <div className="shrink-0">
-            <StatusBadge status={request.status.status_name} />
-          </div>
+          {!hideStatus && (
+            <div className="shrink-0">
+              <StatusBadge status={request.status.status_name} />
+            </div>
+          )}
         </div>
-        {/* Subtle gradient overlay on hover */}
         <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-r from-blue-500/5 to-indigo-500/5" />
       </div>
     </Link>

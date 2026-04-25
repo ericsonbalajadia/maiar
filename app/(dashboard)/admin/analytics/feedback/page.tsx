@@ -1,3 +1,4 @@
+//app/(dashboard)/admin/analytics/feedback/page.tsx
 import { createServiceClient } from '@/lib/supabase/service';
 
 const serviceLabels: Record<number, string> = {

@@ -1,3 +1,4 @@
+//app/(dashboard)/admin/supervisor/page.tsx
 export default function SupervisorDashboard() {
   return (
     <div>
