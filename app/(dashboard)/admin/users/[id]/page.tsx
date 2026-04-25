@@ -1,3 +1,4 @@
+// app/(dashboard)/admin/users/[id]/page.tsx
 import { getAuthUser } from "@/lib/auth";
 import { ROLES } from "@/lib/rbac";
 import { createServiceClient } from "@/lib/supabase/service";
@@ -71,6 +72,25 @@ export default async function AdminUserDetailPage({ params }: Props) {
   };
 
   const userRequests = await getUserRequests(user.id, user.role);
+
+  // Determine request section title and descriptive text
+  let requestTitle = "";
+  let requestDescription = "";
+  let showRequestTable = false;
+
+  if (user.role === "student" || user.role === "staff") {
+    requestTitle = "Submitted Requests";
+    requestDescription = "Requests submitted by this user.";
+    showRequestTable = true;
+  } else if (user.role === "technician") {
+    requestTitle = "Assigned Requests";
+    requestDescription = "Requests that have been assigned to this technician.";
+    showRequestTable = true;
+  } else if (user.role === "clerk") {
+    requestTitle = "Reviewed Requests";
+    requestDescription = "Requests that this clerk has reviewed (approved/rejected).";
+    showRequestTable = true;
+  }
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 fade-in">
@@ -158,76 +178,74 @@ export default async function AdminUserDetailPage({ params }: Props) {
         </div>
       </div>
 
-      {userRequests.length > 0 && (
+      {/* Requests section (only for relevant roles) */}
+      {showRequestTable && (
         <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
             <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-              {user.role === "technician"
-                ? "Assigned Requests"
-                : "Reviewed Requests"}
+              {requestTitle}
             </h3>
+            <p className="text-xs text-slate-500 mt-0.5">{requestDescription}</p>
           </div>
           <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Ticket</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Date</TableHead>
-                  {user.role === "clerk" && <TableHead>Decision</TableHead>}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {userRequests.map((req: any) => (
-                  <TableRow key={req.id}>
-                    <TableCell className="font-mono text-xs">
-                      <Link
-                        href={`/admin/requests/${req.id}`}
-                        className="text-blue-600 hover:underline"
-                      >
-                        {req.ticket_number}
-                      </Link>
-                    </TableCell>
-                    <TableCell>{req.title}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="capitalize">
-                        {req.status?.status_name || "unknown"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-slate-500 text-xs">
-                      {new Date(req.related_at).toLocaleDateString("en-PH")}
-                    </TableCell>
-                    {user.role === "clerk" && (
-                      <TableCell className="capitalize">
-                        {req.decision || "—"}
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            {userRequests.length === 0 ? (
+              <div className="p-6 text-center text-slate-500 text-sm">
+                No requests found.
+              </div>
+            ) : (
+<div className="overflow-x-auto">
+  {userRequests.length === 0 ? (
+    <div className="p-6 text-center text-slate-500 text-sm">
+      No requests found.
+    </div>
+  ) : (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="px-4">Ticket</TableHead>
+          <TableHead className="px-4">Title</TableHead>
+          <TableHead className="px-4">Status</TableHead>
+          <TableHead className="px-4">Date</TableHead>
+          {user.role === "clerk" && <TableHead className="px-4">Decision</TableHead>}
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {userRequests.map((req: any) => (
+          <TableRow key={req.id}>
+            <TableCell className="px-4 font-mono text-xs">
+              <Link
+                href={`/admin/requests/${req.id}`}
+                className="text-blue-600 hover:underline"
+              >
+                {req.ticket_number}
+              </Link>
+            </TableCell>
+            <TableCell className="px-4">{req.title}</TableCell>
+            <TableCell className="px-4">
+              <Badge variant="outline" className="capitalize">
+                {req.status?.status_name || "unknown"}
+              </Badge>
+            </TableCell>
+            <TableCell className="px-4 text-slate-500 text-xs">
+              {new Date(req.related_at).toLocaleDateString("en-PH")}
+            </TableCell>
+            {user.role === "clerk" && (
+              <TableCell className="px-4 capitalize">
+                {req.decision || "—"}
+              </TableCell>
+            )}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  )}
+</div>
+            )}
           </div>
         </div>
       )}
 
-      {userRequests.length === 0 && (user.role === 'technician' || user.role === 'clerk') && (
-  <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 text-center text-slate-500">
-    <p className="text-sm">
-      {user.role === 'technician'
-        ? 'No requests have been assigned to this technician yet.'
-        : 'This clerk has not reviewed any requests yet.'}
-    </p>
-  </div>
-)}
-
-      {user.role !== "technician" && user.role !== "clerk" && (
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 text-center text-slate-500">
-          <p>No request history available for this role.</p>
-        </div>
-      )}
-
-      {/* Role and status management */}
+      {/* Administrative Actions */}
       <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6">
         <h2 className="text-base font-semibold mb-4">Administrative Actions</h2>
         <UserRoleForm

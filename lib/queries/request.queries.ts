@@ -433,10 +433,9 @@ export async function getRecentUsers(limit = 5) {
 // Get requests related to a user (assigned or reviewed)
 export async function getUserRequests(userId: string, role: string) {
   const supabase = createServiceClient();
-  let query;
 
   if (role === 'technician') {
-    query = supabase
+    const { data, error } = await supabase
       .from('request_assignments')
       .select(`
         request_id,
@@ -451,8 +450,15 @@ export async function getUserRequests(userId: string, role: string) {
       `)
       .eq('assigned_user_id', userId)
       .order('assigned_at', { ascending: false });
-  } else if (role === 'clerk') {
-    query = supabase
+    if (error) return [];
+    return data.map((item: any) => ({
+      ...item.requests,
+      related_at: item.assigned_at,
+    }));
+  }
+
+  if (role === 'clerk') {
+    const { data, error } = await supabase
       .from('request_reviews')
       .select(`
         request_id,
@@ -468,20 +474,32 @@ export async function getUserRequests(userId: string, role: string) {
       `)
       .eq('reviewer_id', userId)
       .order('reviewed_at', { ascending: false });
-  } else {
-    return [];
+    if (error) return [];
+    return data.map((item: any) => ({
+      ...item.requests,
+      related_at: item.reviewed_at,
+      decision: item.decision,
+    }));
   }
 
-  const { data, error } = await query;
-  if (error) {
-    console.error('getUserRequests error:', error);
-    return [];
+  if (role === 'student' || role === 'staff') {
+    const { data, error } = await supabase
+      .from('requests')
+      .select(`
+        id,
+        ticket_number,
+        title,
+        created_at,
+        statuses ( status_name )
+      `)
+      .eq('requester_id', userId)
+      .order('created_at', { ascending: false });
+    if (error) return [];
+    return data.map((item: any) => ({
+      ...item,
+      related_at: item.created_at,
+    }));
   }
 
-  // Flatten the nested structure
-  return data.map((item: any) => ({
-    ...item.requests,
-    related_at: item.assigned_at || item.reviewed_at,
-    decision: item.decision || null,
-  }));
+  return [];
 }
