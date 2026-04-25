@@ -88,7 +88,8 @@ export default async function AdminUserDetailPage({ params }: Props) {
     showRequestTable = true;
   } else if (user.role === "clerk") {
     requestTitle = "Reviewed Requests";
-    requestDescription = "Requests that this clerk has reviewed (approved/rejected).";
+    requestDescription =
+      "Requests that this clerk has reviewed (approved/rejected).";
     showRequestTable = true;
   }
 
@@ -185,7 +186,9 @@ export default async function AdminUserDetailPage({ params }: Props) {
             <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
               {requestTitle}
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">{requestDescription}</p>
+            <p className="text-xs text-slate-500 mt-0.5">
+              {requestDescription}
+            </p>
           </div>
           <div className="overflow-x-auto">
             {userRequests.length === 0 ? (
@@ -193,53 +196,70 @@ export default async function AdminUserDetailPage({ params }: Props) {
                 No requests found.
               </div>
             ) : (
-<div className="overflow-x-auto">
-  {userRequests.length === 0 ? (
-    <div className="p-6 text-center text-slate-500 text-sm">
-      No requests found.
-    </div>
-  ) : (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="px-4">Ticket</TableHead>
-          <TableHead className="px-4">Title</TableHead>
-          <TableHead className="px-4">Status</TableHead>
-          <TableHead className="px-4">Date</TableHead>
-          {user.role === "clerk" && <TableHead className="px-4">Decision</TableHead>}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {userRequests.map((req: any) => (
-          <TableRow key={req.id}>
-            <TableCell className="px-4 font-mono text-xs">
-              <Link
-                href={`/admin/requests/${req.id}`}
-                className="text-blue-600 hover:underline"
-              >
-                {req.ticket_number}
-              </Link>
-            </TableCell>
-            <TableCell className="px-4">{req.title}</TableCell>
-            <TableCell className="px-4">
-              <Badge variant="outline" className="capitalize">
-                {req.status?.status_name || "unknown"}
-              </Badge>
-            </TableCell>
-            <TableCell className="px-4 text-slate-500 text-xs">
-              {new Date(req.related_at).toLocaleDateString("en-PH")}
-            </TableCell>
-            {user.role === "clerk" && (
-              <TableCell className="px-4 capitalize">
-                {req.decision || "—"}
-              </TableCell>
-            )}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  )}
-</div>
+              <div className="overflow-x-auto max-h-96 overflow-y-auto border rounded-lg custom-scrollbar">
+                {userRequests.length === 0 ? (
+                  <div className="p-6 text-center text-slate-500 text-sm">
+                    No requests found.
+                  </div>
+                ) : (
+                  <table className="w-full text-sm border-collapse">
+                    <thead className="sticky top-0 bg-white dark:bg-slate-900 z-10">
+                      <tr className="border-b border-slate-200 dark:border-slate-800">
+                        <th className="px-4 py-2 text-left font-semibold text-slate-600 dark:text-slate-400">
+                          Ticket
+                        </th>
+                        <th className="px-4 py-2 text-left font-semibold text-slate-600 dark:text-slate-400">
+                          Title
+                        </th>
+                        <th className="px-4 py-2 text-left font-semibold text-slate-600 dark:text-slate-400">
+                          Status
+                        </th>
+                        <th className="px-4 py-2 text-left font-semibold text-slate-600 dark:text-slate-400">
+                          Date
+                        </th>
+                        {user.role === "clerk" && (
+                          <th className="px-4 py-2 text-left font-semibold text-slate-600 dark:text-slate-400">
+                            Decision
+                          </th>
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                      {userRequests.map((req: any) => (
+                        <tr
+                          key={req.id}
+                          className="hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                        >
+                          <td className="px-4 py-2 font-mono text-xs">
+                            <Link
+                              href={`/admin/requests/${req.id}`}
+                              className="text-blue-600 hover:underline"
+                            >
+                              {req.ticket_number}
+                            </Link>
+                          </td>
+                          <td className="px-4 py-2">{req.title}</td>
+                          <td className="px-4 py-2">
+                            <Badge variant="outline" className="capitalize">
+                              {req.status?.status_name || "unknown"}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-2 text-slate-500 text-xs">
+                            {new Date(req.related_at).toLocaleDateString(
+                              "en-PH",
+                            )}
+                          </td>
+                          {user.role === "clerk" && (
+                            <td className="px-4 py-2 capitalize">
+                              {req.decision || "—"}
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
             )}
           </div>
         </div>
