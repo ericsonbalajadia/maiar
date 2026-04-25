@@ -445,14 +445,18 @@ export async function getUserRequests(userId: string, role: string) {
           ticket_number,
           title,
           created_at,
-          statuses ( status_name )
+          status:status_id ( status_name )
         )
       `)
       .eq('assigned_user_id', userId)
       .order('assigned_at', { ascending: false });
     if (error) return [];
     return data.map((item: any) => ({
-      ...item.requests,
+      id: item.requests.id,
+      ticket_number: item.requests.ticket_number,
+      title: item.requests.title,
+      created_at: item.requests.created_at,
+      status: item.requests.status ?? { status_name: 'unknown' },
       related_at: item.assigned_at,
     }));
   }
@@ -469,14 +473,18 @@ export async function getUserRequests(userId: string, role: string) {
           ticket_number,
           title,
           created_at,
-          statuses ( status_name )
+          status:status_id ( status_name )
         )
       `)
       .eq('reviewer_id', userId)
       .order('reviewed_at', { ascending: false });
     if (error) return [];
     return data.map((item: any) => ({
-      ...item.requests,
+      id: item.requests.id,
+      ticket_number: item.requests.ticket_number,
+      title: item.requests.title,
+      created_at: item.requests.created_at,
+      status: item.requests.status ?? { status_name: 'unknown' },
       related_at: item.reviewed_at,
       decision: item.decision,
     }));
@@ -490,13 +498,17 @@ export async function getUserRequests(userId: string, role: string) {
         ticket_number,
         title,
         created_at,
-        statuses ( status_name )
+        status:status_id ( status_name )
       `)
       .eq('requester_id', userId)
       .order('created_at', { ascending: false });
     if (error) return [];
     return data.map((item: any) => ({
-      ...item,
+      id: item.id,
+      ticket_number: item.ticket_number,
+      title: item.title,
+      created_at: item.created_at,
+      status: item.status ?? { status_name: 'unknown' },
       related_at: item.created_at,
     }));
   }
