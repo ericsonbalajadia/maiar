@@ -417,3 +417,15 @@ export async function getUserSummary() {
   });
   return { total, byRole, pendingApprovals };
 }
+
+// Get recent users for admin dashboard
+export async function getRecentUsers(limit = 5) {
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, full_name, email, role, signup_status, created_at')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error) return [];
+  return data;
+}
