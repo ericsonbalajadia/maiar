@@ -1,3 +1,4 @@
+//components/layout/sidebar.tsx
 'use client'
 
 import Link from 'next/link'
@@ -17,6 +18,7 @@ const EXACT_MATCH_HREFS = new Set([
   '/requester/requests',
   '/requester/requests/new',
   '/admin',
+  '/admin/users',
   '/clerk',
   '/clerk/account-requests',
   '/technician',

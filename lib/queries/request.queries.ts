@@ -417,3 +417,101 @@ export async function getUserSummary() {
   });
   return { total, byRole, pendingApprovals };
 }
+
+// Get recent users for admin dashboard
+export async function getRecentUsers(limit = 5) {
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, full_name, email, role, signup_status, created_at')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error) return [];
+  return data;
+}
+
+// Get requests related to a user (assigned or reviewed)
+export async function getUserRequests(userId: string, role: string) {
+  const supabase = createServiceClient();
+
+  if (role === 'technician') {
+    const { data, error } = await supabase
+      .from('request_assignments')
+      .select(`
+        request_id,
+        assigned_at,
+        requests (
+          id,
+          ticket_number,
+          title,
+          created_at,
+          status:status_id ( status_name )
+        )
+      `)
+      .eq('assigned_user_id', userId)
+      .order('assigned_at', { ascending: false });
+    if (error) return [];
+    return data.map((item: any) => ({
+      id: item.requests.id,
+      ticket_number: item.requests.ticket_number,
+      title: item.requests.title,
+      created_at: item.requests.created_at,
+      status: item.requests.status ?? { status_name: 'unknown' },
+      related_at: item.assigned_at,
+    }));
+  }
+
+  if (role === 'clerk') {
+    const { data, error } = await supabase
+      .from('request_reviews')
+      .select(`
+        request_id,
+        reviewed_at,
+        decision,
+        requests (
+          id,
+          ticket_number,
+          title,
+          created_at,
+          status:status_id ( status_name )
+        )
+      `)
+      .eq('reviewer_id', userId)
+      .order('reviewed_at', { ascending: false });
+    if (error) return [];
+    return data.map((item: any) => ({
+      id: item.requests.id,
+      ticket_number: item.requests.ticket_number,
+      title: item.requests.title,
+      created_at: item.requests.created_at,
+      status: item.requests.status ?? { status_name: 'unknown' },
+      related_at: item.reviewed_at,
+      decision: item.decision,
+    }));
+  }
+
+  if (role === 'student' || role === 'staff') {
+    const { data, error } = await supabase
+      .from('requests')
+      .select(`
+        id,
+        ticket_number,
+        title,
+        created_at,
+        status:status_id ( status_name )
+      `)
+      .eq('requester_id', userId)
+      .order('created_at', { ascending: false });
+    if (error) return [];
+    return data.map((item: any) => ({
+      id: item.id,
+      ticket_number: item.ticket_number,
+      title: item.title,
+      created_at: item.created_at,
+      status: item.status ?? { status_name: 'unknown' },
+      related_at: item.created_at,
+    }));
+  }
+
+  return [];
+}

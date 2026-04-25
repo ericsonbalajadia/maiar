@@ -1,3 +1,4 @@
+//components/feedback/recent-comments-list.tsx
 "use client";
 
 import { useState } from "react";
@@ -17,9 +18,10 @@ interface CommentItem {
 interface Props {
   comments: CommentItem[];
   pageSize?: number;
+  basePath?: string; // e.g., "/supervisor/requests" or "/admin/requests"
 }
 
-export function RecentCommentsList({ comments, pageSize = 5 }: Props) {
+export function RecentCommentsList({ comments, pageSize = 5, basePath = "/supervisor/requests" }: Props) {
   const [visibleCount, setVisibleCount] = useState(pageSize);
   const hasMore = visibleCount < comments.length;
 
@@ -40,7 +42,7 @@ export function RecentCommentsList({ comments, pageSize = 5 }: Props) {
             <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500">
               {f.request ? (
                 <Link
-                  href={`/supervisor/requests/${f.request.id}`}
+                  href={`${basePath}/${f.request.id}`} 
                   className="font-mono font-semibold text-blue-600 dark:text-blue-400 hover:underline"
                 >
                   {f.request.ticket_number}
