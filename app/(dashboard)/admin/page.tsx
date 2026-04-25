@@ -184,7 +184,7 @@ export default async function AdminPage() {
           </p>
         </div>
         <Link
-          href="/admin/users/create-technician"
+          href="/admin/users/create"
           className="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-rose-700 transition-colors shrink-0"
         >
           <UserPlus className="h-4 w-4" />

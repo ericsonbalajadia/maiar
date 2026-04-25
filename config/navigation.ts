@@ -40,13 +40,13 @@ export const NAV_ITEMS: Record<Role, NavItem[]> = {
     { label: 'Staff Requests', href: '/supervisor/account-requests', icon: 'UserCheck'      },
   ],
   admin: [
-    { label: 'Dashboard',         href: '/admin',                icon: 'LayoutDashboard' },
-    { label: 'Users',             href: '/admin/users',          icon: 'Users'           },
-    { label: 'Pending Approvals', href: '/admin/users/pending',  icon: 'UserCheck', badgeKey: 'pendingApprovals' },
-    { label: 'All Requests',      href: '/admin/requests',       icon: 'ClipboardList'   },
-    { label: 'Settings',          href: '/admin/settings',       icon: 'Settings'        },
-    { label: 'Feedback',          href: '/admin/analytics/feedback', icon: 'BarChart2'   },  // only one analytics link
-    { label: 'Reports', href: '/admin/analytics/reports', icon: 'BarChart2' }
-    // Future: { label: 'Reports', href: '/admin/analytics/reports', icon: 'PieChart' }
+  { label: 'Dashboard',         href: '/admin',                         icon: 'LayoutDashboard' },
+  { label: 'Create User',       href: '/admin/users/create',            icon: 'UserPlus'        },
+  { label: 'Users',             href: '/admin/users',                   icon: 'Users'           },
+  { label: 'Pending Approvals', href: '/admin/users/pending',           icon: 'UserCheck', badgeKey: 'pendingApprovals' },
+  { label: 'All Requests',      href: '/admin/requests',                icon: 'ClipboardList'   },
+  { label: 'Settings',          href: '/admin/settings',                icon: 'Settings'        },
+  { label: 'Feedback',          href: '/admin/analytics/feedback',      icon: 'MessageSquare'       },
+  { label: 'Reports',           href: '/admin/analytics/reports',       icon: 'BarChart2'       },
 ],
 }

@@ -30,7 +30,7 @@ export default async function AdminUsersPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">User Management</h1>
         <Link
-          href="/admin/users/create-technician"
+          href="/admin/users/create"
           className="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-rose-700 transition-colors"
         >
           + Create User
