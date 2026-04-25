@@ -429,3 +429,59 @@ export async function getRecentUsers(limit = 5) {
   if (error) return [];
   return data;
 }
+
+// Get requests related to a user (assigned or reviewed)
+export async function getUserRequests(userId: string, role: string) {
+  const supabase = createServiceClient();
+  let query;
+
+  if (role === 'technician') {
+    query = supabase
+      .from('request_assignments')
+      .select(`
+        request_id,
+        assigned_at,
+        requests (
+          id,
+          ticket_number,
+          title,
+          created_at,
+          statuses ( status_name )
+        )
+      `)
+      .eq('assigned_user_id', userId)
+      .order('assigned_at', { ascending: false });
+  } else if (role === 'clerk') {
+    query = supabase
+      .from('request_reviews')
+      .select(`
+        request_id,
+        reviewed_at,
+        decision,
+        requests (
+          id,
+          ticket_number,
+          title,
+          created_at,
+          statuses ( status_name )
+        )
+      `)
+      .eq('reviewer_id', userId)
+      .order('reviewed_at', { ascending: false });
+  } else {
+    return [];
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    console.error('getUserRequests error:', error);
+    return [];
+  }
+
+  // Flatten the nested structure
+  return data.map((item: any) => ({
+    ...item.requests,
+    related_at: item.assigned_at || item.reviewed_at,
+    decision: item.decision || null,
+  }));
+}
