@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { updateUserRole, toggleUserActive } from "@/actions/user.actions";
+import { toggleUserActive } from "@/actions/user.actions";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, Info } from "lucide-react";
 
 interface Props {
   userId: string;
@@ -11,21 +11,19 @@ interface Props {
   isActive: boolean;
 }
 
-const ROLES = ["student", "staff", "clerk", "technician", "supervisor", "admin"];
+const roleColorMap: Record<string, string> = {
+  student: "bg-blue-100 text-blue-700",
+  staff: "bg-indigo-100 text-indigo-700",
+  clerk: "bg-amber-100 text-amber-700",
+  technician: "bg-teal-100 text-teal-700",
+  supervisor: "bg-violet-100 text-violet-700",
+  admin: "bg-rose-100 text-rose-700",
+};
 
 export function UserRoleForm({ userId, currentRole, isActive }: Props) {
-  const [role, setRole] = useState(currentRole);
   const [active, setActive] = useState(isActive);
-  const [isPendingRole, startRole] = useTransition();
   const [isPendingActive, startActive] = useTransition();
-
-  const handleRoleChange = (newRole: string) => {
-    if (newRole === role) return;
-    startRole(async () => {
-      await updateUserRole(userId, newRole);
-      setRole(newRole);
-    });
-  };
+  const roleColor = roleColorMap[currentRole] || "bg-slate-100 text-slate-700";
 
   const handleToggleActive = () => {
     startActive(async () => {
@@ -35,30 +33,36 @@ export function UserRoleForm({ userId, currentRole, isActive }: Props) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Role section */}
       <div>
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Role</label>
-        <div className="flex flex-wrap gap-2">
-          {ROLES.map((r) => (
-            <button
-              key={r}
-              onClick={() => handleRoleChange(r)}
-              disabled={isPendingRole}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                role === r
-                  ? "bg-rose-600 text-white"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-              }`}
-            >
-              {r.charAt(0).toUpperCase() + r.slice(1)}
-            </button>
-          ))}
+        <div className="flex items-center gap-2 mb-1">
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+            Role
+          </label>
+          <span title="Role is assigned during registration and cannot be changed by an admin.">
+            <Info className="h-3.5 w-3.5 text-slate-400 cursor-help" />
+          </span>
         </div>
-        {isPendingRole && <Loader2 className="h-4 w-4 animate-spin mt-2" />}
+        <div>
+          <span className={`px-3 py-1.5 rounded-lg text-sm font-medium ${roleColor}`}>
+            {currentRole.charAt(0).toUpperCase() + currentRole.slice(1)}
+          </span>
+        </div>
       </div>
 
+      {/* Account Status section */}
       <div>
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Account Status</label>
+        <div className="flex items-center gap-2 mb-1">
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+            Account Status
+          </label>
+          <span
+            title={`${active ? "Active users can log in and access the system." : "Deactivated users cannot log in."}`}
+          >
+            <Info className="h-3.5 w-3.5 text-slate-400 cursor-help" />
+          </span>
+        </div>
         <Button
           type="button"
           variant={active ? "destructive" : "default"}
@@ -68,9 +72,6 @@ export function UserRoleForm({ userId, currentRole, isActive }: Props) {
           {isPendingActive ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
           {active ? "Deactivate Account" : "Activate Account"}
         </Button>
-        <p className="text-xs text-slate-500 mt-1">
-          {active ? "User can log in and access the system." : "User cannot log in."}
-        </p>
       </div>
     </div>
   );
