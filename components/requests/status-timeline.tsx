@@ -1,9 +1,14 @@
 // components/requests/status-timeline.tsx
-// Renders a vertical chronological timeline of status_history entries.
-// Each entry shows: what changed, who changed it, when.
-// Works with the raw joined shape returned by getRequestById in request.actions.ts.
+/**
+ * STATUS TIMELINE COMPONENT
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Renders a vertical chronological timeline of status_history entries.
+ * Uses centralized BADGE_STYLES for consistent coloring across the app.
+ * Each entry shows: status, who changed it, when, and optional reason.
+ */
 
 import { CheckCircle2, Clock, XCircle } from 'lucide-react'
+import { BADGE_STYLES } from '@/lib/constants/badge-styles'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -64,27 +69,38 @@ function resolveChangedBy(entry: StatusHistoryEntry): string {
 
 const TERMINAL = ['completed', 'cancelled']
 
+/**
+ * StatusDot Component
+ * Displays a colored dot with appropriate icon based on status.
+ * Uses centralized styles for consistency.
+ */
 function StatusDot({ status }: { status: string }) {
   const normalised = status.toLowerCase().replace(/\s+/g, '_')
+  const timelineStyle = BADGE_STYLES.timeline[normalised as keyof typeof BADGE_STYLES.timeline]
 
   if (normalised === 'completed') {
+    const style = timelineStyle || BADGE_STYLES.timeline.completed
     return (
-      <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 border-2 border-emerald-400 dark:border-emerald-600 flex items-center justify-center shrink-0">
-        <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-      </div>
-    )
-  }
-  if (normalised === 'cancelled') {
-    return (
-      <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-600 flex items-center justify-center shrink-0">
-        <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+      <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center shrink-0 ${style.dot} ${style.border}`}>
+        <CheckCircle2 className={`h-4 w-4 ${style.icon}`} />
       </div>
     )
   }
 
+  if (normalised === 'cancelled') {
+    const style = timelineStyle || BADGE_STYLES.timeline.cancelled
+    return (
+      <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center shrink-0 ${style.dot} ${style.border}`}>
+        <XCircle className={`h-4 w-4 ${style.icon}`} />
+      </div>
+    )
+  }
+
+  // Default pending/in-progress style
+  const style = BADGE_STYLES.timeline.pending
   return (
-    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center shrink-0">
-      <Clock className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400" />
+    <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center shrink-0 ${style.dot} ${style.border}`}>
+      <Clock className={`h-3.5 w-3.5 ${style.icon}`} />
     </div>
   )
 }
@@ -95,12 +111,41 @@ function statusLabel(name: string) {
     .replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
+/**
+ * Get hardcoded inline styles for status styling in timeline
+ * Uses actual color values since dynamic Tailwind classes aren't being compiled
+ */
+function getStatusStyles(status: string): { bg: string; text: string } {
+  const normalised = status.toLowerCase().replace(/\s+/g, '_')
+  
+  switch (normalised) {
+    case 'pending':
+      return { bg: '#FCD34D', text: '#78350F' }
+    case 'under_review':
+      return { bg: '#FBE7E6', text: '#9F1239' }
+    case 'approved':
+      return { bg: '#DBEAFE', text: '#1E40AF' }
+    case 'assigned':
+      return { bg: '#E0E7FF', text: '#3730A3' }
+    case 'in_progress':
+      return { bg: '#E9D5FF', text: '#6B21A8' }
+    case 'completed':
+      return { bg: '#DCFCE7', text: '#15803D' }
+    case 'cancelled':
+      return { bg: '#FEE2E2', text: '#991B1B' }
+    case 'rejected':
+      return { bg: '#FEE2E2', text: '#991B1B' }
+    default:
+      return { bg: '#F2F4F8', text: '#475569' }
+  }
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function StatusTimeline({ history }: Props) {
   if (!history || history.length === 0) {
     return (
-      <p className="text-sm text-slate-400 italic">No status history recorded yet.</p>
+      <p className="text-sm text-slate-400 dark:text-slate-500 italic">No status history recorded yet.</p>
     )
   }
 
@@ -132,11 +177,21 @@ export function StatusTimeline({ history }: Props) {
             <div className={`flex-1 pb-5 ${isLast ? 'pb-0' : ''}`}>
               <div className="flex items-start justify-between gap-2 flex-wrap">
                 <div>
-                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
-                    {statusLabel(newStatus)}
-                  </p>
+                  {(() => {
+                    const styles = getStatusStyles(newStatus)
+                    return (
+                      <span 
+                        style={{ 
+                          color: styles.text,
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        {statusLabel(newStatus)}
+                      </span>
+                    )
+                  })()}
                   {oldStatus && (
-                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 mb-1">
                       from{' '}
                       <span className="italic">{statusLabel(oldStatus)}</span>
                     </p>
