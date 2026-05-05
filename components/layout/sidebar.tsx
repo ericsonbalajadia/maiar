@@ -21,7 +21,6 @@ const EXACT_MATCH_HREFS = new Set([
   '/admin/users',
   '/clerk',
   '/clerk/account-requests',
-  '/technician',
   '/supervisor',
   '/supervisor/account-requests',
 ])
