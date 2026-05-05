@@ -1,7 +1,7 @@
 import { createServiceClient } from '@/lib/supabase/service';
 import { UserManagementTable } from '@/components/users/user-management-table';
 import Link from 'next/link';
-import { ChevronRight, Home } from 'lucide-react';
+import { ChevronRight, Home, Plus } from 'lucide-react';
 
 export default async function AdminUsersPage() {
   const supabase = createServiceClient();
@@ -31,9 +31,10 @@ export default async function AdminUsersPage() {
         <h1 className="text-2xl font-bold">User Management</h1>
         <Link
           href="/admin/users/create"
-          className="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-rose-700 transition-colors"
+          className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-800"
         >
-          + Create User
+          <Plus className="h-4 w-4" />
+          Add User
         </Link>
       </div>
 

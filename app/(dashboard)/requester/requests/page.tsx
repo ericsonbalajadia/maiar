@@ -7,7 +7,7 @@ import { getRoleDashboard, isRequesterRole } from '@/lib/rbac'
 import { getRequesterRequests } from '@/actions/request/request.actions'
 import { RequestListClient } from '@/components/requests/request-list-client'
 import { Skeleton } from '@/components/ui/skeleton'
-import { FileText, ListFilter } from 'lucide-react'
+import { ListFilter, Plus } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -101,9 +101,9 @@ export default async function RequesterRequestsPage({ searchParams }: PageProps)
         </div>
         <Link
           href="/requester/requests/new"
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-500/20 transition-all duration-200 hover:-translate-y-0.5 shrink-0"
+          className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-800 shrink-0"
         >
-          <FileText className="h-4 w-4" />
+          <Plus className="h-4 w-4" />
           New Request
         </Link>
       </div>

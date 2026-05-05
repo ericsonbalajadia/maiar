@@ -155,9 +155,14 @@ async function RequestHistoryTable() {
         <p className="text-sm text-slate-400 mb-5">
           Submit your first request to get started.
         </p>
-        <Button asChild size="sm">
+        <Button
+          asChild
+          size="sm"
+          variant="outline"
+          className="gap-2 rounded-lg border-slate-200 bg-white text-slate-700 shadow-sm hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-800"
+        >
           <Link href="/requester/requests/new">
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4" />
             Submit New Request
           </Link>
         </Button>
@@ -368,7 +373,8 @@ export default async function RequesterDashboardPage() {
         </div>
         <Button
           asChild
-          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20 gap-2 shrink-0 transition-all duration-200"
+          variant="outline"
+          className="gap-2 shrink-0 rounded-lg border-slate-200 bg-white text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-800"
         >
           <Link href="/requester/requests/new">
             <Plus className="h-4 w-4" />
