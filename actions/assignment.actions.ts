@@ -108,7 +108,7 @@ export async function updateAcceptanceStatus(
   const { data: technician } = await admin
     .from('users').select('id, role, full_name').eq('auth_id', user.id).single();
   if (!technician || technician.role !== ROLES.TECHNICIAN)
-    return actionError('form', 'Only technicians can update acceptance status.');
+    return actionError('form', 'Assignment acceptance is not available through app login.');
 
   // Verify the assignment belongs to this technician
   const { data: assignment } = await admin
@@ -166,6 +166,6 @@ export async function updateAcceptanceStatus(
     }
   }
 
-  revalidatePath('/technician');
+  revalidatePath('/supervisor');
   return { success: true };
 }
