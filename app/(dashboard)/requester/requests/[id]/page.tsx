@@ -90,7 +90,7 @@ function StatusStepper({ currentStatus }: { currentStatus: string }) {
 
   if (isCancelled) {
     return (
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+      <div className="bg-white dark:bg-slate-900 border border-[#ADEBB3]/70 dark:border-emerald-800/60 rounded-xl p-6">
         <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
           Status Progress
         </h3>
@@ -105,7 +105,7 @@ function StatusStepper({ currentStatus }: { currentStatus: string }) {
   }
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+    <div className="bg-white dark:bg-slate-900 border border-[#ADEBB3]/70 dark:border-emerald-800/60 rounded-xl p-6">
       <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-5">
         Status Progress
       </h3>
@@ -122,12 +122,12 @@ function StatusStepper({ currentStatus }: { currentStatus: string }) {
             >
               <div className="flex flex-col items-center gap-2 min-w-0">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center border-2 shrink-0 transition-all ${
+                  className={`w-8 h-8 rounded-full flex items-center justify-center border shrink-0 transition-all ${
                     isPast
                       ? "bg-slate-900 dark:bg-white border-slate-900 dark:border-white"
                       : isCurrent
                         ? "bg-slate-900 dark:bg-white border-slate-900 dark:border-white"
-                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                        : "bg-white dark:bg-slate-900 border-[#ADEBB3]/70 dark:border-emerald-800/60"
                   }`}
                 >
                   {isPast ? (
@@ -155,7 +155,7 @@ function StatusStepper({ currentStatus }: { currentStatus: string }) {
                   className={`flex-1 h-px mt-4 mx-1 ${
                     index < currentIndex
                       ? "bg-slate-900 dark:bg-white"
-                      : "bg-slate-200 dark:bg-slate-700"
+                      : "bg-[#ADEBB3]/60 dark:bg-emerald-900/60"
                   }`}
                 />
               )}
@@ -190,22 +190,22 @@ function TechnicianCard({
   assignment: AssignmentWithTechnician | null;
 }) {
   return (
-    <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl p-5">
-      <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-4 flex items-center gap-2">
-        <User className="h-4 w-4 text-blue-500" />
+    <div className="bg-[#ADEBB3]/20 dark:bg-emerald-950/30 border border-[#ADEBB3]/70 dark:border-emerald-800 rounded-xl p-5">
+      <h3 className="text-sm font-semibold text-[#225c2b] dark:text-[#ADEBB3] mb-4 flex items-center gap-2">
+        <User className="h-4 w-4 text-[#3f8f4a] dark:text-[#ADEBB3]" />
         Assigned Technician
       </h3>
 
       {!assignment || !assignment.assigned_user ? (
         <div className="flex items-center gap-3 py-2">
-          <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-800 flex items-center justify-center shrink-0">
-            <User className="h-4 w-4 text-blue-400 dark:text-blue-300" />
+          <div className="w-9 h-9 rounded-full bg-[#ADEBB3]/50 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+            <User className="h-4 w-4 text-[#3f8f4a] dark:text-[#ADEBB3]" />
           </div>
           <div>
-            <p className="text-sm text-blue-600 dark:text-blue-400 italic">
+            <p className="text-sm text-[#2f7a3b] dark:text-[#ADEBB3] italic">
               Not yet assigned
             </p>
-            <p className="text-xs text-blue-500 dark:text-blue-500 mt-0.5">
+            <p className="text-xs text-[#3f8f4a] dark:text-emerald-400 mt-0.5">
               A technician will be assigned after review.
             </p>
           </div>
@@ -213,34 +213,34 @@ function TechnicianCard({
       ) : (
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-blue-900 dark:bg-white flex items-center justify-center shrink-0 text-white dark:text-blue-900 text-sm font-bold uppercase">
+            <div className="w-9 h-9 rounded-full bg-[#225c2b] dark:bg-[#ADEBB3] flex items-center justify-center shrink-0 text-white dark:text-[#225c2b] text-sm font-bold uppercase">
               {assignment.assigned_user.full_name.charAt(0)}
             </div>
             <div>
-              <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+              <p className="text-sm font-semibold text-[#225c2b] dark:text-emerald-100">
                 {assignment.assigned_user.full_name}
               </p>
-              <p className="text-xs text-blue-600 dark:text-blue-400 capitalize">
+              <p className="text-xs text-[#2f7a3b] dark:text-[#ADEBB3] capitalize">
                 {assignment.assigned_user.role}
               </p>
             </div>
           </div>
 
-          <div className="divide-y divide-blue-100 dark:divide-blue-800">
+          <div className="divide-y divide-[#ADEBB3]/50 dark:divide-emerald-800">
             <div className="py-1.5">
-              <span className="text-blue-700 dark:text-blue-400 font-medium text-sm">
+              <span className="text-[#2f7a3b] dark:text-[#ADEBB3] font-medium text-sm">
                 Assigned on:
               </span>{" "}
-              <span className="text-blue-900 dark:text-blue-100 text-sm">
+              <span className="text-[#225c2b] dark:text-emerald-100 text-sm">
                 {formatDate(assignment.assigned_at)}
               </span>
             </div>
             {assignment.notes && (
               <div className="pt-2">
-                <p className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-1">
+                <p className="text-xs font-medium text-[#2f7a3b] dark:text-[#ADEBB3] uppercase tracking-wide mb-1">
                   Notes
                 </p>
-                <p className="text-sm text-blue-800 dark:text-blue-200">
+                <p className="text-sm text-[#225c2b] dark:text-emerald-100">
                   {assignment.notes}
                 </p>
               </div>
@@ -272,13 +272,13 @@ function ScheduledDateCard({ request }: { request: RequestDetail }) {
   }
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+    <div className="bg-white dark:bg-slate-900 border border-[#ADEBB3]/70 dark:border-emerald-800/60 rounded-xl p-5">
       <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
         <Calendar className="h-4 w-4 text-slate-400" />
         Schedule
       </h3>
 
-      <div className="divide-y divide-slate-50 dark:divide-slate-800 space-y-0">
+      <div className="divide-y divide-[#ADEBB3]/35 dark:divide-emerald-900/45 space-y-0">
         {/* RMR inspection/repair schedule */}
         {hasRmrSchedule && (
           <>
@@ -430,18 +430,18 @@ function AssignmentScheduleCard({
     : null;
 
   return (
-    <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl p-5">
-      <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-4 flex items-center gap-2">
-        <Calendar className="h-4 w-4 text-blue-500" />
+    <div className="bg-[#ADEBB3]/20 dark:bg-emerald-950/30 border border-[#ADEBB3]/70 dark:border-emerald-800 rounded-xl p-5">
+      <h3 className="text-sm font-semibold text-[#225c2b] dark:text-[#ADEBB3] mb-4 flex items-center gap-2">
+        <Calendar className="h-4 w-4 text-[#3f8f4a] dark:text-[#ADEBB3]" />
         Scheduled Repair Window
       </h3>
       <div className="space-y-3">
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
           <div>
-            <span className="text-blue-700 dark:text-blue-400 font-medium">
+            <span className="text-[#2f7a3b] dark:text-[#ADEBB3] font-medium">
               Start:
             </span>{" "}
-            <span className="text-blue-900 dark:text-blue-100">
+            <span className="text-[#225c2b] dark:text-emerald-100">
               {start.toLocaleString("en-PH", {
                 dateStyle: "medium",
                 timeStyle: "short",
@@ -450,10 +450,10 @@ function AssignmentScheduleCard({
           </div>
           {end && (
             <div>
-              <span className="text-blue-700 dark:text-blue-400 font-medium">
+              <span className="text-[#2f7a3b] dark:text-[#ADEBB3] font-medium">
                 End:
               </span>{" "}
-              <span className="text-blue-900 dark:text-blue-100">
+              <span className="text-[#225c2b] dark:text-emerald-100">
                 {end.toLocaleString("en-PH", {
                   dateStyle: "medium",
                   timeStyle: "short",
@@ -463,21 +463,21 @@ function AssignmentScheduleCard({
           )}
         </div>
         {assignment.schedule_notes && (
-          <div className="pt-2 border-t border-blue-100 dark:border-blue-800">
-            <p className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+          <div className="pt-2 border-t border-[#ADEBB3]/50 dark:border-emerald-800">
+            <p className="text-xs font-medium text-[#2f7a3b] dark:text-[#ADEBB3] uppercase tracking-wide">
               Notes
             </p>
-            <p className="text-sm text-blue-800 dark:text-blue-200 mt-1">
+            <p className="text-sm text-[#225c2b] dark:text-emerald-100 mt-1">
               {assignment.schedule_notes}
             </p>
           </div>
         )}
         {assignment.assigned_user && (
-          <div className="pt-2 border-t border-blue-100 dark:border-blue-800">
-            <p className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+          <div className="pt-2 border-t border-[#ADEBB3]/50 dark:border-emerald-800">
+            <p className="text-xs font-medium text-[#2f7a3b] dark:text-[#ADEBB3] uppercase tracking-wide">
               Assigned Technician
             </p>
-            <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mt-1">
+            <p className="text-sm font-semibold text-[#225c2b] dark:text-emerald-100 mt-1">
               {assignment.assigned_user.full_name}
             </p>
           </div>
@@ -564,11 +564,11 @@ const uploadDisabledReason = canUpload
       {/* ── Two-column: Request info + Work details ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Request Information */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+        <div className="bg-white dark:bg-slate-900 border border-[#ADEBB3]/70 dark:border-emerald-800/60 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">
             Request Information
           </h3>
-          <div className="divide-y divide-slate-50 dark:divide-slate-800">
+          <div className="divide-y divide-[#ADEBB3]/35 dark:divide-emerald-900/45">
             <InfoRow
               label="Ref #"
               value={<span className="font-mono">{request.ticket_number}</span>}
@@ -604,7 +604,7 @@ const uploadDisabledReason = canUpload
               value={
                 <a
                   href={`mailto:${request.requester?.email}`}
-                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                  className="text-[#2f7a3b] dark:text-[#ADEBB3] hover:underline"
                 >
                   {request.requester?.email ?? "—"}
                 </a>
@@ -614,7 +614,7 @@ const uploadDisabledReason = canUpload
         </div>
 
         {/* Work Details */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+        <div className="bg-white dark:bg-slate-900 border border-[#ADEBB3]/70 dark:border-emerald-800/60 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">
             Work Details
           </h3>
@@ -667,7 +667,7 @@ const uploadDisabledReason = canUpload
             )}
 
             {/* Description */}
-            <div className="pt-3 border-t border-slate-50 dark:border-slate-800">
+            <div className="pt-3 border-t border-[#ADEBB3]/35 dark:border-emerald-900/45">
               <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">
                 Description
               </p>
@@ -694,7 +694,7 @@ const uploadDisabledReason = canUpload
 
       {/* ── Inspection Report (RMR only, if filled) ── */}
       {request.request_type === "rmr" && rmr && hasInspection && (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+        <div className="bg-white dark:bg-slate-900 border border-[#ADEBB3]/70 dark:border-emerald-800/60 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
             <Wrench className="h-4 w-4 text-slate-400" />
             Inspection Report
@@ -735,7 +735,7 @@ const uploadDisabledReason = canUpload
             )}
           </div>
           {rmr.inspector_notes && (
-            <div className="mt-3 pt-3 border-t border-slate-50 dark:border-slate-800">
+            <div className="mt-3 pt-3 border-t border-[#ADEBB3]/35 dark:border-emerald-900/45">
               <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1.5">
                 Inspector Notes
               </p>
@@ -748,7 +748,7 @@ const uploadDisabledReason = canUpload
       )}
 
       {/* ── Status History Timeline ── */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+      <div className="bg-white dark:bg-slate-900 border border-[#ADEBB3]/70 dark:border-emerald-800/60 rounded-xl p-5">
         <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-5 flex items-center gap-2">
           <ClipboardList className="h-4 w-4 text-slate-400" />
           Status History
@@ -757,7 +757,7 @@ const uploadDisabledReason = canUpload
       </div>
 
       {/* ── Attachments ── */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+      <div className="bg-white dark:bg-slate-900 border border-[#ADEBB3]/70 dark:border-emerald-800/60 rounded-xl p-5">
     <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
         <Paperclip className="h-4 w-4 text-slate-400" />
         Attachments

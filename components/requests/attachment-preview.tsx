@@ -124,7 +124,7 @@ export function AttachmentPreview({ attachments, requestId, canDelete = false }:
         <>
             <div className="space-y-2">
                 {attachments.map((att) => (
-                    <div key={att.id} className="flex items-center justify-between gap-2 border rounded-lg p-3 bg-white dark:bg-slate-900">
+                    <div key={att.id} className="flex items-center justify-between gap-2 border border-[#ADEBB3]/70 dark:border-emerald-800/60 rounded-lg p-3 bg-white dark:bg-slate-900">
                         <div className="flex items-center gap-3 min-w-0 flex-1">
                             {getFileIcon(att.mime_type)}
                             <div className="min-w-0 flex-1">
@@ -171,10 +171,10 @@ export function AttachmentPreview({ attachments, requestId, canDelete = false }:
                     onClick={() => setPreviewUrl(null)}
                 >
                     <div
-                        className="bg-white dark:bg-slate-900 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto relative"
+                        className="bg-white dark:bg-slate-900 rounded-lg border border-[#ADEBB3]/70 dark:border-emerald-800/60 max-w-4xl w-full max-h-[90vh] overflow-auto relative"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="sticky top-0 bg-white dark:bg-slate-900 p-2 border-b flex justify-between items-center">
+                        <div className="sticky top-0 bg-white dark:bg-slate-900 p-2 border-b border-[#ADEBB3]/55 dark:border-emerald-900/50 flex justify-between items-center">
                             <span className="text-sm font-medium">Preview</span>
                             <button onClick={() => setPreviewUrl(null)} className="p-1 hover:bg-gray-100 rounded">
                                 <X className="h-5 w-5" />
