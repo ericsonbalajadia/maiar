@@ -39,8 +39,8 @@ const ROLE_LABELS: Record<string, string> = {
 }
 
 const ROLE_BADGE_COLORS: Record<string, string> = {
-  student:    'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
-  staff:      'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+  student:    'bg-[#ADEBB3]/45 text-[#225c2b] dark:bg-emerald-900/40 dark:text-[#ADEBB3]',
+  staff:      'bg-[#ADEBB3]/45 text-[#225c2b] dark:bg-emerald-900/40 dark:text-[#ADEBB3]',
   clerk:      'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
   technician: 'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300',
   supervisor: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
@@ -155,6 +155,7 @@ supabase.auth.getSession().then(({ data: { session } }: { data: { session: Sessi
   }
 
   const role = user.role ?? ''
+  const isRequester = role === 'student' || role === 'staff'
   const roleLabel = ROLE_LABELS[role] ?? role
   const roleBadge = ROLE_BADGE_COLORS[role] ?? 'bg-slate-100 text-slate-600'
   const initials = getInitials(user.full_name ?? 'User')
@@ -162,7 +163,7 @@ supabase.auth.getSession().then(({ data: { session } }: { data: { session: Sessi
   const settingsHref = `${getRoleDashboard(role)}/settings`
 
   return (
-    <header className="header-glass h-14 border-b border-white/20 dark:border-white/5 px-5 flex items-center justify-between shrink-0 gap-3 sticky top-0 z-30">
+    <header className={cn('header-glass h-14 border-b px-5 flex items-center justify-between shrink-0 gap-3 sticky top-0 z-30', isRequester ? 'border-[#ADEBB3]/55 dark:border-emerald-900/50' : 'border-white/20 dark:border-white/5')}>
       <div className="flex-1" />
       <div className="flex items-center gap-1">
         <ThemeSwitcher />
@@ -189,7 +190,7 @@ supabase.auth.getSession().then(({ data: { session } }: { data: { session: Sessi
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className="w-60 rounded-xl border border-white/20 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-xl p-1"
+            className={cn('w-60 rounded-xl border bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-xl p-1', isRequester ? 'border-[#ADEBB3]/60 dark:border-emerald-800/60' : 'border-white/20 dark:border-white/10')}
           >
             <div className="flex items-center gap-3 px-3 py-2.5 mb-1">
               <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-bold shrink-0 shadow-sm bg-gradient-to-br', avatarGradient)}>

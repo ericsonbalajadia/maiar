@@ -27,8 +27,8 @@ const EXACT_MATCH_HREFS = new Set([
 ])
 
 const ROLE_META: Record<string, { label: string; accent: string; dot: string }> = {
-  student:    { label: 'Requester',  accent: 'from-blue-500 to-indigo-600',   dot: 'bg-blue-500' },
-  staff:      { label: 'Requester',  accent: 'from-blue-500 to-indigo-600',   dot: 'bg-blue-500' },
+  student:    { label: 'Requester',  accent: 'from-[#ADEBB3] to-[#ADEBB3]',   dot: 'bg-[#ADEBB3]' },
+  staff:      { label: 'Requester',  accent: 'from-[#ADEBB3] to-[#ADEBB3]',   dot: 'bg-[#ADEBB3]' },
   clerk:      { label: 'Clerk',      accent: 'from-amber-400 to-orange-500',  dot: 'bg-amber-400' },
   technician: { label: 'Personnel',  accent: 'from-teal-400 to-emerald-600',  dot: 'bg-teal-400' },
   supervisor: { label: 'Supervisor', accent: 'from-violet-500 to-purple-600', dot: 'bg-violet-500' },
@@ -39,6 +39,7 @@ export function Sidebar({ userRole }: SidebarProps) {
   const pathname = usePathname()
   const navItems = NAV_ITEMS[userRole as keyof typeof NAV_ITEMS] || []
   const meta = ROLE_META[userRole] ?? { label: userRole, accent: 'from-slate-500 to-slate-700', dot: 'bg-slate-500' }
+  const isRequester = userRole === 'student' || userRole === 'staff'
 
   const renderIcon = (iconName: string) => {
     const Icon = Icons[iconName as keyof typeof Icons] as ComponentType<{ className: string }> | undefined
@@ -59,7 +60,7 @@ export function Sidebar({ userRole }: SidebarProps) {
       <div className={`absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b ${meta.accent} opacity-50`} />
 
       {/* Logo */}
-      <div className="px-5 pt-5 pb-4 border-b border-white/20 dark:border-white/5 shrink-0">
+      <div className={cn('px-5 pt-5 pb-4 border-b shrink-0', isRequester ? 'border-[#ADEBB3]/55 dark:border-emerald-900/50' : 'border-white/20 dark:border-white/5')}>
         <div className="flex items-center gap-3">
           <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${meta.accent} flex items-center justify-center shadow-md`}>
             <svg viewBox="0 0 24 24" fill="none" className="w-4.5 h-4.5 text-white" stroke="currentColor" strokeWidth={2.5}>
@@ -90,20 +91,25 @@ export function Sidebar({ userRole }: SidebarProps) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 group',
+                  'relative flex items-center gap-3 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all duration-150 group',
                   active
-                    ? 'text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-white/20 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'
+                    ? isRequester ? 'text-[#0e2f22] shadow-sm' : 'text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-white/20 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white',
+                  isRequester
+                    ? active
+                      ? 'border-[#ADEBB3]/70 dark:border-emerald-800/60'
+                      : 'border-[#ADEBB3]/45 dark:border-emerald-900/45'
+                    : 'border-transparent'
                 )}
               >
                 {active && (
-                  <span className={`absolute inset-0 rounded-xl bg-gradient-to-r ${meta.accent} opacity-95`} aria-hidden />
+                  <span className={`absolute inset-0 rounded-xl bg-gradient-to-r ${meta.accent} ${isRequester ? 'opacity-20' : 'opacity-95'}`} aria-hidden />
                 )}
-                <span className={cn('relative z-10 transition-colors', active ? 'text-white' : 'text-slate-400 dark:text-slate-500')}>
+                <span className={cn('relative z-10 transition-colors', active ? isRequester ? 'text-[#ADEBB3] dark:text-[#ADEBB3]' : 'text-white' : 'text-slate-400 dark:text-slate-500')}>
                   {renderIcon(item.icon)}
                 </span>
                 <span className="relative z-10 truncate flex-1">{item.label}</span>
-                {active && <span className="relative z-10 w-1.5 h-1.5 rounded-full bg-white/70 shrink-0" />}
+                {active && <span className={cn('relative z-10 w-1.5 h-1.5 rounded-full shrink-0', isRequester ? 'bg-[#ADEBB3]' : 'bg-white/70')} />}
               </Link>
             )
           })}
@@ -111,7 +117,7 @@ export function Sidebar({ userRole }: SidebarProps) {
       </ScrollArea>
 
       {/* Footer */}
-      <div className="px-5 py-3.5 border-t border-white/20 dark:border-white/5 shrink-0">
+      <div className={cn('px-5 py-3.5 border-t shrink-0', isRequester ? 'border-[#ADEBB3]/55 dark:border-emerald-900/50' : 'border-white/20 dark:border-white/5')}>
         <div className="flex items-center justify-between">
           <p className="text-[10px] text-slate-400 dark:text-slate-600 font-medium tracking-wide uppercase">VSU · GSO © 2026</p>
         </div>
