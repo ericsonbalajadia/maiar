@@ -23,7 +23,6 @@ import {
   Plus,
   Eye,
   Star,
-  FileText,
   InboxIcon,
   TrendingUp,  
   ArrowRight,
@@ -59,21 +58,21 @@ function StatCard({
   sub?: string;
 }) {
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
+    <div className="bg-white/90 dark:bg-slate-900/80 border border-[#ADEBB3]/55 dark:border-emerald-900/50 rounded-2xl p-6 flex items-center gap-5 shadow-sm shadow-[#ADEBB3]/10 hover:shadow-md hover:shadow-[#ADEBB3]/20 transition-all duration-300 hover:-translate-y-0.5">
       <div
-        className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${gradient} shadow-sm`}
+        className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${gradient} shadow-sm`}
       >
-        <Icon className={`h-5 w-5 ${iconColor}`} />
+        <Icon className={`h-6 w-6 ${iconColor}`} />
       </div>
       <div>
-        <p className="text-2xl font-bold text-slate-900 dark:text-white leading-none tabular-nums">
+        <p className="text-3xl font-bold text-[#0e2f22] dark:text-white leading-none tabular-nums">
           {value}
         </p>
-        <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">
+        <p className="text-sm font-medium text-[#6fa58f] dark:text-emerald-200 mt-1">
           {label}
         </p>
         {sub && (
-          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+          <p className="text-xs text-[#7aa996] dark:text-emerald-300/75 mt-0.5">
             {sub}
           </p>
         )}
@@ -87,36 +86,36 @@ function StatCard({
 async function StatsRow() {
   const stats = await getRequesterStats();
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
       <StatCard
         label="Total Requests"
         value={stats.total}
         icon={ClipboardList}
-        gradient="bg-gradient-to-br from-slate-500 to-slate-700"
-        iconColor="text-white"
+        gradient="bg-[#ADEBB3]/35 dark:bg-emerald-900/40"
+        iconColor="text-[#2f7a3b] dark:text-[#ADEBB3]"
       />
       <StatCard
         label="Pending"
         value={stats.pending}
-        icon={FileText}
-        gradient="bg-gradient-to-br from-amber-400 to-orange-500"
-        iconColor="text-white"
+        icon={Clock}
+        gradient="bg-amber-100/80 dark:bg-amber-900/25"
+        iconColor="text-amber-500 dark:text-amber-300"
         sub="Awaiting action"
       />
       <StatCard
         label="In Progress"
         value={stats.inProgress}
         icon={Wrench}
-        gradient="bg-gradient-to-br from-blue-500 to-indigo-600"
-        iconColor="text-white"
+        gradient="bg-sky-100/80 dark:bg-sky-900/25"
+        iconColor="text-sky-500 dark:text-sky-300"
         sub="Being worked on"
       />
       <StatCard
         label="Completed"
         value={stats.completed}
         icon={CheckCircle2}
-        gradient="bg-gradient-to-br from-emerald-400 to-teal-600"
-        iconColor="text-white"
+        gradient="bg-emerald-100/80 dark:bg-emerald-900/25"
+        iconColor="text-emerald-500 dark:text-emerald-300"
       />
     </div>
   );
@@ -159,7 +158,7 @@ async function RequestHistoryTable() {
           asChild
           size="sm"
           variant="outline"
-          className="gap-2 rounded-lg border-slate-200 bg-white text-slate-700 shadow-sm hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-800"
+          className="gap-2 rounded-lg border-[#ADEBB3]/70 bg-white text-slate-700 shadow-sm hover:border-[#ADEBB3] hover:bg-[#ADEBB3]/20 dark:border-emerald-800/60 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-[#ADEBB3] dark:hover:bg-emerald-900/20"
         >
           <Link href="/requester/requests/new">
             <Plus className="h-4 w-4" />
@@ -174,7 +173,7 @@ return (
   <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
     <table className="w-full text-sm">
       <thead>
-        <tr className="border-b border-slate-100 dark:border-slate-800/60 sticky top-0 bg-white dark:bg-slate-900 z-10">
+        <tr className="border-b border-[#ADEBB3]/45 dark:border-emerald-900/50 sticky top-0 bg-white dark:bg-slate-900 z-10">
           {[
             { label: "Ref #", tip: "Unique ticket reference number" },
             { label: "Type", tip: "R&M or Physical Plant Service" },
@@ -194,7 +193,7 @@ return (
           ))}
         </tr>
       </thead>
-      <tbody className="divide-y divide-slate-50 dark:divide-slate-800/30">
+      <tbody className="divide-y divide-[#ADEBB3]/35 dark:divide-emerald-900/30">
         {requests.map((req, i) => {
           const statusName = req.statuses?.status_name?.toLowerCase() ?? "";
           const isCompleted = statusName === "completed";
@@ -203,7 +202,7 @@ return (
           return (
             <tr
               key={req.id}
-              className="group hover:bg-blue-50/40 dark:hover:bg-blue-900/10 transition-colors duration-150 fade-in"
+              className="group hover:bg-[#ADEBB3]/30 dark:hover:bg-emerald-900/10 transition-colors duration-150 fade-in"
               style={{
                 animationDelay: `${i * 40}ms`,
                 animationFillMode: "forwards",
@@ -249,7 +248,7 @@ return (
                     asChild
                     variant="ghost"
                     size="sm"
-                    className="h-7 px-2.5 text-xs gap-1 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    className="h-7 px-2.5 text-xs gap-1 hover:bg-[#ADEBB3]/30 dark:hover:bg-emerald-900/30 hover:text-[#225c2b] dark:hover:text-[#ADEBB3] transition-colors"
                   >
                     <Link href={`/requester/requests/${req.id}`}>
                       <Eye className="h-3 w-3" />
@@ -300,7 +299,7 @@ function StatsSkeleton() {
       {[...Array(4)].map((_, i) => (
         <div
           key={i}
-          className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex items-center gap-4"
+          className="bg-white dark:bg-slate-900 border border-[#ADEBB3]/70 dark:border-emerald-800/60 rounded-xl p-5 flex items-center gap-4"
         >
           <Skeleton className="w-12 h-12 rounded-xl shrink-0" />
           <div className="space-y-2">
@@ -319,7 +318,7 @@ function TableSkeleton() {
       {[...Array(5)].map((_, i) => (
         <div
           key={i}
-          className="flex items-center gap-4 py-3.5 border-b border-slate-50 last:border-0"
+          className="flex items-center gap-4 py-3.5 border-b border-[#ADEBB3]/35 last:border-0"
         >
           <Skeleton className="h-4 w-28 shrink-0" />
           <Skeleton className="h-5 w-14 rounded-full shrink-0" />
@@ -357,24 +356,24 @@ export default async function RequesterDashboardPage() {
   const firstName = dbUser.full_name?.split(" ")[0] ?? "there";
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 md:px-6">
+    <div className="space-y-7 max-w-7xl mx-auto px-4 md:px-6">
       {/* ── Page header ── */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-blue-500 dark:text-blue-400 mb-1">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#3f8f4a] dark:text-[#ADEBB3] mb-1">
             Dashboard
           </p>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-[#0e2f22] dark:text-white">
             Welcome back, {firstName} 👋
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-base text-[#6fa58f] dark:text-emerald-200/80 mt-0.5">
             Track and manage your maintenance requests below.
           </p>
         </div>
         <Button
           asChild
           variant="outline"
-          className="gap-2 shrink-0 rounded-lg border-slate-200 bg-white text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-800"
+          className="gap-2 shrink-0 rounded-2xl border-[#ADEBB3]/70 bg-white/80 px-5 py-6 text-[#225c2b] shadow-sm shadow-[#ADEBB3]/15 transition-colors hover:border-[#ADEBB3] hover:bg-[#ADEBB3]/20 dark:border-emerald-800 dark:bg-slate-900 dark:text-[#ADEBB3] dark:hover:bg-emerald-900/20"
         >
           <Link href="/requester/requests/new">
             <Plus className="h-4 w-4" />
@@ -391,13 +390,13 @@ export default async function RequesterDashboardPage() {
       {/* ── Request History ── */}
 {/* ── Request History (glass panel) ── */}
 <div
-  className="rounded-2xl border border-white/60 dark:border-slate-700/60 shadow-sm overflow-hidden"
+  className="rounded-2xl border border-[#ADEBB3]/60 dark:border-emerald-800/60 shadow-sm overflow-hidden"
   style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
 >
-  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-5 py-4 border-b border-slate-100/80 dark:border-slate-800/60 gap-3 bg-white/40 dark:bg-slate-900/40">
+  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-5 py-4 border-b border-[#ADEBB3]/50 dark:border-emerald-900/50 gap-3 bg-white/40 dark:bg-slate-900/40">
     <div className="flex items-center gap-2.5">
-      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
-        <TrendingUp className="h-3.5 w-3.5 text-white" />
+      <div className="w-7 h-7 rounded-lg bg-[#ADEBB3] flex items-center justify-center shadow-sm">
+        <TrendingUp className="h-3.5 w-3.5 text-[#225c2b]" />
       </div>
       <h2 className="font-semibold text-slate-900 dark:text-white text-base">
         Recent Requests
@@ -407,7 +406,7 @@ export default async function RequesterDashboardPage() {
       asChild
       variant="ghost"
       size="sm"
-      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 h-8 gap-1.5"
+      className="text-xs text-[#2f7a3b] dark:text-[#ADEBB3] hover:text-[#225c2b] hover:bg-[#ADEBB3]/30 dark:hover:bg-emerald-900/30 h-8 gap-1.5"
     >
       <Link href="/requester/requests">
         View all

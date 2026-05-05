@@ -90,16 +90,16 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
     <div className="space-y-5 fade-in">
       {/* ── Glassmorphic Filter Bar ── */}
       <div
-        className="rounded-2xl border border-white/60 dark:border-slate-700/60 shadow-sm p-4"
+        className="rounded-2xl border border-[#ADEBB3]/60 dark:border-emerald-800/60 shadow-sm p-4"
         style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
       >
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
-            <SlidersHorizontal className="h-3 w-3 text-white" />
+          <div className="w-6 h-6 rounded-lg bg-[#ADEBB3] flex items-center justify-center shadow-sm">
+            <SlidersHorizontal className="h-3 w-3 text-[#225c2b]" />
           </div>
           <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Filters</span>
           {filtersActive > 0 && (
-            <Badge variant="secondary" className="text-xs px-1.5 py-0 h-4 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">
+            <Badge variant="secondary" className="text-xs px-1.5 py-0 h-4 bg-[#ADEBB3]/50 dark:bg-emerald-900/40 text-[#225c2b] dark:text-[#ADEBB3]">
               {filtersActive}
             </Badge>
           )}
@@ -113,7 +113,7 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
               value={filters.status ?? 'all'}
               onValueChange={(v) => handleFilterChange('status', v === 'all' ? '' : v)}
             >
-              <SelectTrigger className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl truncate">
+              <SelectTrigger className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-[#ADEBB3]/70 dark:border-emerald-800/60 rounded-xl truncate">
                 <SelectValue placeholder="All statuses" />
               </SelectTrigger>
               <SelectContent>
@@ -134,7 +134,7 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
               value={filters.request_type ?? 'all'}
               onValueChange={(v) => handleFilterChange('request_type', v === 'all' ? '' : v)}
             >
-              <SelectTrigger className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl truncate">
+              <SelectTrigger className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-[#ADEBB3]/70 dark:border-emerald-800/60 rounded-xl truncate">
                 <SelectValue placeholder="All types" />
               </SelectTrigger>
               <SelectContent>
@@ -153,7 +153,7 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
             <Label className="text-xs text-slate-500 dark:text-slate-400">From</Label>
             <Input
               type="date"
-              className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl"
+              className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-[#ADEBB3]/70 dark:border-emerald-800/60 rounded-xl"
               value={filters.date_from ?? ''}
               onChange={(e) => handleFilterChange('date_from', e.target.value)}
             />
@@ -164,7 +164,7 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
             <Label className="text-xs text-slate-500 dark:text-slate-400">To</Label>
             <Input
               type="date"
-              className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl"
+              className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-[#ADEBB3]/70 dark:border-emerald-800/60 rounded-xl"
               value={filters.date_to ?? ''}
               onChange={(e) => handleFilterChange('date_to', e.target.value)}
             />
@@ -290,7 +290,7 @@ function Pagination({
       <Button
         variant="outline"
         size="icon"
-        className="h-8 w-8 rounded-xl border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700"
+        className="h-8 w-8 rounded-xl border-[#ADEBB3]/70 dark:border-emerald-800/60 bg-white/50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700"
         disabled={page <= 1 || isPending}
         onClick={() => onPageChange(page - 1)}
         aria-label="Previous page"
@@ -310,7 +310,7 @@ function Pagination({
             disabled={isPending}
             className={`h-8 w-8 rounded-xl text-xs font-medium transition-all duration-200 ${
               p === page
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20'
+                ? 'bg-[#ADEBB3] text-[#225c2b] shadow-md shadow-[#ADEBB3]/30'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
@@ -322,7 +322,7 @@ function Pagination({
       <Button
         variant="outline"
         size="icon"
-        className="h-8 w-8 rounded-xl border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700"
+        className="h-8 w-8 rounded-xl border-[#ADEBB3]/70 dark:border-emerald-800/60 bg-white/50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700"
         disabled={page >= totalPages || isPending}
         onClick={() => onPageChange(page + 1)}
         aria-label="Next page"

@@ -91,7 +91,7 @@ export default async function RequesterRequestsPage({ searchParams }: PageProps)
       {/* Page header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-blue-500 dark:text-blue-400 mb-1">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#3f8f4a] dark:text-[#ADEBB3] mb-1">
             My Requests
           </p>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">All Requests</h1>
@@ -101,7 +101,7 @@ export default async function RequesterRequestsPage({ searchParams }: PageProps)
         </div>
         <Link
           href="/requester/requests/new"
-          className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-800 shrink-0"
+          className="inline-flex items-center gap-2 rounded-lg border border-[#ADEBB3]/70 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-[#ADEBB3] hover:bg-[#ADEBB3]/20 dark:border-emerald-800/60 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-[#ADEBB3] dark:hover:bg-emerald-900/20 shrink-0"
         >
           <Plus className="h-4 w-4" />
           New Request
@@ -110,10 +110,10 @@ export default async function RequesterRequestsPage({ searchParams }: PageProps)
 
       {/* Filter info badge */}
       {(sp.status || sp.request_type || sp.date_from || sp.date_to) && (
-        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 rounded-xl px-3 py-2">
-          <ListFilter className="h-3.5 w-3.5 text-blue-400" />
+        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 bg-[#ADEBB3]/25 dark:bg-emerald-900/20 border border-[#ADEBB3]/60 dark:border-emerald-800/50 rounded-xl px-3 py-2">
+          <ListFilter className="h-3.5 w-3.5 text-[#3f8f4a] dark:text-[#ADEBB3]" />
           Filters applied —{' '}
-          <Link href="/requester/requests" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">
+          <Link href="/requester/requests" className="text-[#2f7a3b] dark:text-[#ADEBB3] hover:underline font-medium">
             Clear all
           </Link>
         </div>
