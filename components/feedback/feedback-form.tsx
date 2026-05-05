@@ -45,7 +45,7 @@ export function FeedbackForm({ requestId }: { requestId: string }) {
 
   if (state.success) {
     return (
-      <div className="rounded-xl backdrop-blur-md bg-white/30 border border-white/40 shadow-xl p-6 text-center">
+      <div className="rounded-xl backdrop-blur-md bg-white/30 border border-[#ADEBB3]/60 shadow-xl p-6 text-center">
         <p className="text-base font-semibold text-green-800">Thank you for your feedback!</p>
         <p className="mt-1 text-sm text-green-600">Your response has been recorded.</p>
       </div>
@@ -59,7 +59,7 @@ export function FeedbackForm({ requestId }: { requestId: string }) {
   };
 
   return (
-    <div className="rounded-2xl backdrop-blur-lg bg-white/20 border border-white/20 shadow-2xl p-6 space-y-5">
+    <div className="rounded-2xl backdrop-blur-lg bg-white/20 border border-[#ADEBB3]/60 shadow-2xl p-6 space-y-5">
       <form action={handleSubmit} className="space-y-5">
         <input type="hidden" name="request_id" value={requestId} />
 
@@ -94,8 +94,8 @@ export function FeedbackForm({ requestId }: { requestId: string }) {
             name="comments"
             rows={4}
             placeholder="Tell us about your experience..."
-            className="w-full rounded-xl bg-white/20 backdrop-blur-sm border border-white/50 px-4 py-3 text-sm text-slate-800 placeholder:text-slate-500 
-                       focus:bg-white/60 focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-400/30 
+            className="w-full rounded-xl bg-white/20 backdrop-blur-sm border border-[#ADEBB3]/70 px-4 py-3 text-sm text-slate-800 placeholder:text-slate-500 
+                       focus:bg-white/60 focus:border-[#ADEBB3] focus:outline-none focus:ring-2 focus:ring-[#ADEBB3]/30 
                        transition-all duration-200 resize-y"
           />
         </div>

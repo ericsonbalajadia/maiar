@@ -38,7 +38,7 @@ export function StarRating({ value, readonly = false, name, required, onChange, 
             onChange={() => onChange?.(star)}
             className="sr-only peer"
           />
-          <span className="h-8 w-8 flex items-center justify-center rounded-full border border-slate-300 text-sm text-slate-600 peer-checked:border-teal-500 peer-checked:bg-teal-50 peer-checked:text-teal-700 peer-checked:font-bold hover:border-teal-400 transition-colors">
+          <span className="h-8 w-8 flex items-center justify-center rounded-full border border-[#ADEBB3]/70 text-sm text-slate-600 peer-checked:border-[#ADEBB3] peer-checked:bg-[#ADEBB3]/25 peer-checked:text-[#225c2b] peer-checked:font-bold hover:border-[#ADEBB3] transition-colors">
             {star}
           </span>
           {labels && (

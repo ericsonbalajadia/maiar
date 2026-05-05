@@ -137,6 +137,7 @@ function NotifItem({
 }) {
   const meta = TYPE_META[notif.type] ?? TYPE_META["system"];
   const Icon = meta.icon;
+  const isRequester = pathname.startsWith("/requester");
 
   let href: string | null = null;
 
@@ -164,7 +165,10 @@ function NotifItem({
   const inner = (
     <div
       className={cn(
-        "flex items-start gap-3 px-4 py-3 transition-colors duration-150 border-b border-slate-100/60 dark:border-slate-800/60 last:border-0",
+        "flex items-start gap-3 px-4 py-3 transition-colors duration-150 border-b last:border-0",
+        isRequester
+          ? "border-[#ADEBB3]/35 dark:border-emerald-900/45"
+          : "border-slate-100/60 dark:border-slate-800/60",
         notif.read_at === null
           ? "bg-blue-50/40 dark:bg-blue-950/10 hover:bg-blue-50/70 dark:hover:bg-blue-950/20"
           : "hover:bg-slate-50/60 dark:hover:bg-slate-800/30",
@@ -227,6 +231,7 @@ export function NotificationBell() {
   const setUnreadCount = useNotificationStore((s) => s.setUnreadCount);
   const pathname = usePathname();
   const allNotifsHref = notificationHref(pathname);
+  const isRequester = pathname.startsWith('/requester');
 
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -331,10 +336,10 @@ export function NotificationBell() {
             style={{
               background: "var(--glass-sidebar)",
               backdropFilter: "blur(16px)",
-              border: "1px solid rgba(255, 255, 255, 0.2)",
+              border: isRequester ? "1px solid rgba(173, 235, 179, 0.65)" : "1px solid rgba(255, 255, 255, 0.2)",
             }}
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/20 dark:border-white/5 bg-white/30 dark:bg-slate-900/30">
+            <div className={cn('flex items-center justify-between px-4 py-3 border-b bg-white/30 dark:bg-slate-900/30', isRequester ? 'border-[#ADEBB3]/55 dark:border-emerald-900/50' : 'border-white/20 dark:border-white/5')}>
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">
                   Notifications
@@ -370,7 +375,7 @@ export function NotificationBell() {
                   {[...Array(4)].map((_, i) => (
                     <div
                       key={i}
-                      className="flex items-start gap-3 px-4 py-3 border-b border-white/10 dark:border-white/5 last:border-0"
+                      className={cn('flex items-start gap-3 px-4 py-3 border-b last:border-0', isRequester ? 'border-[#ADEBB3]/35 dark:border-emerald-900/45' : 'border-white/10 dark:border-white/5')}
                     >
                       <div className="w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-slate-700/60 animate-pulse shrink-0" />
                       <div className="flex-1 space-y-1.5">
@@ -406,7 +411,7 @@ export function NotificationBell() {
             </div>
 
             {notifications.length > 0 && (
-              <div className="px-4 py-2.5 border-t border-white/20 dark:border-white/5 bg-slate-50/30 dark:bg-slate-900/30">
+              <div className={cn('px-4 py-2.5 border-t bg-slate-50/30 dark:bg-slate-900/30', isRequester ? 'border-[#ADEBB3]/55 dark:border-emerald-900/50' : 'border-white/20 dark:border-white/5')}>
                 <Link
                   href={allNotifsHref}
                   onClick={() => setOpen(false)}

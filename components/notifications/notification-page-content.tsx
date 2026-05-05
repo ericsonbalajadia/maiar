@@ -62,6 +62,7 @@ function NotifCard({
   const meta = TYPE_META[notif.type] ?? TYPE_META['system'];
   const Icon = meta.icon;
   const isUnread = notif.read_at === null;
+  const isRequester = pathname.startsWith('/requester');
 
   // Build href based on notification type and user role
   let href: string | null = null;
@@ -98,8 +99,10 @@ function NotifCard({
       className={cn(
         'group relative rounded-xl border transition-all duration-200',
         isUnread
-          ? `${meta.border} ${meta.bg} hover:shadow-sm`
-          : 'border-slate-100/60 dark:border-slate-800/60 bg-white/60 dark:bg-slate-900/40 hover:bg-white/80 dark:hover:bg-slate-900/60'
+          ? `${isRequester ? 'border-[#ADEBB3]/60 dark:border-emerald-800/60' : meta.border} ${meta.bg} hover:shadow-sm`
+          : isRequester
+            ? 'border-[#ADEBB3]/60 dark:border-emerald-800/60 bg-white/60 dark:bg-slate-900/40 hover:bg-white/80 dark:hover:bg-slate-900/60'
+            : 'border-slate-100/60 dark:border-slate-800/60 bg-white/60 dark:bg-slate-900/40 hover:bg-white/80 dark:hover:bg-slate-900/60'
       )}
       onClick={handleClick}
     >
@@ -108,7 +111,7 @@ function NotifCard({
       )}
 
       <div className="flex items-start gap-3 p-4">
-        <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center shrink-0', meta.bg, 'border', meta.border)}>
+        <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center shrink-0', meta.bg, 'border', isRequester ? 'border-[#ADEBB3]/60 dark:border-emerald-800/60' : meta.border)}>
           <Icon className={cn('h-4 w-4', meta.color)} />
         </div>
         <div className="flex-1 min-w-0">
@@ -155,6 +158,7 @@ function NotifCard({
 
 export function NotificationsPageContent() {
   const pathname = usePathname();
+  const isRequester = pathname.startsWith('/requester');
   const setUnreadCount = useNotificationStore((s) => s.setUnreadCount);
 
   const [notifications, setNotifications] = useState<NotificationRow[]>([]);
@@ -211,7 +215,7 @@ export function NotificationsPageContent() {
     <div className="max-w-3xl mx-auto space-y-6 fade-in">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-blue-500 dark:text-blue-400 mb-1">Notifications</p>
+          <p className={cn('text-xs font-semibold uppercase tracking-widest mb-1', isRequester ? 'text-[#2f7a3b] dark:text-[#ADEBB3]' : 'text-blue-500 dark:text-blue-400')}>Notifications</p>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Notification Center</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
             {unreadCount > 0 ? `You have ${unreadCount} unread notification${unreadCount > 1 ? 's' : ''}.` : "You're all caught up!"}
@@ -219,20 +223,20 @@ export function NotificationsPageContent() {
         </div>
         {unreadCount > 0 && (
           <Button variant="outline" size="sm" onClick={handleMarkAll} disabled={isPending}
-            className="gap-1.5 shrink-0 text-blue-600 border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/20">
+            className={cn('gap-1.5 shrink-0', isRequester ? 'text-[#225c2b] border-[#ADEBB3]/70 dark:border-emerald-800/60 hover:bg-[#ADEBB3]/20 dark:hover:bg-emerald-900/20' : 'text-blue-600 border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/20')}>
             <CheckCheck className="h-3.5 w-3.5" /> Mark all read
           </Button>
         )}
       </div>
 
-      <div className="flex items-center gap-1 p-1 rounded-xl border border-slate-200/60 dark:border-slate-700/60 w-fit" style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(12px)' }}>
+      <div className={cn('flex items-center gap-1 p-1 rounded-xl border w-fit', isRequester ? 'border-[#ADEBB3]/60 dark:border-emerald-800/60' : 'border-slate-200/60 dark:border-slate-700/60')} style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(12px)' }}>
         {FILTER_OPTIONS.map(({ value, label }) => (
           <button
             key={value}
             onClick={() => setFilter(value as typeof filter)}
             className={cn('px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150',
               filter === value
-                ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm'
+                ? isRequester ? 'bg-white dark:bg-slate-800 text-[#225c2b] dark:text-[#ADEBB3] shadow-sm border border-[#ADEBB3]/60 dark:border-emerald-800/60' : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
             )}
           >
@@ -247,7 +251,7 @@ export function NotificationsPageContent() {
       {loading ? (
         <div className="space-y-3">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="rounded-xl border border-slate-100 dark:border-slate-800 p-4 flex gap-3 bg-white/60 dark:bg-slate-900/40">
+            <div key={i} className={cn('rounded-xl border p-4 flex gap-3 bg-white/60 dark:bg-slate-900/40', isRequester ? 'border-[#ADEBB3]/60 dark:border-emerald-800/60' : 'border-slate-100 dark:border-slate-800')}>
               <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse shrink-0" />
               <div className="flex-1 space-y-2">
                 <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded-full animate-pulse w-2/3" />
@@ -258,7 +262,7 @@ export function NotificationsPageContent() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-2xl border border-slate-200/60 dark:border-slate-700/60 flex flex-col items-center justify-center py-16 text-center" style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(12px)' }}>
+        <div className={cn('rounded-2xl border flex flex-col items-center justify-center py-16 text-center', isRequester ? 'border-[#ADEBB3]/60 dark:border-emerald-800/60' : 'border-slate-200/60 dark:border-slate-700/60')} style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(12px)' }}>
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center mb-4">
             {filter === 'unread' ? <CheckCheck className="h-6 w-6 text-emerald-400" /> : <Inbox className="h-6 w-6 text-slate-400" />}
           </div>

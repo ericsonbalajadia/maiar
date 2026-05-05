@@ -36,7 +36,7 @@ export function PpsrServiceDataForm({ serviceType }: Props) {
                 type="checkbox"
                 name={name}
                 value="true"
-                className="h-4 w-4 rounded border-slate-300 text-teal-600"
+                className="h-4 w-4 rounded border-[#ADEBB3]/70 text-teal-600"
               />
               {label}
             </label>
@@ -53,7 +53,7 @@ export function PpsrServiceDataForm({ serviceType }: Props) {
                 name={name}
                 min="0"
                 step="0.5"
-                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                className="mt-1 w-full rounded-md border border-[#ADEBB3]/70 px-3 py-2 text-sm focus:border-[#ADEBB3] focus:outline-none focus:ring-1 focus:ring-[#ADEBB3]"
               />
             </div>
           );
@@ -67,7 +67,7 @@ export function PpsrServiceDataForm({ serviceType }: Props) {
               <input
                 type="datetime-local"
                 name={name}
-                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                className="mt-1 w-full rounded-md border border-[#ADEBB3]/70 px-3 py-2 text-sm focus:border-[#ADEBB3] focus:outline-none focus:ring-1 focus:ring-[#ADEBB3]"
               />
             </div>
           );
@@ -81,7 +81,7 @@ export function PpsrServiceDataForm({ serviceType }: Props) {
               <textarea
                 name={name}
                 rows={3}
-                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                className="mt-1 w-full rounded-md border border-[#ADEBB3]/70 px-3 py-2 text-sm focus:border-[#ADEBB3] focus:outline-none focus:ring-1 focus:ring-[#ADEBB3]"
               />
             </div>
           );
@@ -94,7 +94,7 @@ export function PpsrServiceDataForm({ serviceType }: Props) {
             <input
               type="text"
               name={name}
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+              className="mt-1 w-full rounded-md border border-[#ADEBB3]/70 px-3 py-2 text-sm focus:border-[#ADEBB3] focus:outline-none focus:ring-1 focus:ring-[#ADEBB3]"
             />
           </div>
         );
