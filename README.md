@@ -10,6 +10,51 @@ iTrack is a web-based application that streamlines the submission, tracking, and
 | [MA.010.003](#ma010003-release-notes) | 2026-04-04 |
 | [MA.010.004](#ma010004-release-notes) | 2026-04-09 |
 | [MA.010.005](#ma010005-release-notes) | 2026-04-15 |
+| [MA.010.006](#ma010006-release-notes) | 2026-04-22 |
+
+---
+
+<h2 id="ma010006-release-notes">📦 MA.010.006 Release Notes</h2>
+
+##### Missing Pages – Clerk & Supervisor All‑Requests
+- Add `getFilteredRequests` server query with pagination, status/priority filters, search, and month/year date ranges  
+- Create reusable `RequestsTable` component with glass‑styled filter bar, priority badges, and row‑click navigation  
+- Add clerk all‑requests page at `/clerk/requests`  
+- Add supervisor all‑requests page at `/supervisor/requests`  
+- Fix TypeScript errors caused by Supabase array relations (transform to single objects)  
+- Add month/year filter support and “Clear filters” button  
+- Remove duplicate “Filters applied” banner above the table  
+
+##### Account Approval & Rejection Workflow
+- Add dedicated dashboards: `/clerk/account-requests` and `/supervisor/account-requests` to manage pending user registrations  
+- Add approve/reject actions with optional rejection reason  
+- Integrate automated email notifications for registration submitted, email verified, account approved, account rejected  
+- Refine user onboarding flow: registration → check‑email → email verification → pending‑approval → login  
+- Enforce `signup_status` in middleware to restrict unapproved users  
+- Update RBAC: Supervisors can approve Student, Staff, Clerk, and Technician roles  
+
+##### Full Feedback System
+- Add feedback form at `/requester/requests/[id]/feedback` with Service Satisfaction and Overall Rating (1‑5, descriptive labels), comments, no anonymous option  
+- Add green feedback card on requester detail page and read‑only panel for supervisors/admins  
+- Add admin feedback analytics (`/admin/analytics/feedback`) and supervisor feedback analytics (`/supervisor/analytics/feedback`) with averages, distribution bars, per‑category ratings, and recent comments  
+- Add daily cron endpoint `/api/cron/feedback-reminder` (Vercel) that sends an in‑app reminder 7 days after completion if no feedback – prevents duplicate reminders  
+- Add notification preferences page (UI only, email integration not yet active)  
+
+##### Staff Notifications Integration
+- Notify all clerks when a new request is submitted (`request_submitted`)  
+- Notify all admins and clerks when a user signs up (`new_user_registered`)  
+- Notify all supervisors when a clerk approves or rejects a request (`request_approved` / `request_rejected`)  
+- Notify all clerks when a supervisor completes or cancels a request (`request_completed` / `request_cancelled`)  
+- Add helper functions `getUserIdsByRole` and `sendBulkNotification` for bulk in‑app notifications  
+- Extend UI to display new notification types with correct icons, labels, and navigation links (e.g., pending approvals pages)  
+
+##### Improvements & Fixes
+- **Missing Pages:** Replace array‑based relation queries with singular objects; fix filter logic using `status_id`/`priority_id` lookups; add date conversion for month/year filters.  
+- **Feedback System:** Replace raw debug output with user‑friendly error card; fix ticket number links in analytics comments; make “Requester Feedback” heading visible in dark mode; conditionally show feedback panel only for completed requests.  
+- **Cron:** Add `/api/cron/feedback-reminder` to public routes to bypass middleware auth; resolve Supabase subquery errors (PGRST108, 22P02) by switching to in‑memory filtering and direct `status_id` filter.  
+- **Notification Bell:** Move unread count fetch to client‑side to avoid server blocking; add database index `idx_notifications_user_read_null` for faster queries.  
+- **General:** Remove global dashboard skeleton to prevent double‑loading conflicts; each role now controls its own loading state.  
+- **Build:** Fix Google Fonts fetch, `React.unstable_postpone` with `cacheComponents`, static generation of `/_not-found`, and conditionally mock Supabase client during build.
 
 ---
 
