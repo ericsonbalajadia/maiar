@@ -181,6 +181,11 @@ export async function loginUser(
     return { errors: { form: ['Your registration was rejected. Contact admin.'] } }
   }
 
+  if (user.role === 'technician') {
+    await supabase.auth.signOut()
+    return { errors: { form: ['Technicians are personnel records only and do not have app login access.'] } }
+  }
+
   console.log('User is approved, redirecting to role dashboard. Role:', user.role)
   redirect(getRoleDashboard(user.role))
 }
