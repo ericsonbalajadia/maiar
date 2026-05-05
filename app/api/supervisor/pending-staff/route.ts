@@ -28,7 +28,7 @@ export async function GET() {
     .from('users')
     .select('id, email, full_name, role, department, created_at')
     .eq('signup_status', 'pending')
-    .in('role', ['student', 'staff', 'clerk', 'technician'])
+    .in('role', ['student', 'staff', 'clerk'])
     .order('created_at', { ascending: true });
 
   if (error) {

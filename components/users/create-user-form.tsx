@@ -13,7 +13,6 @@ const ROLES = [
   { value: 'student', label: 'Student' },
   { value: 'staff', label: 'Staff' },
   { value: 'clerk', label: 'Clerk' },
-  { value: 'technician', label: 'Technician' },
   { value: 'supervisor', label: 'Supervisor' },
   { value: 'admin', label: 'Admin' },
 ];
