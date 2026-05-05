@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils'
 import { getRoleDashboard } from '@/lib/rbac'
 import Link from 'next/link'
 import { NotificationBell } from '@/components/notifications/notification-bell'
+import { ThemeSwitcher } from '@/components/common/theme-switcher'
 import { createClient } from '@/lib/supabase/client'
 import { AuthChangeEvent, Session } from '@supabase/supabase-js'
 
@@ -146,6 +147,7 @@ supabase.auth.getSession().then(({ data: { session } }: { data: { session: Sessi
       <header className="header-glass h-14 border-b border-white/20 dark:border-white/5 px-5 flex items-center justify-end gap-3">
         {/* Minimal placeholder – user not logged in */}
         <div className="flex items-center gap-1">
+          <ThemeSwitcher />
           <div className="w-7 h-7 rounded-lg bg-white/20 dark:bg-white/10" />
         </div>
       </header>
@@ -163,6 +165,7 @@ supabase.auth.getSession().then(({ data: { session } }: { data: { session: Sessi
     <header className="header-glass h-14 border-b border-white/20 dark:border-white/5 px-5 flex items-center justify-between shrink-0 gap-3 sticky top-0 z-30">
       <div className="flex-1" />
       <div className="flex items-center gap-1">
+        <ThemeSwitcher />
         <NotificationBell />
         <div className="w-px h-5 bg-slate-200/50 dark:bg-slate-700/50 mx-1" />
         <DropdownMenu>
