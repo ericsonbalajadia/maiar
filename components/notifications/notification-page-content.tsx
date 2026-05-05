@@ -80,8 +80,6 @@ function NotifCard({
       href = `/clerk/requests/${notif.request_id}`;
     } else if (pathname.startsWith('/supervisor')) {
       href = `/supervisor/requests/${notif.request_id}`;
-    } else if (pathname.startsWith('/technician')) {
-      href = `/technician/requests/${notif.request_id}`;
     } else if (pathname.startsWith('/admin')) {
       href = `/admin/requests/${notif.request_id}`;
     } else {
