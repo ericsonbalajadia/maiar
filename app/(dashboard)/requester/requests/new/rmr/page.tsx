@@ -41,8 +41,8 @@ export default async function RmrRequestPage() {
 
       {/* Glass header */}
       <div className="flex items-center gap-4">
-        <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shrink-0 shadow-md shadow-blue-500/30">
-          <Wrench className="h-5 w-5 text-white" />
+        <div className="w-11 h-11 bg-[#ADEBB3] rounded-2xl flex items-center justify-center shrink-0 shadow-md shadow-[#ADEBB3]/30">
+          <Wrench className="h-5 w-5 text-[#225c2b]" />
         </div>
         <div className="flex-1 min-w-0">
           <h1 className="text-xl font-bold text-slate-900 dark:text-white">
@@ -53,9 +53,9 @@ export default async function RmrRequestPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs font-bold bg-blue-600 text-white px-2.5 py-1 rounded-lg shadow-sm">R&amp;M</span>
+          <span className="text-xs font-bold bg-[#ADEBB3] text-[#225c2b] px-2.5 py-1 rounded-lg shadow-sm">R&amp;M</span>
           <Link href="/requester/requests/new/ppsr">
-            <span className="text-xs font-semibold border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 px-2.5 py-1 rounded-lg hover:border-violet-300 dark:hover:border-violet-700 hover:text-violet-500 transition-colors cursor-pointer">
+            <span className="text-xs font-semibold border border-[#ADEBB3]/70 dark:border-emerald-800/60 text-slate-400 dark:text-slate-500 px-2.5 py-1 rounded-lg hover:border-[#ADEBB3] dark:hover:border-emerald-700 hover:text-[#2f7a3b] dark:hover:text-[#ADEBB3] transition-colors cursor-pointer">
               PPSR
             </span>
           </Link>

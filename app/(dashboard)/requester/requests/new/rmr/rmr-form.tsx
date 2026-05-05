@@ -101,14 +101,14 @@ function StepIndicator({ current }: { current: number }) {
                 isPast
                   ? 'bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-emerald-200 dark:shadow-emerald-900/30'
                   : isCurrent
-                  ? 'bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-blue-200 dark:shadow-blue-900/30'
+                  ? 'bg-[#ADEBB3] text-[#225c2b] shadow-[#ADEBB3]/40 dark:shadow-emerald-900/30'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'
               )}>
                 {isPast ? <Check className="h-4 w-4" /> : step.number}
               </div>
               <span className={cn(
                 'text-xs text-center whitespace-nowrap font-medium',
-                isCurrent ? 'text-blue-600 dark:text-blue-400'
+                isCurrent ? 'text-[#2f7a3b] dark:text-[#ADEBB3]'
                   : isPast ? 'text-emerald-600 dark:text-emerald-400'
                   : 'text-slate-400 dark:text-slate-500'
               )}>
@@ -186,7 +186,7 @@ function IconInput({
       <Input
         {...props}
         className={cn(
-          'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-400/20 transition-all',
+          'h-10 bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] dark:focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all',
           error && 'border-rose-400 dark:border-rose-500 focus:border-rose-400 focus:ring-rose-400/20',
           props.className
         )}
@@ -200,7 +200,7 @@ function IconInput({
       <Input
         {...props}
         className={cn(
-          'h-10 pl-9 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-400/20 transition-all',
+          'h-10 pl-9 bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] dark:focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all',
           error && 'border-rose-400 dark:border-rose-500 focus:border-rose-400 focus:ring-rose-400/20',
           props.className
         )}
@@ -214,8 +214,8 @@ function IconInput({
 function SectionHeader({ number, title, subtitle }: { number: number; title: string; subtitle?: string }) {
   return (
     <div className="flex items-start gap-3 mb-6">
-      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm mt-0.5">
-        <span className="text-xs font-bold text-white">{number}</span>
+      <div className="w-7 h-7 rounded-lg bg-[#ADEBB3] flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+        <span className="text-xs font-bold text-[#225c2b]">{number}</span>
       </div>
       <div>
         <h2 className="text-base font-bold text-slate-900 dark:text-white">{title}</h2>
@@ -244,7 +244,7 @@ function SuccessModal({
   return createPortal(
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div
-        className="rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center border border-white/20 dark:border-slate-700/60"
+        className="rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center border border-[#ADEBB3]/60 dark:border-emerald-800/60"
         style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(20px)' }}
       >
         <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/30">
@@ -259,7 +259,7 @@ function SuccessModal({
         <div className="flex flex-col gap-2.5">
           <Button
             onClick={onView}
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20"
+            className="w-full bg-[#ADEBB3] text-[#225c2b] shadow-md shadow-[#ADEBB3]/30 hover:bg-[#ADEBB3]/80"
           >
             View Request
           </Button>
@@ -382,13 +382,13 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
 
   return (
     <div
-      className="rounded-2xl border border-white/60 dark:border-slate-700/60 shadow-sm overflow-hidden"
+      className="rounded-2xl border border-[#ADEBB3]/60 dark:border-emerald-800/60 shadow-sm overflow-hidden"
       style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(12px)' }}
     >
       {/* Progress bar */}
       <div className="h-1 bg-slate-100 dark:bg-slate-800">
         <div
-          className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-500 ease-out rounded-full"
+          className="h-full bg-[#ADEBB3] transition-all duration-500 ease-out rounded-full"
           style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%` }}
         />
       </div>
@@ -432,7 +432,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                         value={form.location_building}
                         onChange={(e) => set('location_building', e.target.value)}
                         className={cn(
-                          'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all',
+                          'h-10 bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all',
                           errors.location_building && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
                         )}
                       />
@@ -442,7 +442,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                         placeholder="Floor level (optional)"
                         value={form.location_floor}
                         onChange={(e) => set('location_floor', e.target.value)}
-                        className="h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
+                        className="h-10 bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all"
                       />
                     </div>
                     <div>
@@ -450,7 +450,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                         placeholder="Room number (optional)"
                         value={form.location_room}
                         onChange={(e) => set('location_room', e.target.value)}
-                        className="h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
+                        className="h-10 bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all"
                       />
                     </div>
                   </div>
@@ -518,17 +518,17 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                     type="button"
                     onClick={() => toggleCategory(cat.id)}
                     className={cn(
-                      'flex items-center gap-2.5 p-3 rounded-xl border-2 text-left transition-all duration-150',
+                      'flex items-center gap-2.5 p-3 rounded-xl border text-left transition-all duration-150',
                       checked
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-sm shadow-blue-500/10'
-                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white/40 dark:bg-slate-800/40'
+                        ? 'border-[#ADEBB3] bg-[#ADEBB3]/25 dark:bg-emerald-900/20 shadow-sm shadow-[#ADEBB3]/30'
+                        : 'border-[#ADEBB3]/70 dark:border-emerald-800/60 hover:border-[#ADEBB3] dark:hover:border-[#ADEBB3] bg-white/40 dark:bg-slate-800/40'
                     )}
                   >
                     <div className={cn(
-                      'w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-all duration-150',
+                      'w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all duration-150',
                       checked
-                        ? 'bg-blue-500 border-blue-500 shadow-sm'
-                        : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900'
+                        ? 'bg-[#2f7a3b] border-[#2f7a3b] shadow-sm'
+                        : 'border-[#ADEBB3]/70 dark:border-emerald-800/60 bg-white dark:bg-slate-900'
                     )}>
                       {checked && <Check className="h-2.5 w-2.5 text-white" />}
                     </div>
@@ -536,7 +536,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                       <Icon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
                       <span className={cn(
                         'text-sm font-medium leading-tight',
-                        checked ? 'text-blue-700 dark:text-blue-300' : 'text-slate-700 dark:text-slate-300'
+                        checked ? 'text-[#225c2b] dark:text-[#ADEBB3]' : 'text-slate-700 dark:text-slate-300'
                       )}>
                         {displayName}
                       </span>
@@ -565,7 +565,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                     return (
                       <span
                         key={id}
-                        className="inline-flex items-center gap-1.5 text-xs bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-2.5 py-1 rounded-full font-medium shadow-sm"
+                        className="inline-flex items-center gap-1.5 text-xs bg-[#ADEBB3] text-[#225c2b] px-2.5 py-1 rounded-full font-medium shadow-sm"
                       >
                         <Icon className="h-2.5 w-2.5" />
                         {displayName}
@@ -600,7 +600,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                   value={form.title}
                   onChange={(e) => set('title', e.target.value)}
                   className={cn(
-                    'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all',
+                    'h-10 bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all',
                     errors.title && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
                   )}
                 />
@@ -611,11 +611,11 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                   placeholder="Provide as much detail as possible — when did it start, what symptoms, etc."
                   value={form.description}
                   onChange={(e) => set('description', e.target.value)}
-                  className="min-h-[140px] resize-none bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all"
+                  className="min-h-[140px] resize-none bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all"
                 />
               </Field>
 
-              <div className="rounded-xl bg-blue-50/60 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/50 px-4 py-3 text-xs text-blue-600 dark:text-blue-400">
+              <div className="rounded-xl bg-[#ADEBB3]/25 dark:bg-emerald-900/10 border border-[#ADEBB3]/60 dark:border-emerald-800/50 px-4 py-3 text-xs text-[#2f7a3b] dark:text-[#ADEBB3]">
                 💡 The more detail you provide, the faster and more accurately we can handle your request.
               </div>
             </div>
@@ -632,7 +632,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
             />
 
             <div className="space-y-3 text-sm">
-              <div className="rounded-xl border border-slate-200/60 dark:border-slate-700/60 overflow-hidden bg-white/40 dark:bg-slate-800/40">
+              <div className="rounded-xl border border-[#ADEBB3]/60 dark:border-emerald-800/60 overflow-hidden bg-white/40 dark:bg-slate-800/40">
                 {[
                   ['Building / Dept',  form.building],
                   ['Location',         form.location_building],
@@ -656,7 +656,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                 ))}
               </div>
 
-              <div className="rounded-xl border border-slate-200/60 dark:border-slate-700/60 px-4 py-3 bg-white/40 dark:bg-slate-800/40">
+              <div className="rounded-xl border border-[#ADEBB3]/60 dark:border-emerald-800/60 px-4 py-3 bg-white/40 dark:bg-slate-800/40">
                 <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-2">Nature of Work</p>
                 <div className="flex flex-wrap gap-2">
                   {form.category_ids.map((id) => {
@@ -664,7 +664,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                     if (!cat) return null;
                     const displayName = formatCategoryName(cat.category_name);
                     return (
-                      <span key={id} className="text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-2.5 py-1 rounded-full font-medium">
+                      <span key={id} className="text-xs bg-[#ADEBB3]/35 dark:bg-emerald-900/40 text-[#225c2b] dark:text-[#ADEBB3] px-2.5 py-1 rounded-full font-medium">
                         {displayName}
                       </span>
                     );
@@ -673,7 +673,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
               </div>
 
               {form.title && (
-                <div className="rounded-xl border border-slate-200/60 dark:border-slate-700/60 px-4 py-3 bg-white/40 dark:bg-slate-800/40">
+                <div className="rounded-xl border border-[#ADEBB3]/60 dark:border-emerald-800/60 px-4 py-3 bg-white/40 dark:bg-slate-800/40">
                   <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1">Title</p>
                   <p className="font-semibold text-slate-800 dark:text-white">{form.title}</p>
                   {form.description && (
@@ -696,13 +696,13 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
         )}
 
         {/* ── Navigation Buttons ── */}
-        <div className="flex items-center justify-between mt-8 pt-5 border-t border-slate-100 dark:border-slate-800/60">
+        <div className="flex items-center justify-between mt-8 pt-5 border-t border-[#ADEBB3]/45 dark:border-emerald-900/50">
           {step === 1 ? (
             <Button
               type="button"
               variant="outline"
               onClick={cancel}
-              className="text-slate-500 border-slate-200 dark:border-slate-700"
+              className="text-slate-500 border-[#ADEBB3]/70 dark:border-emerald-800/60"
             >
               Cancel
             </Button>
@@ -711,7 +711,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
               type="button"
               variant="outline"
               onClick={back}
-              className="gap-1.5 text-slate-500 border-slate-200 dark:border-slate-700"
+              className="gap-1.5 text-slate-500 border-[#ADEBB3]/70 dark:border-emerald-800/60"
             >
               <ChevronLeft className="h-4 w-4" />
               Back
@@ -726,7 +726,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                   className={cn(
                     'rounded-full transition-all duration-200',
                     s.number === step
-                      ? 'w-4 h-2 bg-blue-500'
+                      ? 'w-4 h-2 bg-[#2f7a3b]'
                       : s.number < step
                       ? 'w-2 h-2 bg-emerald-400'
                       : 'w-2 h-2 bg-slate-200 dark:bg-slate-700'
@@ -739,7 +739,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
               <Button
                 type="button"
                 onClick={next}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20 gap-1.5 transition-all"
+                className="bg-[#ADEBB3] text-[#225c2b] shadow-md shadow-[#ADEBB3]/30 hover:bg-[#ADEBB3]/80 gap-1.5 transition-all"
               >
                 Next <ChevronRight className="h-4 w-4" />
               </Button>

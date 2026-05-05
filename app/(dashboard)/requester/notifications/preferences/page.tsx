@@ -35,7 +35,7 @@ function PreferenceRow({
 }) {
   return (
     <div className={cn(
-      "flex items-start gap-3 rounded-xl border border-slate-200/60 dark:border-slate-700/60 p-4 transition-all",
+      "flex items-start gap-3 rounded-xl border border-[#ADEBB3]/60 dark:border-emerald-800/60 p-4 transition-all",
       "bg-white/60 dark:bg-slate-800/40 backdrop-blur-sm hover:bg-white/80 dark:hover:bg-slate-800/60"
     )}>
       <Checkbox id={id} name={id} defaultChecked={defaultChecked} className="mt-0.5" />
@@ -82,7 +82,7 @@ export default async function RequesterNotificationsPage({
   return (
     <div className="space-y-8 max-w-4xl mx-auto fade-in">
       <div className="space-y-2">
-        <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+        <div className="flex items-center gap-2 text-[#2f7a3b] dark:text-[#ADEBB3]">
           <Bell className="h-4 w-4" />
           <p className="text-sm font-semibold uppercase tracking-widest">Notifications</p>
         </div>
@@ -101,7 +101,7 @@ export default async function RequesterNotificationsPage({
       )}
 
       <form action={updateNotificationPreferences} className="space-y-6">
-        <Card className="border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/40 backdrop-blur-sm">
+        <Card className="border-[#ADEBB3]/60 dark:border-emerald-800/60 bg-white/60 dark:bg-slate-800/40 backdrop-blur-sm">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Mail className="h-5 w-5 text-slate-500" />
@@ -139,7 +139,7 @@ export default async function RequesterNotificationsPage({
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/40 backdrop-blur-sm">
+        <Card className="border-[#ADEBB3]/60 dark:border-emerald-800/60 bg-white/60 dark:bg-slate-800/40 backdrop-blur-sm">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Settings2 className="h-5 w-5 text-slate-500" />
@@ -166,7 +166,7 @@ export default async function RequesterNotificationsPage({
         </Card>
 
         <div className="flex justify-end">
-          <Button type="submit" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20">
+          <Button type="submit" className="bg-[#ADEBB3] text-[#225c2b] shadow-md shadow-[#ADEBB3]/30 hover:bg-[#ADEBB3]/80">
             Save preferences
           </Button>
         </div>

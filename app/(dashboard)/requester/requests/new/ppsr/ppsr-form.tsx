@@ -53,17 +53,17 @@ const SERVICE_ICONS: Record<string, React.ElementType> = {
 }
 
 const SERVICE_COLORS: Record<string, string> = {
-  audio_system:             'from-orange-400 to-red-500',
-  land_preparation:         'from-amber-400 to-yellow-500',
-  site_development:         'from-blue-400 to-cyan-500',
-  hauling:                  'from-slate-400 to-slate-600',
-  tent_installation:        'from-green-400 to-emerald-500',
-  fabrication:              'from-violet-400 to-purple-500',
-  installation:             'from-teal-400 to-cyan-600',
-  machining_works:          'from-zinc-400 to-zinc-600',
-  landscaping:              'from-lime-400 to-green-600',
-  plans_layouts_estimates:  'from-indigo-400 to-blue-600',
-  others:                   'from-rose-400 to-pink-500',
+  audio_system:             'from-[#ADEBB3] to-emerald-500',
+  land_preparation:         'from-lime-300 to-green-500',
+  site_development:         'from-[#ADEBB3] to-teal-500',
+  hauling:                  'from-emerald-300 to-emerald-700',
+  tent_installation:        'from-green-300 to-emerald-500',
+  fabrication:              'from-[#ADEBB3] to-green-600',
+  installation:             'from-teal-300 to-emerald-600',
+  machining_works:          'from-emerald-200 to-green-700',
+  landscaping:              'from-lime-300 to-green-600',
+  plans_layouts_estimates:  'from-[#ADEBB3] to-emerald-600',
+  others:                   'from-green-200 to-emerald-500',
 }
 
 const STEPS = [
@@ -115,14 +115,14 @@ function StepIndicator({ current }: { current: number }) {
                 isPast
                   ? 'bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-emerald-200 dark:shadow-emerald-900/30'
                   : isCurrent
-                  ? 'bg-gradient-to-br from-violet-600 to-purple-600 text-white shadow-violet-200 dark:shadow-violet-900/30'
+                  ? 'bg-[#ADEBB3] text-[#225c2b] shadow-[#ADEBB3]/40 dark:shadow-emerald-900/30'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'
               )}>
                 {isPast ? <Check className="h-4 w-4" /> : step.number}
               </div>
               <span className={cn(
                 'text-xs text-center whitespace-nowrap font-medium',
-                isCurrent ? 'text-violet-600 dark:text-violet-400'
+                isCurrent ? 'text-[#2f7a3b] dark:text-[#ADEBB3]'
                   : isPast ? 'text-emerald-600 dark:text-emerald-400'
                   : 'text-slate-400 dark:text-slate-500'
               )}>
@@ -163,7 +163,7 @@ function SuccessModal({
   return createPortal(
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div
-        className="rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center border border-white/20 dark:border-slate-700/60"
+        className="rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center border border-[#ADEBB3]/60 dark:border-emerald-800/60"
         style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(20px)' }}
       >
         <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/30">
@@ -180,7 +180,7 @@ function SuccessModal({
         <div className="flex flex-col gap-2.5">
           <Button
             onClick={onView}
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20"
+            className="w-full bg-[#ADEBB3] text-[#225c2b] shadow-md shadow-[#ADEBB3]/30 hover:bg-[#ADEBB3]/80"
           >
             View My Requests
           </Button>
@@ -240,7 +240,7 @@ function ServiceSubFields({
 
   if (fields.length === 0) {
     return (
-      <div className="rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 px-4 py-6 text-center">
+      <div className="rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-[#ADEBB3]/60 dark:border-emerald-800/60 px-4 py-6 text-center">
         <p className="text-sm text-slate-400 dark:text-slate-500 italic">
           No additional fields required for this service type.
         </p>
@@ -248,7 +248,7 @@ function ServiceSubFields({
     )
   }
 
-  const inputClass = 'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all'
+  const inputClass = 'h-10 bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all'
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -279,7 +279,7 @@ function ServiceSubFields({
                 placeholder={`Enter ${label.toLowerCase()}...`}
                 value={value}
                 onChange={(e) => onChange(field, e.target.value)}
-                className="resize-none min-h-[100px] bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all"
+                className="resize-none min-h-[100px] bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all"
               />
             </Field>
           )
@@ -406,13 +406,13 @@ if (ticketNumber && requestId) {
 
   return (
     <div
-      className="rounded-2xl border border-white/60 dark:border-slate-700/60 shadow-sm overflow-hidden"
+      className="rounded-2xl border border-[#ADEBB3]/60 dark:border-emerald-800/60 shadow-sm overflow-hidden"
       style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(12px)' }}
     >
       {/* Progress bar */}
       <div className="h-1 bg-slate-100 dark:bg-slate-800">
         <div
-          className="h-full bg-gradient-to-r from-violet-500 to-purple-500 transition-all duration-500 ease-out rounded-full"
+          className="h-full bg-[#ADEBB3] transition-all duration-500 ease-out rounded-full"
           style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%` }}
         />
       </div>
@@ -424,8 +424,8 @@ if (ticketNumber && requestId) {
         {step === 1 && (
           <div className="fade-in">
             <div className="flex items-start gap-3 mb-6">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shrink-0 shadow-sm mt-0.5">
-                <span className="text-xs font-bold text-white">1</span>
+              <div className="w-7 h-7 rounded-lg bg-[#ADEBB3] flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                <span className="text-xs font-bold text-[#225c2b]">1</span>
               </div>
               <div>
                 <h2 className="text-base font-bold text-slate-900 dark:text-white">Request Information</h2>
@@ -437,7 +437,7 @@ if (ticketNumber && requestId) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Date Filled">
-                <Input value={form.date_filled} readOnly className="h-10 bg-slate-50/80 dark:bg-slate-800/80 text-slate-500 cursor-default border-slate-200 dark:border-slate-700" />
+                <Input value={form.date_filled} readOnly className="h-10 bg-slate-50/80 dark:bg-slate-800/80 text-slate-500 cursor-default border-[#ADEBB3]/70 dark:border-emerald-800/60" />
               </Field>
 
               <Field label="Building / Department" required error={errors.building}>
@@ -446,7 +446,7 @@ if (ticketNumber && requestId) {
                   value={form.building}
                   onChange={(e) => set('building', e.target.value)}
                   className={cn(
-                    'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                    'h-10 bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all',
                     errors.building && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
                   )}
                 />
@@ -460,7 +460,7 @@ if (ticketNumber && requestId) {
                       value={form.location_building}
                       onChange={(e) => set('location_building', e.target.value)}
                       className={cn(
-                        'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                        'h-10 bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all',
                         errors.location_building && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
                       )}
                     />
@@ -468,13 +468,13 @@ if (ticketNumber && requestId) {
                       placeholder="Floor level (optional)"
                       value={form.location_floor}
                       onChange={(e) => set('location_floor', e.target.value)}
-                      className="h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all"
+                      className="h-10 bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all"
                     />
                     <Input
                       placeholder="Room number (optional)"
                       value={form.location_room}
                       onChange={(e) => set('location_room', e.target.value)}
-                      className="h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all"
+                      className="h-10 bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all"
                     />
                   </div>
                 </Field>
@@ -485,7 +485,7 @@ if (ticketNumber && requestId) {
                   value={form.requesting_party}
                   onChange={(e) => set('requesting_party', e.target.value)}
                   className={cn(
-                    'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                    'h-10 bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all',
                     errors.requesting_party && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
                   )}
                 />
@@ -497,7 +497,7 @@ if (ticketNumber && requestId) {
                   value={form.designation}
                   onChange={(e) => set('designation', e.target.value)}
                   className={cn(
-                    'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                    'h-10 bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all',
                     errors.designation && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
                   )}
                 />
@@ -509,7 +509,7 @@ if (ticketNumber && requestId) {
                   value={form.contact_number}
                   onChange={(e) => set('contact_number', e.target.value)}
                   className={cn(
-                    'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                    'h-10 bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all',
                     errors.contact_number && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
                   )}
                 />
@@ -521,7 +521,7 @@ if (ticketNumber && requestId) {
                   value={form.email}
                   onChange={(e) => set('email', e.target.value)}
                   className={cn(
-                    'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                    'h-10 bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all',
                     errors.email && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
                   )}
                 />
@@ -534,8 +534,8 @@ if (ticketNumber && requestId) {
         {step === 2 && (
           <div className="fade-in">
             <div className="flex items-start gap-3 mb-6">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shrink-0 shadow-sm mt-0.5">
-                <span className="text-xs font-bold text-white">2</span>
+              <div className="w-7 h-7 rounded-lg bg-[#ADEBB3] flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                <span className="text-xs font-bold text-[#225c2b]">2</span>
               </div>
               <div>
                 <h2 className="text-base font-bold text-slate-900 dark:text-white">Service Type</h2>
@@ -556,14 +556,14 @@ if (ticketNumber && requestId) {
                     type="button"
                     onClick={() => setServiceType(type)}
                     className={cn(
-                      'relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 text-center transition-all duration-200',
+                      'relative flex flex-col items-center gap-2 p-4 rounded-xl border text-center transition-all duration-200',
                       isSelected
-                        ? 'border-violet-500 bg-violet-50 dark:bg-violet-900/20 shadow-md shadow-violet-500/10'
-                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white/40 dark:bg-slate-800/40'
+                        ? 'border-[#ADEBB3] bg-[#ADEBB3]/25 dark:bg-emerald-900/20 shadow-md shadow-[#ADEBB3]/30'
+                        : 'border-[#ADEBB3]/70 dark:border-emerald-800/60 hover:border-[#ADEBB3] dark:hover:border-[#ADEBB3] bg-white/40 dark:bg-slate-800/40'
                     )}
                   >
                     {isSelected && (
-                      <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-violet-500 flex items-center justify-center">
+                      <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-[#2f7a3b] flex items-center justify-center">
                         <Check className="h-2.5 w-2.5 text-white" />
                       </div>
                     )}
@@ -575,7 +575,7 @@ if (ticketNumber && requestId) {
                     </div>
                     <span className={cn(
                       'text-xs font-semibold leading-tight',
-                      isSelected ? 'text-violet-700 dark:text-violet-300' : 'text-slate-600 dark:text-slate-400'
+                      isSelected ? 'text-[#225c2b] dark:text-[#ADEBB3]' : 'text-slate-600 dark:text-slate-400'
                     )}>
                       {PPSR_SERVICE_LABELS[type]}
                     </span>
@@ -597,8 +597,8 @@ if (ticketNumber && requestId) {
         {step === 3 && form.service_type && (
           <div className="fade-in space-y-5">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shrink-0 shadow-sm">
-                <span className="text-xs font-bold text-white">3</span>
+              <div className="w-7 h-7 rounded-lg bg-[#ADEBB3] flex items-center justify-center shrink-0 shadow-sm">
+                <span className="text-xs font-bold text-[#225c2b]">3</span>
               </div>
               <div>
                 <h2 className="text-base font-bold text-slate-900 dark:text-white">Service Details</h2>
@@ -608,7 +608,7 @@ if (ticketNumber && requestId) {
               </div>
               <div className={cn(
                 'ml-auto w-8 h-8 rounded-lg flex items-center justify-center shrink-0',
-                `bg-gradient-to-br ${SERVICE_COLORS[form.service_type] ?? 'from-violet-400 to-purple-500'}`
+                `bg-gradient-to-br ${SERVICE_COLORS[form.service_type] ?? 'from-[#ADEBB3] to-emerald-500'}`
               )}>
                 {(() => { const Icon = SERVICE_ICONS[form.service_type] ?? MoreHorizontal; return <Icon className="h-4 w-4 text-white" /> })()}
               </div>
@@ -623,7 +623,7 @@ if (ticketNumber && requestId) {
                 value={form.title}
                 onChange={(e) => set('title', e.target.value)}
                 className={cn(
-                  'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                  'h-10 bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all',
                   errors.title && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
                 )}
               />
@@ -644,7 +644,7 @@ if (ticketNumber && requestId) {
                 placeholder="Any other details the team should know..."
                 value={form.description}
                 onChange={(e) => set('description', e.target.value)}
-                className="resize-none bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all"
+                className="resize-none bg-white/60 dark:bg-slate-800/60 border-[#ADEBB3]/70 dark:border-emerald-800/60 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/30 transition-all"
               />
             </div>
           </div>
@@ -654,8 +654,8 @@ if (ticketNumber && requestId) {
         {step === 4 && (
           <div className="fade-in">
             <div className="flex items-start gap-3 mb-6">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shrink-0 shadow-sm mt-0.5">
-                <span className="text-xs font-bold text-white">4</span>
+              <div className="w-7 h-7 rounded-lg bg-[#ADEBB3] flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                <span className="text-xs font-bold text-[#225c2b]">4</span>
               </div>
               <div>
                 <h2 className="text-base font-bold text-slate-900 dark:text-white">Review &amp; Submit</h2>
@@ -666,7 +666,7 @@ if (ticketNumber && requestId) {
             </div>
 
             <div className="space-y-3 text-sm">
-              <div className="rounded-xl border border-slate-200/60 dark:border-slate-700/60 overflow-hidden bg-white/40 dark:bg-slate-800/40">
+              <div className="rounded-xl border border-[#ADEBB3]/60 dark:border-emerald-800/60 overflow-hidden bg-white/40 dark:bg-slate-800/40">
                 {[
                   ['Building / Dept',  form.building],
                   ['Location',         form.location_building],
@@ -689,7 +689,7 @@ if (ticketNumber && requestId) {
               </div>
 
               {form.service_type && Object.keys(form.service_data).length > 0 && (
-                <div className="rounded-xl border border-slate-200/60 dark:border-slate-700/60 overflow-hidden bg-white/40 dark:bg-slate-800/40">
+                <div className="rounded-xl border border-[#ADEBB3]/60 dark:border-emerald-800/60 overflow-hidden bg-white/40 dark:bg-slate-800/40">
                   {Object.entries(form.service_data)
                     .filter(([, v]) => v)
                     .map(([key, value], i) => (
@@ -710,7 +710,7 @@ if (ticketNumber && requestId) {
                 </div>
               )}
 
-              <div className="rounded-xl border border-slate-200/60 dark:border-slate-700/60 px-4 py-3 bg-white/40 dark:bg-slate-800/40">
+              <div className="rounded-xl border border-[#ADEBB3]/60 dark:border-emerald-800/60 px-4 py-3 bg-white/40 dark:bg-slate-800/40">
                 <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1">Title</p>
                 <p className="font-semibold text-slate-800 dark:text-white">{form.title}</p>
                 {form.description && (
@@ -732,13 +732,13 @@ if (ticketNumber && requestId) {
         )}
 
         {/* Navigation Buttons */}
-        <div className="flex items-center justify-between mt-8 pt-5 border-t border-slate-100 dark:border-slate-800/60">
+        <div className="flex items-center justify-between mt-8 pt-5 border-t border-[#ADEBB3]/45 dark:border-emerald-900/50">
           {step === 1 ? (
-            <Button type="button" variant="outline" onClick={cancel} className="text-slate-500 border-slate-200 dark:border-slate-700">
+            <Button type="button" variant="outline" onClick={cancel} className="text-slate-500 border-[#ADEBB3]/70 dark:border-emerald-800/60">
               Cancel
             </Button>
           ) : (
-            <Button type="button" variant="outline" onClick={back} className="gap-1.5 text-slate-500 border-slate-200 dark:border-slate-700">
+            <Button type="button" variant="outline" onClick={back} className="gap-1.5 text-slate-500 border-[#ADEBB3]/70 dark:border-emerald-800/60">
               <ChevronLeft className="h-4 w-4" />
               Back
             </Button>
@@ -753,7 +753,7 @@ if (ticketNumber && requestId) {
                   className={cn(
                     'rounded-full transition-all duration-200',
                     s.number === step
-                      ? 'w-4 h-2 bg-violet-500'
+                      ? 'w-4 h-2 bg-[#2f7a3b]'
                       : s.number < step
                       ? 'w-2 h-2 bg-emerald-400'
                       : 'w-2 h-2 bg-slate-200 dark:bg-slate-700'
@@ -766,7 +766,7 @@ if (ticketNumber && requestId) {
               <Button
                 type="button"
                 onClick={next}
-                className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-md shadow-violet-500/20 gap-1.5 transition-all"
+                className="bg-[#ADEBB3] text-[#225c2b] shadow-md shadow-[#ADEBB3]/30 hover:bg-[#ADEBB3]/80 gap-1.5 transition-all"
               >
                 Next <ChevronRight className="h-4 w-4" />
               </Button>
