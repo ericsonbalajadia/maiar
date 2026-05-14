@@ -13,6 +13,7 @@ import {
 import { cn } from '@/lib/utils'
 import { getRoleDashboard } from '@/lib/rbac'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { NotificationBell } from '@/components/notifications/notification-bell'
 import { ThemeSwitcher } from '@/components/common/theme-switcher'
 import { createClient } from '@/lib/supabase/client'
@@ -39,10 +40,10 @@ const ROLE_LABELS: Record<string, string> = {
 }
 
 const ROLE_BADGE_COLORS: Record<string, string> = {
-  student:    'bg-[#ADEBB3]/45 text-[#225c2b] dark:bg-emerald-900/40 dark:text-[#ADEBB3]',
-  staff:      'bg-[#ADEBB3]/45 text-[#225c2b] dark:bg-emerald-900/40 dark:text-[#ADEBB3]',
+  student:    'bg-[#ADEBB3]/60 text-[#1e2c1f] dark:bg-white/[0.07] dark:text-emerald-300',
+  staff:      'bg-[#ADEBB3]/60 text-[#1e2c1f] dark:bg-white/[0.07] dark:text-emerald-300',
   clerk:      'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
-  technician: 'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300',
+  technician: 'bg-[#ADEBB3]/45 text-[#374e39] dark:bg-white/[0.07] dark:text-emerald-300',
   supervisor: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
   admin:      'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300',
 }
@@ -50,7 +51,7 @@ const ROLE_BADGE_COLORS: Record<string, string> = {
 const AVATAR_GRADIENTS = [
   'from-blue-500 to-indigo-600',
   'from-violet-500 to-purple-600',
-  'from-emerald-500 to-teal-600',
+  'from-[#6f9873] to-[#6f9873]',
   'from-orange-500 to-amber-600',
   'from-rose-500 to-pink-600',
   'from-cyan-500 to-blue-600',
@@ -67,13 +68,13 @@ function HeaderSkeleton() {
   return (
     <header className="header-glass h-14 border-b border-white/20 dark:border-white/5 px-5 flex items-center justify-end gap-3">
       <div className="flex items-center gap-1">
-        <div className="w-7 h-7 rounded-lg bg-white/20 dark:bg-white/10 animate-pulse" />
-        <div className="w-px h-5 bg-slate-200/50 dark:bg-slate-700/50 mx-1" />
+        <div className="w-7 h-7 rounded-lg bg-white/20 dark:bg-white/[0.04] animate-pulse" />
+        <div className="w-px h-5 bg-slate-200/50 dark:bg-white/[0.08] mx-1" />
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-white/20 dark:bg-white/10 animate-pulse" />
+          <div className="w-7 h-7 rounded-lg bg-white/20 dark:bg-white/[0.04] animate-pulse" />
           <div className="hidden sm:block space-y-1">
-            <div className="h-3 w-24 bg-white/20 dark:bg-white/10 rounded animate-pulse" />
-            <div className="h-2 w-16 bg-white/20 dark:bg-white/10 rounded animate-pulse" />
+            <div className="h-3 w-24 bg-white/20 dark:bg-white/[0.04] rounded animate-pulse" />
+            <div className="h-2 w-16 bg-white/20 dark:bg-white/[0.04] rounded animate-pulse" />
           </div>
         </div>
       </div>
@@ -81,18 +82,13 @@ function HeaderSkeleton() {
   )
 }
 
-function getNotificationPreferencesPath(role: string): string {
-  if (role === 'student' || role === 'staff') {
-    return '/requester/notifications/preferences';
-  }
-  return `/${role}/notifications/preferences`;
-}
-
 // ─── Main Component ──────────────────────────────────────────────────────────
 export function Header() {
   const [user, setUser] = useState<DbUser | null>(null)
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
+  const pathname = usePathname()
+  const isRequesterPath = pathname.startsWith('/requester')
 
   useEffect(() => {
     let isMounted = true
@@ -139,6 +135,7 @@ supabase.auth.getSession().then(({ data: { session } }: { data: { session: Sessi
   }, [supabase])
 
   if (loading) {
+    if (isRequesterPath) return null
     return <HeaderSkeleton />
   }
 
@@ -148,7 +145,7 @@ supabase.auth.getSession().then(({ data: { session } }: { data: { session: Sessi
         {/* Minimal placeholder – user not logged in */}
         <div className="flex items-center gap-1">
           <ThemeSwitcher />
-          <div className="w-7 h-7 rounded-lg bg-white/20 dark:bg-white/10" />
+          <div className="w-7 h-7 rounded-lg bg-white/20 dark:bg-white/[0.04]" />
         </div>
       </header>
     )
@@ -156,6 +153,7 @@ supabase.auth.getSession().then(({ data: { session } }: { data: { session: Sessi
 
   const role = user.role ?? ''
   const isRequester = role === 'student' || role === 'staff'
+  if (isRequester) return null
   const roleLabel = ROLE_LABELS[role] ?? role
   const roleBadge = ROLE_BADGE_COLORS[role] ?? 'bg-slate-100 text-slate-600'
   const initials = getInitials(user.full_name ?? 'User')
@@ -163,15 +161,15 @@ supabase.auth.getSession().then(({ data: { session } }: { data: { session: Sessi
   const settingsHref = `${getRoleDashboard(role)}/settings`
 
   return (
-    <header className={cn('header-glass h-14 border-b px-5 flex items-center justify-between shrink-0 gap-3 sticky top-0 z-30', isRequester ? 'border-[#ADEBB3]/55 dark:border-emerald-900/50' : 'border-white/20 dark:border-white/5')}>
+    <header className={cn('header-glass h-14 border-b px-5 flex items-center justify-between shrink-0 gap-3 sticky top-0 z-30', isRequester ? 'border-[#ADEBB3]/60 dark:border-white/10 bg-white/70 dark:bg-[#101216]' : 'border-white/20 dark:border-white/5')}>
       <div className="flex-1" />
       <div className="flex items-center gap-1">
         <ThemeSwitcher />
         <NotificationBell />
-        <div className="w-px h-5 bg-slate-200/50 dark:bg-slate-700/50 mx-1" />
+        <div className="w-px h-5 bg-slate-200/50 dark:bg-white/[0.08] mx-1" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 hover:bg-white/20 dark:hover:bg-white/10 transition-all duration-150 outline-none group">
+            <button className={cn('flex items-center gap-2.5 rounded-2xl border px-2.5 py-1.5 transition-all duration-150 outline-none group', isRequester ? 'border-[#ADEBB3]/60 bg-white/35 hover:bg-[#ADEBB3]/35 dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.08]' : 'border-transparent hover:bg-white/20 dark:hover:bg-white/[0.07]')}>
               <div className={cn('w-7 h-7 rounded-lg flex items-center justify-center text-white text-[11px] font-bold shrink-0 shadow-sm bg-gradient-to-br', avatarGradient)}>
                 {initials}
               </div>
@@ -190,7 +188,7 @@ supabase.auth.getSession().then(({ data: { session } }: { data: { session: Sessi
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className={cn('w-60 rounded-xl border bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-xl p-1', isRequester ? 'border-[#ADEBB3]/60 dark:border-emerald-800/60' : 'border-white/20 dark:border-white/10')}
+            className={cn('w-60 rounded-xl border bg-white/80 dark:bg-white/[0.04] backdrop-blur-md shadow-xl p-1', isRequester ? 'border-[#ADEBB3]/60 dark:border-white/10' : 'border-white/20 dark:border-white/10')}
           >
             <div className="flex items-center gap-3 px-3 py-2.5 mb-1">
               <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-bold shrink-0 shadow-sm bg-gradient-to-br', avatarGradient)}>
@@ -201,26 +199,26 @@ supabase.auth.getSession().then(({ data: { session } }: { data: { session: Sessi
                 <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">{user.email}</p>
               </div>
             </div>
-            <DropdownMenuSeparator className="bg-slate-200/50 dark:bg-slate-700/50" />
-            <DropdownMenuItem asChild className="rounded-lg gap-2.5 py-2 cursor-pointer text-slate-700 dark:text-slate-200 focus:bg-white/30 dark:focus:bg-white/10 hover:bg-white/30 dark:hover:bg-white/10 transition-colors">
+            <DropdownMenuSeparator className="bg-slate-200/50 dark:bg-white/[0.08]" />
+            <DropdownMenuItem asChild className="rounded-lg gap-2.5 py-2 cursor-pointer text-slate-700 dark:text-slate-200 focus:bg-white/30 dark:focus:bg-white/[0.07] hover:bg-white/30 dark:hover:bg-white/[0.07] transition-colors">
               <Link href={settingsHref} className="flex items-center gap-2.5">
-                <div className="w-6 h-6 rounded-md bg-white/20 dark:bg-white/10 flex items-center justify-center">
+                <div className="w-6 h-6 rounded-md bg-white/20 dark:bg-white/[0.04] flex items-center justify-center">
                   <Settings className="h-3.5 w-3.5 text-slate-600 dark:text-slate-300" />
                 </div>
                 <span className="text-sm font-medium">Profile Settings</span>
               </Link>
             </DropdownMenuItem>
 {(user.role === 'student' || user.role === 'staff') && (
-  <DropdownMenuItem asChild className="rounded-lg gap-2.5 py-2 cursor-pointer text-slate-700 dark:text-slate-200 focus:bg-white/30 dark:focus:bg-white/10 hover:bg-white/30 dark:hover:bg-white/10 transition-colors">
+  <DropdownMenuItem asChild className="rounded-lg gap-2.5 py-2 cursor-pointer text-slate-700 dark:text-slate-200 focus:bg-white/30 dark:focus:bg-white/[0.07] hover:bg-white/30 dark:hover:bg-white/[0.07] transition-colors">
     <Link href="/requester/notifications/preferences" className="flex items-center gap-2.5">
-      <div className="w-6 h-6 rounded-md bg-white/20 dark:bg-white/10 flex items-center justify-center">
+      <div className="w-6 h-6 rounded-md bg-white/20 dark:bg-white/[0.04] flex items-center justify-center">
         <Bell className="h-3.5 w-3.5 text-slate-600 dark:text-slate-300" />
       </div>
       <span className="text-sm font-medium">Notification Preferences</span>
     </Link>
   </DropdownMenuItem>
 )}
-            <DropdownMenuSeparator className="bg-slate-200/50 dark:bg-slate-700/50" />
+            <DropdownMenuSeparator className="bg-slate-200/50 dark:bg-white/[0.08]" />
             <DropdownMenuItem
               className="rounded-lg gap-2.5 py-2 cursor-pointer text-rose-600 dark:text-rose-400 focus:bg-rose-50/50 dark:focus:bg-rose-950/30 hover:bg-rose-50/50 dark:hover:bg-rose-950/30 transition-colors"
               onSelect={() => logoutUser()}

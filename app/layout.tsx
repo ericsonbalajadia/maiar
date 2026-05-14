@@ -34,7 +34,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${montserrat.variable} ${electrolize.variable} h-screen overflow-hidden`}>
+      <body
+        suppressHydrationWarning
+        className={`${montserrat.variable} ${electrolize.variable} h-screen overflow-hidden`}
+      >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
             <div className="h-full flex flex-col overflow-hidden">
