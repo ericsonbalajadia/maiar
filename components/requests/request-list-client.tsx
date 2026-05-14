@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import { ChevronLeft, ChevronRight, Loader2, SlidersHorizontal, X, FileX } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Loader2, SlidersHorizontal, FileX } from 'lucide-react'
 import type { PaginatedRequests, RequestFilters } from '@/actions/request/request.actions'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -76,10 +76,6 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
     navigate({ ...filters, [key]: value || undefined, page: 1 })
   }
 
-  const handleClearFilters = () => {
-    navigate({ page: 1 })
-  }
-
   const handlePageChange = (newPage: number) => {
     navigate({ ...filters, page: newPage })
   }
@@ -89,17 +85,14 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
   return (
     <div className="space-y-5 fade-in">
       {/* ── Glassmorphic Filter Bar ── */}
-      <div
-        className="rounded-2xl border border-[#ADEBB3]/60 dark:border-emerald-800/60 shadow-sm p-4"
-        style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
-      >
+      <div className="requester-surface-soft rounded-[24px] p-4">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-6 h-6 rounded-lg bg-[#ADEBB3] flex items-center justify-center shadow-sm">
-            <SlidersHorizontal className="h-3 w-3 text-[#225c2b]" />
+          <div className="requester-tile w-7 h-7 rounded-xl flex items-center justify-center">
+            <SlidersHorizontal className="h-3 w-3 text-[#1e2c1f]" />
           </div>
-          <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Filters</span>
+          <span className="text-sm font-semibold text-[#0b130b] dark:text-white/90">Filters</span>
           {filtersActive > 0 && (
-            <Badge variant="secondary" className="text-xs px-1.5 py-0 h-4 bg-[#ADEBB3]/50 dark:bg-emerald-900/40 text-[#225c2b] dark:text-[#ADEBB3]">
+            <Badge variant="secondary" className="text-xs px-1.5 py-0 h-4 bg-[#ADEBB3]/55 dark:bg-white/[0.07] text-[#1e2c1f] dark:text-emerald-300">
               {filtersActive}
             </Badge>
           )}
@@ -108,12 +101,12 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
         <div className="flex flex-wrap gap-3 items-end">
           {/* Status */}
           <div className="flex-1 min-w-[140px] space-y-1">
-            <Label className="text-xs text-slate-500 dark:text-slate-400">Status</Label>
+            <Label className="text-xs text-slate-500 dark:text-white/60">Status</Label>
             <Select
               value={filters.status ?? 'all'}
               onValueChange={(v) => handleFilterChange('status', v === 'all' ? '' : v)}
             >
-              <SelectTrigger className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-[#ADEBB3]/70 dark:border-emerald-800/60 rounded-xl truncate">
+              <SelectTrigger className="h-9 text-sm bg-white/70 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 rounded-xl truncate shadow-none">
                 <SelectValue placeholder="All statuses" />
               </SelectTrigger>
               <SelectContent>
@@ -129,12 +122,12 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
 
           {/* Type */}
           <div className="flex-[2] min-w-[200px] space-y-1">
-            <Label className="text-xs text-slate-500 dark:text-slate-400">Request Type</Label>
+            <Label className="text-xs text-slate-500 dark:text-white/60">Request Type</Label>
             <Select
               value={filters.request_type ?? 'all'}
               onValueChange={(v) => handleFilterChange('request_type', v === 'all' ? '' : v)}
             >
-              <SelectTrigger className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-[#ADEBB3]/70 dark:border-emerald-800/60 rounded-xl truncate">
+              <SelectTrigger className="h-9 text-sm bg-white/70 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 rounded-xl truncate shadow-none">
                 <SelectValue placeholder="All types" />
               </SelectTrigger>
               <SelectContent>
@@ -150,10 +143,10 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
 
           {/* Date from */}
           <div className="flex-1 min-w-[140px] space-y-1">
-            <Label className="text-xs text-slate-500 dark:text-slate-400">From</Label>
+            <Label className="text-xs text-slate-500 dark:text-white/60">From</Label>
             <Input
               type="date"
-              className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-[#ADEBB3]/70 dark:border-emerald-800/60 rounded-xl"
+              className="h-9 text-sm bg-white/70 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 rounded-xl shadow-none"
               value={filters.date_from ?? ''}
               onChange={(e) => handleFilterChange('date_from', e.target.value)}
             />
@@ -161,10 +154,10 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
 
           {/* Date to */}
           <div className="flex-1 min-w-[140px] space-y-1">
-            <Label className="text-xs text-slate-500 dark:text-slate-400">To</Label>
+            <Label className="text-xs text-slate-500 dark:text-white/60">To</Label>
             <Input
               type="date"
-              className="h-9 text-sm bg-white/50 dark:bg-slate-800/50 border-[#ADEBB3]/70 dark:border-emerald-800/60 rounded-xl"
+              className="h-9 text-sm bg-white/70 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 rounded-xl shadow-none"
               value={filters.date_to ?? ''}
               onChange={(e) => handleFilterChange('date_to', e.target.value)}
             />
@@ -174,7 +167,7 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
 
       {/* ── Results header ── */}
       <div className="flex items-center justify-between">
-        <p className="text-xs text-slate-500 dark:text-slate-400">
+        <p className="text-xs text-slate-500 dark:text-white/60">
           {isPending ? (
             <span className="flex items-center gap-1.5">
               <Loader2 className="h-3 w-3 animate-spin" />
@@ -195,9 +188,9 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
   className={`transition-opacity duration-150 ${isPending ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
 >
   {requests.length === 0 ? (
-    <EmptyState hasFilters={filtersActive > 0} onClear={handleClearFilters} />
+    <EmptyState hasFilters={filtersActive > 0} />
   ) : (
-    <div className="max-h-[600px] overflow-y-auto pr-2 space-y-4 pb-2 pt-2 mt-4 custom-scrollbar">
+    <div className="max-h-[600px] overflow-y-auto pr-2 space-y-3 pb-2 pt-2 mt-3 custom-scrollbar">
       {requests.map((req, idx) => (
         <div
           key={req.id}
@@ -216,6 +209,7 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
     location: { building_name: req.locations?.building_name ?? '—' },
   }}
   fullHref={`/requester/requests/${req.id}`}
+  variant="requester"
 />
         </div>
       ))}
@@ -238,14 +232,14 @@ export function RequestListClient({ initialData, initialFilters }: Props) {
 
 // ─── Empty state (without redundant clear button) ─────────────────────────────
 
-function EmptyState({ hasFilters, onClear }: { hasFilters: boolean; onClear: () => void }) {
+function EmptyState({ hasFilters }: { hasFilters: boolean }) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center shadow-inner">
-        <FileX className="h-6 w-6 text-slate-400 dark:text-slate-500" />
+      <div className="requester-tile w-14 h-14 rounded-2xl flex items-center justify-center">
+        <FileX className="h-6 w-6 text-slate-400 dark:text-white/45" />
       </div>
       <div>
-        <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+        <p className="text-sm font-medium text-slate-700 dark:text-white/80">
           {hasFilters ? 'No requests match your filters' : 'No requests yet'}
         </p>
         <p className="text-xs text-slate-400 mt-0.5">
@@ -290,7 +284,7 @@ function Pagination({
       <Button
         variant="outline"
         size="icon"
-        className="h-8 w-8 rounded-xl border-[#ADEBB3]/70 dark:border-emerald-800/60 bg-white/50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700"
+        className="h-8 w-8 rounded-xl border-[#ADEBB3]/70 dark:border-white/10 bg-white/70 dark:bg-white/[0.05] hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]"
         disabled={page <= 1 || isPending}
         onClick={() => onPageChange(page - 1)}
         aria-label="Previous page"
@@ -310,8 +304,8 @@ function Pagination({
             disabled={isPending}
             className={`h-8 w-8 rounded-xl text-xs font-medium transition-all duration-200 ${
               p === page
-                ? 'bg-[#ADEBB3] text-[#225c2b] shadow-md shadow-[#ADEBB3]/30'
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                ? 'bg-[#ADEBB3]/60 text-[#1e2c1f] border border-[#ADEBB3]/70'
+                : 'text-slate-600 dark:text-white/60 hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]'
             }`}
           >
             {p}
@@ -322,7 +316,7 @@ function Pagination({
       <Button
         variant="outline"
         size="icon"
-        className="h-8 w-8 rounded-xl border-[#ADEBB3]/70 dark:border-emerald-800/60 bg-white/50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700"
+        className="h-8 w-8 rounded-xl border-[#ADEBB3]/70 dark:border-white/10 bg-white/70 dark:bg-white/[0.05] hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]"
         disabled={page >= totalPages || isPending}
         onClick={() => onPageChange(page + 1)}
         aria-label="Next page"
