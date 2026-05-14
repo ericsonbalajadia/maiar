@@ -1,9 +1,9 @@
-//components/requests/requests-table.tsx
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { StatusBadge } from "@/components/common/status-badge";
 import { Search, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface RequestRow {
   id: string;
@@ -250,11 +250,11 @@ export function RequestsTable({
               {requests.length === 0 && (
                 <div className="py-16 text-center text-gray-400">
                   No requests found. Adjust filters.
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
 
       {/* Pagination (sticky at bottom) */}

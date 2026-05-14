@@ -1,34 +1,38 @@
 // components/notifications/notification-page-content.tsx
-'use client';
+"use client";
 
-import { useState, useEffect, useTransition } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useState, useEffect, useTransition } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   CheckCheck, Wrench, ClipboardList, CheckCircle2, XCircle,
   AlertTriangle, Info, ExternalLink, Inbox,
   UserPlus,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   getNotificationsPage,
   markAllNotificationsRead,
   markNotificationRead,
   type NotificationRow,
-} from '@/actions/notifications/notifications.actions';
-import { useNotificationStore } from '@/stores/notification.store';
+} from "@/actions/notifications/notifications.actions";
+import { useNotificationStore } from "@/stores/notification.store";
 
 function relativeTime(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
-  if (mins < 1) return 'Just now';
+  if (mins < 1) return "Just now";
   if (mins < 60) return `${mins}m ago`;
   if (hours < 24) return `${hours}h ago`;
   if (days < 7) return `${days}d ago`;
-  return new Date(dateStr).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
+  return new Date(dateStr).toLocaleDateString("en-PH", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 const TYPE_META: Record<string, { icon: React.ElementType; label: string; color: string; bg: string; border: string }> = {
@@ -45,9 +49,9 @@ const TYPE_META: Record<string, { icon: React.ElementType; label: string; color:
 };
 
 const FILTER_OPTIONS = [
-  { value: 'all',    label: 'All' },
-  { value: 'unread', label: 'Unread' },
-  { value: 'read',   label: 'Read' },
+  { value: "all", label: "All" },
+  { value: "unread", label: "Unread" },
+  { value: "read", label: "Read" },
 ];
 
 function NotifCard({
@@ -59,31 +63,31 @@ function NotifCard({
   pathname: string;
   onRead: (id: string) => void;
 }) {
-  const meta = TYPE_META[notif.type] ?? TYPE_META['system'];
+  const meta = TYPE_META[notif.type] ?? TYPE_META["system"];
   const Icon = meta.icon;
   const isUnread = notif.read_at === null;
   const isRequester = pathname.startsWith('/requester');
 
   // Build href based on notification type and user role
   let href: string | null = null;
-  if (notif.type === 'new_user_registered') {
-    if (pathname.startsWith('/admin')) {
-      href = '/admin/users/pending';
-    } else if (pathname.startsWith('/clerk')) {
-      href = '/clerk/account-requests';
-    } else if (pathname.startsWith('/supervisor')) {
-      href = '/supervisor/account-requests'; // or any appropriate page
+  if (notif.type === "new_user_registered") {
+    if (pathname.startsWith("/admin")) {
+      href = "/admin/users/pending";
+    } else if (pathname.startsWith("/clerk")) {
+      href = "/clerk/account-requests";
+    } else if (pathname.startsWith("/supervisor")) {
+      href = "/supervisor/account-requests"; // or any appropriate page
     } else {
-      href = '/';
+      href = "/";
     }
   } else if (notif.request_id) {
-    if (pathname.startsWith('/clerk')) {
+    if (pathname.startsWith("/clerk")) {
       href = `/clerk/requests/${notif.request_id}`;
-    } else if (pathname.startsWith('/supervisor')) {
+    } else if (pathname.startsWith("/supervisor")) {
       href = `/supervisor/requests/${notif.request_id}`;
-    } else if (pathname.startsWith('/technician')) {
+    } else if (pathname.startsWith("/technician")) {
       href = `/technician/requests/${notif.request_id}`;
-    } else if (pathname.startsWith('/admin')) {
+    } else if (pathname.startsWith("/admin")) {
       href = `/admin/requests/${notif.request_id}`;
     } else {
       href = `/requester/requests/${notif.request_id}`;
@@ -97,7 +101,7 @@ function NotifCard({
   const inner = (
     <div
       className={cn(
-        'group relative rounded-xl border transition-all duration-200',
+        "group relative rounded-xl border transition-all duration-200",
         isUnread
           ? `${isRequester ? 'border-[#ADEBB3]/70 dark:border-white/10' : meta.border} ${meta.bg} hover:shadow-sm`
           : isRequester
@@ -107,7 +111,9 @@ function NotifCard({
       onClick={handleClick}
     >
       {isUnread && (
-        <div className={`absolute left-0 top-3 bottom-3 w-0.5 rounded-full ${meta.color.replace('text-', 'bg-')} opacity-60`} />
+        <div
+          className={`absolute left-0 top-3 bottom-3 w-0.5 rounded-full ${meta.color.replace("text-", "bg-")} opacity-60`}
+        />
       )}
 
       <div className="flex items-start gap-3 p-4">
@@ -123,12 +129,22 @@ function NotifCard({
               <span className="text-xs text-slate-400 dark:text-white/45 whitespace-nowrap">
                 {relativeTime(notif.created_at)}
               </span>
-              {isUnread && <div className="w-2 h-2 rounded-full bg-blue-500 shadow-sm shadow-blue-500/50" />}
+              {isUnread && (
+                <div className="w-2 h-2 rounded-full bg-blue-500 shadow-sm shadow-blue-500/50" />
+              )}
             </div>
           </div>
           <p className="text-sm text-slate-500 dark:text-white/60 mt-1 leading-relaxed">{notif.message}</p>
           <div className="flex items-center gap-3 mt-2.5 flex-wrap">
-            <span className={cn('text-[11px] font-semibold px-2 py-0.5 rounded-full', meta.bg, meta.color)}>{meta.label}</span>
+            <span
+              className={cn(
+                "text-[11px] font-semibold px-2 py-0.5 rounded-full",
+                meta.bg,
+                meta.color,
+              )}
+            >
+              {meta.label}
+            </span>
             {notif.requests?.ticket_number && href && (
               <Link
                 href={href}
@@ -151,7 +167,11 @@ function NotifCard({
   );
 
   if (href) {
-    return <Link href={href} className="block">{inner}</Link>;
+    return (
+      <Link href={href} className="block">
+        {inner}
+      </Link>
+    );
   }
   return inner;
 }
@@ -164,7 +184,7 @@ export function NotificationsPageContent() {
   const [notifications, setNotifications] = useState<NotificationRow[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all');
+  const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
   const [loading, setLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
 
@@ -180,13 +200,15 @@ export function NotificationsPageContent() {
     });
   };
 
-  useEffect(() => { load(page); }, [page]);
+  useEffect(() => {
+    load(page);
+  }, [page]);
 
   const handleMarkAll = () => {
     startTransition(async () => {
       await markAllNotificationsRead();
       setNotifications((prev) =>
-        prev.map((n) => ({ ...n, read_at: new Date().toISOString() }))
+        prev.map((n) => ({ ...n, read_at: new Date().toISOString() })),
       );
       setUnreadCount(0);
     });
@@ -196,16 +218,17 @@ export function NotificationsPageContent() {
     await markNotificationRead(id);
     setNotifications((prev) =>
       prev.map((n) =>
-        n.id === id ? { ...n, read_at: new Date().toISOString() } : n
-      )
+        n.id === id ? { ...n, read_at: new Date().toISOString() } : n,
+      ),
     );
-    const newUnreadCount = notifications.filter((n) => n.read_at === null).length - 1;
+    const newUnreadCount =
+      notifications.filter((n) => n.read_at === null).length - 1;
     setUnreadCount(Math.max(0, newUnreadCount));
   };
 
   const filtered = notifications.filter((n) => {
-    if (filter === 'unread') return n.read_at === null;
-    if (filter === 'read')   return n.read_at !== null;
+    if (filter === "unread") return n.read_at === null;
+    if (filter === "read") return n.read_at !== null;
     return true;
   });
 
@@ -234,7 +257,8 @@ export function NotificationsPageContent() {
           <button
             key={value}
             onClick={() => setFilter(value as typeof filter)}
-            className={cn('px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150',
+            className={cn(
+              "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150",
               filter === value
                 ? isRequester ? 'bg-white dark:bg-white/[0.05] text-[#1e2c1f] dark:text-emerald-300 shadow-sm border border-[#ADEBB3]/70 dark:border-white/10' : 'bg-white dark:bg-white/[0.05] text-slate-900 dark:text-white shadow-sm'
                 : 'text-slate-500 dark:text-white/60 hover:text-[#527255] dark:hover:text-[#527255]'
@@ -274,7 +298,12 @@ export function NotificationsPageContent() {
       ) : (
         <div className="space-y-2.5">
           {filtered.map((notif) => (
-            <NotifCard key={notif.id} notif={notif} pathname={pathname} onRead={handleMarkOne} />
+            <NotifCard
+              key={notif.id}
+              notif={notif}
+              pathname={pathname}
+              onRead={handleMarkOne}
+            />
           ))}
         </div>
       )}

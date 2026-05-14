@@ -1,56 +1,20 @@
-//app/(dashboard)/clerk/page.tsx
 import React, { Suspense } from "react";
 import { getRequestsForClerk } from "@/lib/queries/request.queries";
 import { RequestCard } from "@/components/requests/request-card";
-import { StatusUpdatePanel } from "@/components/clerk/status-update-panel";
-import { ClipboardCheck, Clock, Eye, InboxIcon, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Eye, InboxIcon } from "lucide-react";
 import Link from "next/link";
 import { ClerkDashboardSkeleton } from "./skeleton";
+import { ReviewQueueFilter } from "@/components/clerk/review-queue-filter";
 
-const DISPLAY_LIMIT = 2;
-
-// ─── Section header ───────────────────────────────────────────────────────────
-function SectionHeader({
-  label,
-  count,
-  countColor,
-  countBg,
-  icon: Icon,
-  iconColor,
-  iconBg,
-}: {
-  label: string;
-  count: number;
-  countColor: string;
-  countBg: string;
-  icon: React.ElementType;
-  iconColor: string;
-  iconBg: string;
-}) {
-  return (
-    <div className="flex items-center gap-3 mb-4">
-      <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}>
-        <Icon className={`h-4 w-4 ${iconColor}`} />
-      </div>
-      <h2 className="text-base font-bold text-slate-800 dark:text-white">{label}</h2>
-      <span
-        className={`inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-xs font-bold ${countBg} ${countColor}`}
-      >
-        {count}
-      </span>
-    </div>
-  );
-}
-
-// ─── Empty state ──────────────────────────────────────────────────────────────
-function EmptySection({ label }: { label: string }) {
+function EmptySection() {
   return (
     <div className="flex flex-col items-center justify-center py-10 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700/60 text-center">
       <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/[0.05] flex items-center justify-center mb-3">
         <InboxIcon className="h-5 w-5 text-slate-400" />
       </div>
       <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-        No {label.toLowerCase()} requests
+        No requests in review
       </p>
       <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
         All caught up.
@@ -59,11 +23,10 @@ function EmptySection({ label }: { label: string }) {
   );
 }
 
-// ─── Request card + status panel wrapped in glass card ────────────────────────
-function RequestCardWithActions({ request }: { request: any }) {
+function ReviewCard({ request }: { request: any }) {
   return (
     <div
-      className="rounded-2xl border border-white/60 dark:border-slate-700/60 overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
+      className="rounded-2xl border border-white/60 dark:border-slate-700/60 overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 relative z-0"
       style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
     >
       <RequestCard request={request} fullHref={`/clerk/requests/${request.id}/review`} />
@@ -78,16 +41,20 @@ function RequestCardWithActions({ request }: { request: any }) {
   );
 }
 
-// ─── Async content component ─────────────────────────────────────────────────
-async function ClerkDashboardContent() {
+interface Props {
+  searchParams: Promise<{ type?: string }>;
+}
+
+export default async function ClerkDashboardPage({ searchParams }: Props) {
+  const sp = await searchParams;
+  const typeFilter = sp.type === "rmr" || sp.type === "ppsr" ? sp.type : "all";
+
   const { data: requests } = await getRequestsForClerk();
 
-  const pending = requests?.filter((r) => r.status.status_name === "pending") ?? [];
-  const underReview = requests?.filter((r) => r.status.status_name === "under_review") ?? [];
-
-  const totalActive = pending.length + underReview.length;
-  const pendingToShow = pending.slice(0, DISPLAY_LIMIT);
-  const underReviewToShow = underReview.slice(0, DISPLAY_LIMIT);
+  let underReview = requests?.filter((r) => r.status.status_name === "under_review") ?? [];
+  if (typeFilter !== "all") {
+    underReview = underReview.filter((r) => r.request_type === typeFilter);
+  }
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto fade-in px-4 md:px-6">
@@ -99,7 +66,7 @@ async function ClerkDashboardContent() {
           </p>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Review Queue</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            Requests awaiting review — oldest first (FIFO)
+            Requests ready for review — oldest first
           </p>
         </div>
         <Link
@@ -121,43 +88,14 @@ async function ClerkDashboardContent() {
             <ClipboardCheck className="h-3.5 w-3.5" /> {underReview.length} under review
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Two‑column grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left column: Pending */}
-        <div>
-          <SectionHeader
-            label="Pending"
-            count={pending.length}
-            countBg="bg-amber-100 dark:bg-amber-900/40"
-            countColor="text-amber-700 dark:text-amber-300"
-            icon={Clock}
-            iconBg="bg-amber-50 dark:bg-amber-900/20"
-            iconColor="text-amber-500"
-          />
-          {pendingToShow.length > 0 ? (
-            <>
-              <div className="space-y-4">
-                {pendingToShow.map((r) => (
-                  <RequestCardWithActions key={r.id} request={r} />
-                ))}
-              </div>
-              {pending.length > DISPLAY_LIMIT && (
-                <div className="mt-4 flex justify-center">
-                  <Link
-                    href="/clerk/requests?status=pending"
-                    className="inline-flex items-center gap-1 text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
-                  >
-                    View all pending ({pending.length - DISPLAY_LIMIT} more)
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </div>
-              )}
-            </>
-          ) : (
-            <EmptySection label="Pending" />
-          )}
+      {/* Vertically scrollable list */}
+      {underReview.length > 0 ? (
+        <div className="max-h-[calc(100vh-280px)] overflow-y-auto custom-scrollbar space-y-4 pr-2 pb-6">
+          {underReview.map((r) => (
+            <ReviewCard key={r.id} request={r} />
+          ))}
         </div>
 
         {/* Right column: Under Review */}

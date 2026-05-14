@@ -123,6 +123,27 @@ const TYPE_META: Record<
     color: "text-slate-500",
     bg: "bg-slate-50 dark:bg-white/[0.04]",
   },
+
+  account_approved: {
+    icon: CheckCircle2,
+    color: "text-emerald-500",
+    bg: "bg-emerald-50 dark:bg-emerald-900/20",
+  },
+  account_rejected: {
+    icon: XCircle,
+    color: "text-rose-500",
+    bg: "bg-rose-50 dark:bg-rose-900/20",
+  },
+  user_account_approved: {
+    icon: UserPlus,
+    color: "text-blue-500",
+    bg: "bg-blue-50 dark:bg-blue-900/20",
+  },
+  user_account_rejected: {
+    icon: XCircle,
+    color: "text-slate-500",
+    bg: "bg-slate-50 dark:bg-slate-800/40",
+  },
 };
 
 function NotifItem({

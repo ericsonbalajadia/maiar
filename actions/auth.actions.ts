@@ -93,11 +93,12 @@ export async function registerUser(
       });
     }
 
-    // Send in-app notifications to all admins and clerks
+    // Send in-app notifications to all admins, clerks, and supervisors
     try {
       const adminIds = await getUserIdsByRole('admin');
       const clerkIds = await getUserIdsByRole('clerk');
-      const staffIds = [...adminIds, ...clerkIds];
+      const supervisorIds = await getUserIdsByRole('supervisor');
+      const staffIds = [...adminIds, ...clerkIds, ...supervisorIds];
 
       if (staffIds.length > 0) {
         await sendBulkNotification({
