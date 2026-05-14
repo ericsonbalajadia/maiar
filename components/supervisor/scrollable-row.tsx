@@ -25,7 +25,7 @@ function SectionHeader({
 }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+      <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-white/[0.05] flex items-center justify-center shrink-0">
         <Icon className="h-4 w-4 text-slate-600 dark:text-slate-300" />
       </div>
       <div className="flex-1 min-w-0">
@@ -46,7 +46,7 @@ function SectionHeader({
 function EmptySection({ text }: { text: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-10 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700/60 text-center">
-      <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
+      <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/[0.05] flex items-center justify-center mb-3">
         <InboxIcon className="h-5 w-5 text-slate-400" />
       </div>
       <p className="text-sm text-slate-500 dark:text-slate-400">{text}</p>
@@ -59,7 +59,6 @@ export function ScrollableRow({ items, sectionKey }: ScrollableRowProps) {
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
   const section = SECTIONS.find(s => s.key === sectionKey);
-  if (!section) return null;
 
   const checkScroll = () => {
     if (!scrollRef.current) return;
@@ -84,6 +83,8 @@ export function ScrollableRow({ items, sectionKey }: ScrollableRowProps) {
     return () => window.removeEventListener('resize', checkScroll);
   }, [items]);
 
+  if (!section) return null;
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
@@ -98,7 +99,7 @@ export function ScrollableRow({ items, sectionKey }: ScrollableRowProps) {
           {showLeftArrow && (
             <button
               onClick={() => scroll('left')}
-              className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors"
               aria-label="Scroll left"
             >
               <ChevronLeft className="h-5 w-5 text-slate-500" />
@@ -107,7 +108,7 @@ export function ScrollableRow({ items, sectionKey }: ScrollableRowProps) {
           {showRightArrow && (
             <button
               onClick={() => scroll('right')}
-              className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors"
               aria-label="Scroll right"
             >
               <ChevronRight className="h-5 w-5 text-slate-500" />
@@ -127,7 +128,7 @@ export function ScrollableRow({ items, sectionKey }: ScrollableRowProps) {
               className="w-80 shrink-0 fade-in"
               style={{ animationDelay: `${i * 50}ms` }}
             >
-              <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800/50 transition-all duration-200 hover:shadow-md">
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-white/[0.05] transition-all duration-200 hover:shadow-md">
                 <RequestCard request={r} fullHref={`/supervisor/requests/${r.id}`} hideStatus={true} />
               </div>
             </div>

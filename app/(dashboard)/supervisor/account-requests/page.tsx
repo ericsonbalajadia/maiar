@@ -19,15 +19,15 @@ type PendingStaff = {
 // ─── Config ───────────────────────────────────────────────────────────────────
 
 const ROLE_STYLES: Record<string, string> = {
-  technician: "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800/50",
+  technician: "bg-[#ADEBB3]/35 text-[#374e39] border-[#ADEBB3]/70 dark:bg-white/[0.06] dark:text-emerald-300 dark:border-white/10",
   supervisor: "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/30 dark:text-violet-300 dark:border-violet-800/50",
   clerk:      "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800/50",
-  staff:      "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800/50",
+  staff:      "bg-blue-50 text-blue-700 border-blue-200 dark:bg-white/[0.06] dark:text-blue-300 dark:border-blue-800/50",
 };
 
 const AVATAR_GRADIENTS = [
   "from-violet-500 to-purple-600",
-  "from-teal-400 to-emerald-600",
+  "from-[#8dc192] to-[#527255]",
   "from-blue-500 to-indigo-600",
   "from-orange-500 to-amber-600",
   "from-rose-500 to-pink-600",
@@ -52,12 +52,12 @@ function LoadingSkeleton() {
         >
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 animate-pulse shrink-0" />
           <div className="flex-1 space-y-2">
-            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full animate-pulse w-40" />
-            <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded-full animate-pulse w-56" />
+            <div className="h-4 bg-slate-200 dark:bg-white/[0.08] rounded-full animate-pulse w-40" />
+            <div className="h-3 bg-slate-100 dark:bg-white/[0.05] rounded-full animate-pulse w-56" />
           </div>
           <div className="flex gap-2 shrink-0">
-            <div className="h-8 w-20 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />
-            <div className="h-8 w-20 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />
+            <div className="h-8 w-20 bg-slate-100 dark:bg-white/[0.05] rounded-xl animate-pulse" />
+            <div className="h-8 w-20 bg-slate-100 dark:bg-white/[0.05] rounded-xl animate-pulse" />
           </div>
         </div>
       ))}
@@ -121,8 +121,8 @@ export default function SupervisorAccountRequestsPage() {
           className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-700/60 flex flex-col items-center justify-center py-16 text-center"
           style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
         >
-          <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mb-4">
-            <UserCheck className="h-7 w-7 text-emerald-500" />
+          <div className="w-14 h-14 rounded-2xl bg-[#ADEBB3]/35 dark:bg-white/[0.06] flex items-center justify-center mb-4">
+            <UserCheck className="h-7 w-7 text-[#527255]" />
           </div>
           <p className="text-base font-semibold text-slate-700 dark:text-slate-300">
             All registrations reviewed
@@ -138,7 +138,7 @@ export default function SupervisorAccountRequestsPage() {
             const gradient = getGradient(user.full_name);
             const roleStyle =
               ROLE_STYLES[user.role] ??
-              "bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800/40 dark:text-slate-400 dark:border-slate-700/50";
+              "bg-slate-50 text-slate-600 border-slate-200 dark:bg-white/[0.05] dark:text-slate-400 dark:border-slate-700/50";
             const roleDisplay =
               user.role.charAt(0).toUpperCase() + user.role.slice(1);
 
@@ -195,7 +195,7 @@ export default function SupervisorAccountRequestsPage() {
                         </span>
 
                         {user.department && (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded-full">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/[0.05] px-2 py-0.5 rounded-full">
                             <Building2 className="h-2.5 w-2.5" />
                             {user.department}
                           </span>
