@@ -17,7 +17,7 @@ interface Props {
 export function RequestTimeline({ history }: Props) {
   if (!history.length) {
     return (
-      <div className="rounded-lg border border-slate-200 bg-white p-6 text-center text-slate-500">
+      <div className="rounded-lg border border-[#ADEBB3]/70 bg-white p-6 text-center text-slate-500">
         No status history available.
       </div>
     );
@@ -37,13 +37,13 @@ export function RequestTimeline({ history }: Props) {
               <div className="relative pb-8">
                 {!isLast && (
                   <span
-                    className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-slate-200"
+                    className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-[#ADEBB3]/65"
                     aria-hidden="true"
                   />
                 )}
                 <div className="relative flex space-x-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-teal-50 ring-1 ring-teal-200">
-                    <div className="h-2 w-2 rounded-full bg-teal-600" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ADEBB3]/30 ring-1 ring-[#ADEBB3]/70">
+                    <div className="h-2 w-2 rounded-full bg-[#8dc192]" />
                   </div>
                   <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                     <div>
@@ -60,7 +60,7 @@ export function RequestTimeline({ history }: Props) {
                       </p>
                       {entry.change_reason && (
                         <p className="mt-0.5 text-xs text-slate-500 italic">
-                          "{entry.change_reason}"
+                          &quot;{entry.change_reason}&quot;
                         </p>
                       )}
                       <p className="mt-0.5 text-xs text-slate-400">
