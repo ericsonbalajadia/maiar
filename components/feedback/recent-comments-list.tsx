@@ -36,10 +36,10 @@ export function RecentCommentsList({ comments, pageSize = 5, basePath = "/superv
       {visibleComments.map((f, idx) => (
         <div
           key={idx}
-          className="rounded-xl border border-slate-100 dark:border-slate-800/60 bg-white/60 dark:bg-slate-800/30 p-4"
+          className="rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 bg-white/60 dark:bg-white/[0.04] p-4"
         >
           <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-            <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500">
+            <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-white/45">
               {f.request ? (
                 <Link
                   href={`${basePath}/${f.request.id}`} 
@@ -63,15 +63,15 @@ export function RecentCommentsList({ comments, pageSize = 5, basePath = "/superv
               )}
             </div>
             <div className="flex gap-2">
-              <span className="text-[11px] font-semibold bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800/50 px-2 py-0.5 rounded-full">
+              <span className="text-[11px] font-semibold bg-[#ADEBB3]/35 dark:bg-white/[0.06] text-[#1e2c1f] dark:text-emerald-300 border border-[#ADEBB3]/70 dark:border-white/10 px-2 py-0.5 rounded-full">
                 Service: {SERVICE_LABELS[f.service_satisfaction] ?? f.service_satisfaction}
               </span>
-              <span className="text-[11px] font-semibold bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/50 px-2 py-0.5 rounded-full">
+              <span className="text-[11px] font-semibold bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-[#ADEBB3]/70 dark:border-white/10 px-2 py-0.5 rounded-full">
                 Overall: {OVERALL_LABELS[f.overall_rating] ?? f.overall_rating}
               </span>
             </div>
           </div>
-          <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
+          <p className="text-sm text-slate-700 dark:text-white/80 leading-relaxed whitespace-pre-wrap">
             {f.comments}
           </p>
         </div>
@@ -81,7 +81,7 @@ export function RecentCommentsList({ comments, pageSize = 5, basePath = "/superv
         <div className="flex justify-center pt-2">
           <button
             onClick={loadMore}
-            className="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-[#527255] dark:text-emerald-300 border border-[#ADEBB3]/70 dark:border-white/10 rounded-xl hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] transition-colors"
           >
             Load more ({comments.length - visibleCount} remaining)
           </button>
