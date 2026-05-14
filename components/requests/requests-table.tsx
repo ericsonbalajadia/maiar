@@ -250,11 +250,11 @@ export function RequestsTable({
               {requests.length === 0 && (
                 <div className="py-16 text-center text-gray-400">
                   No requests found. Adjust filters.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Pagination (sticky at bottom) */}
