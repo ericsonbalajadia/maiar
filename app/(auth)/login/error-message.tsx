@@ -10,7 +10,7 @@ export function ErrorMessage() {
 
   if (verified === '1') {
     return (
-      <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md text-sm text-green-700">
+      <div className="mb-4 p-3 bg-[#ADEBB3]/35 border border-[#ADEBB3]/70 rounded-md text-sm text-[#374e39]">
         Your email has been successfully confirmed. Please log in to continue.
       </div>
     )
