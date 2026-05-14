@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
 
 export default {
   darkMode: ["class"],
@@ -16,6 +17,15 @@ export default {
         mono: ["var(--font-montserrat)", "sans-serif"],
       },
       colors: {
+        brand: {
+          50: "#ADEBB3",
+          100: "#8dc192",
+          200: "#6f9873",
+          300: "#527255",
+          400: "#374e39",
+          500: "#1e2c1f",
+          600: "#0b130b",
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
@@ -64,5 +74,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [animate],
 } satisfies Config;
