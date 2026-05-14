@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ImagePlus, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -82,18 +82,20 @@ export async function uploadRequestPhotos(requestId: string, files: File[]) {
 }
 
 export function SelectedPhotoGrid({ files, removable, disabled, onRemove }: SelectedPhotoGridProps) {
-  const previews = useMemo<PreviewPhoto[]>(() => {
-    return files.map((file) => ({
+  const [previews, setPreviews] = useState<PreviewPhoto[]>([]);
+
+  useEffect(() => {
+    const nextPreviews = files.map((file) => ({
       file,
       url: URL.createObjectURL(file),
     }));
-  }, [files]);
 
-  useEffect(() => {
+    setPreviews(nextPreviews);
+
     return () => {
-      previews.forEach((preview) => URL.revokeObjectURL(preview.url));
+      nextPreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
     };
-  }, [previews]);
+  }, [files]);
 
   if (previews.length === 0) return null;
 
