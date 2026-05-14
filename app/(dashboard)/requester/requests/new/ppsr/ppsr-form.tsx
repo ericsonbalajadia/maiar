@@ -454,7 +454,7 @@ if (ticketNumber && requestId) {
                 <Field label="Location" required error={errors.location_building}>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1.5">
                     <Input
-                      placeholder="Building name *"
+                      placeholder="Specific location *"
                       value={form.location_building}
                       onChange={(e) => set('location_building', e.target.value)}
                       className={cn(

@@ -441,7 +441,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1.5">
                     <div>
                       <Input
-                        placeholder="Building name *"
+                        placeholder="Specific location *"
                         value={form.location_building}
                         onChange={(e) => set('location_building', e.target.value)}
                         className={cn(
