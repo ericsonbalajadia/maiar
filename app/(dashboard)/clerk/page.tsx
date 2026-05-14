@@ -46,7 +46,7 @@ function SectionHeader({
 function EmptySection({ label }: { label: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-10 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700/60 text-center">
-      <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
+      <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/[0.05] flex items-center justify-center mb-3">
         <InboxIcon className="h-5 w-5 text-slate-400" />
       </div>
       <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
@@ -67,7 +67,7 @@ function RequestCardWithActions({ request }: { request: any }) {
       style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
     >
       <RequestCard request={request} fullHref={`/clerk/requests/${request.id}/review`} />
-      <div className="border-t border-slate-100/80 dark:border-slate-800/60 px-4 py-3 bg-slate-50/40 dark:bg-slate-900/20">
+      <div className="border-t border-slate-100/80 dark:border-slate-800/60 px-4 py-3 bg-slate-50/40 dark:bg-white/[0.04]">
         <StatusUpdatePanel
           requestId={request.id}
           currentStatus={request.status.status_name}
@@ -104,7 +104,7 @@ async function ClerkDashboardContent() {
         </div>
         <Link
           href="/clerk/requests"
-          className="inline-flex items-center gap-2 self-start rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-800"
+          className="inline-flex items-center gap-2 self-start rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-white/[0.04] dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-white/[0.08]"
         >
           <Eye className="h-4 w-4" />
           View All Requests
@@ -117,7 +117,7 @@ async function ClerkDashboardContent() {
           <div className="inline-flex items-center gap-2 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-800/40 px-3.5 py-2 text-sm font-semibold text-amber-700 dark:text-amber-300">
             <Clock className="h-3.5 w-3.5" /> {pending.length} pending
           </div>
-          <div className="inline-flex items-center gap-2 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200/60 dark:border-blue-800/40 px-3.5 py-2 text-sm font-semibold text-blue-700 dark:text-blue-300">
+          <div className="inline-flex items-center gap-2 rounded-xl bg-blue-50 dark:bg-white/[0.06] border border-blue-200/60 dark:border-blue-800/40 px-3.5 py-2 text-sm font-semibold text-blue-700 dark:text-blue-300">
             <ClipboardCheck className="h-3.5 w-3.5" /> {underReview.length} under review
           </div>
         </div>
@@ -165,10 +165,10 @@ async function ClerkDashboardContent() {
           <SectionHeader
             label="Under Review"
             count={underReview.length}
-            countBg="bg-blue-100 dark:bg-blue-900/40"
+            countBg="bg-blue-100 dark:bg-white/[0.06]"
             countColor="text-blue-700 dark:text-blue-300"
             icon={ClipboardCheck}
-            iconBg="bg-blue-50 dark:bg-blue-900/20"
+            iconBg="bg-blue-50 dark:bg-white/[0.06]"
             iconColor="text-blue-500"
           />
           {underReviewToShow.length > 0 ? (
