@@ -21,12 +21,6 @@ export default async function PpsrRequestPage() {
   if (!dbUser || dbUser.signup_status !== 'approved') redirect('/pending-approval')
   if (!isRequesterRole(dbUser.role)) redirect(getRoleDashboard(dbUser.role))
 
-  const { data: locations } = await supabase
-    .from('locations')
-    .select('*')
-    .eq('is_active', true)
-    .order('building_name')
-
   return (
     <div className="max-w-3xl mx-auto space-y-6 fade-in">
       {/* Back button */}
@@ -41,24 +35,24 @@ export default async function PpsrRequestPage() {
 
       {/* Glassmorphic header */}
       <div className="flex items-center gap-4">
-        <div className="w-11 h-11 bg-[#ADEBB3] rounded-2xl flex items-center justify-center shrink-0 shadow-md shadow-[#ADEBB3]/30">
-          <ClipboardList className="h-5 w-5 text-[#225c2b]" />
+        <div className="w-11 h-11 bg-[#8dc192] rounded-2xl flex items-center justify-center shrink-0 shadow-md shadow-[#ADEBB3]/35">
+          <ClipboardList className="h-5 w-5 text-[#1e2c1f]" />
         </div>
         <div className="flex-1 min-w-0">
           <h1 className="text-xl font-bold text-slate-900 dark:text-white">
             Physical Plant Service Request
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-slate-500 dark:text-white/60">
             Fill all steps to submit · FM-GSO-15
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <Link href="/requester/requests/new/rmr">
-            <span className="text-xs font-semibold border border-[#ADEBB3]/70 dark:border-emerald-800/60 text-slate-400 dark:text-slate-500 px-2.5 py-1 rounded-lg hover:border-[#ADEBB3] dark:hover:border-emerald-700 hover:text-[#2f7a3b] dark:hover:text-[#ADEBB3] transition-colors cursor-pointer">
+            <span className="text-xs font-semibold border border-[#ADEBB3]/70 dark:border-white/10 text-slate-400 dark:text-white/45 px-2.5 py-1 rounded-lg hover:border-[#ADEBB3]/70 dark:hover:border-[#ADEBB3]/80 hover:text-[#527255] dark:hover:text-emerald-300 transition-colors cursor-pointer">
               R&amp;M
             </span>
           </Link>
-          <span className="text-xs font-bold bg-[#ADEBB3] text-[#225c2b] px-2.5 py-1 rounded-lg shadow-sm">
+          <span className="text-xs font-bold bg-[#8dc192] text-[#0b130b] px-2.5 py-1 rounded-lg shadow-sm">
             PPSR
           </span>
         </div>

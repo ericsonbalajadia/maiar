@@ -5,9 +5,8 @@ import { useFormState, useFormStatus } from 'react-dom';
 import { useState } from 'react';
 import { createRequest } from '@/actions/request.actions';
 import { PpsrServiceDataForm } from '@/components/forms/PpsrServiceDataForm';
-import { REQUEST_TYPES } from '@/lib/constants/request-types';
-import { PPSR_SERVICE_TYPES, PPSR_SERVICE_LABELS } from '@/lib/constants/ppsr-service-types';
-import type { DbLocation, DbCategory, DbPriority } from '@/types/models';
+import { PPSR_SERVICE_TYPES, PPSR_SERVICE_LABELS, type PpsrServiceType } from '@/lib/constants/ppsr-service-types';
+import type { DbLocation, DbCategory } from '@/types/models';
 import type { ActionResult } from '@/lib/utils/errors';
 
 const INITIAL_STATE: ActionResult = { success: false, errors: {} };
@@ -18,7 +17,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="w-full rounded-lg bg-teal-600 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50 transition-colors"
+      className="w-full rounded-lg bg-[#6f9873] py-2.5 text-sm font-semibold text-white shadow-sm shadow-[#ADEBB3]/35 hover:bg-[#ADEBB3]/35 disabled:opacity-50 transition-colors"
     >
       {pending ? 'Submitting...' : 'Submit Request'}
     </button>
@@ -48,8 +47,8 @@ export function NewRequestForm({ locations, categories }: NewRequestFormProps) {
             onClick={() => setRequestType('rmr')}
             className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
               requestType === 'rmr'
-                ? 'border-[#ADEBB3] bg-[#ADEBB3]/25 text-[#225c2b]'
-                : 'border-[#ADEBB3]/70 bg-white text-slate-600 hover:bg-[#ADEBB3]/20'
+                ? 'border-[#ADEBB3] bg-[#ADEBB3]/30 text-[#1e2c1f]'
+                : 'border-[#ADEBB3]/70 bg-white text-slate-600 hover:bg-[#ADEBB3]/35'
             }`}
           >
             FM-GSO-09 – Repair & Maintenance
@@ -59,8 +58,8 @@ export function NewRequestForm({ locations, categories }: NewRequestFormProps) {
             onClick={() => setRequestType('ppsr')}
             className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
               requestType === 'ppsr'
-                ? 'border-[#ADEBB3] bg-[#ADEBB3]/25 text-[#225c2b]'
-                : 'border-[#ADEBB3]/70 bg-white text-slate-600 hover:bg-[#ADEBB3]/20'
+                ? 'border-[#ADEBB3] bg-[#ADEBB3]/30 text-[#1e2c1f]'
+                : 'border-[#ADEBB3]/70 bg-white text-slate-600 hover:bg-[#ADEBB3]/35'
             }`}
           >
             FM-GSO-15 – Physical Plant Service
@@ -154,7 +153,7 @@ export function NewRequestForm({ locations, categories }: NewRequestFormProps) {
           )}
 
           {/* Dynamic sub‑fields for the selected service type */}
-          {selectedPpsrType && <PpsrServiceDataForm serviceType={selectedPpsrType as any} />}
+          {selectedPpsrType && <PpsrServiceDataForm serviceType={selectedPpsrType as PpsrServiceType} />}
         </div>
       )}
 

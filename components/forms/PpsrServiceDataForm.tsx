@@ -36,7 +36,7 @@ export function PpsrServiceDataForm({ serviceType }: Props) {
                 type="checkbox"
                 name={name}
                 value="true"
-                className="h-4 w-4 rounded border-[#ADEBB3]/70 text-teal-600"
+                className="h-4 w-4 rounded border-[#ADEBB3]/70 text-[#1e2c1f]"
               />
               {label}
             </label>
