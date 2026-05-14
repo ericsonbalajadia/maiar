@@ -10,7 +10,6 @@ import {
   X,
   CheckCheck,
   ExternalLink,
-  Clock,
   Wrench,
   ClipboardList,
   CheckCircle2,
@@ -82,12 +81,12 @@ const TYPE_META: Record<
   request_submitted: {
     icon: ClipboardList,
     color: "text-blue-500",
-    bg: "bg-blue-50 dark:bg-blue-900/20",
+    bg: "bg-blue-50 dark:bg-white/[0.06]",
   },
   request_approved: {
     icon: CheckCircle2,
-    color: "text-emerald-500",
-    bg: "bg-emerald-50 dark:bg-emerald-900/20",
+    color: "text-[#527255]",
+    bg: "bg-[#ADEBB3]/35 dark:bg-white/[0.06]",
   },
   request_rejected: {
     icon: XCircle,
@@ -97,12 +96,12 @@ const TYPE_META: Record<
   technician_assigned: {
     icon: Wrench,
     color: "text-indigo-500",
-    bg: "bg-indigo-50 dark:bg-indigo-900/20",
+    bg: "bg-indigo-50 dark:bg-white/[0.06]",
   },
   status_updated: {
     icon: CheckCircle2,
-    color: "text-teal-500",
-    bg: "bg-teal-50 dark:bg-teal-900/20",
+    color: "text-[#527255]",
+    bg: "bg-[#ADEBB3]/35 dark:bg-white/[0.06]",
   },
   feedback_requested: {
     icon: AlertTriangle,
@@ -112,17 +111,17 @@ const TYPE_META: Record<
   system: {
     icon: Info,
     color: "text-slate-500",
-    bg: "bg-slate-50 dark:bg-slate-800/40",
+    bg: "bg-slate-50 dark:bg-white/[0.04]",
   },
   request_completed: {
     icon: CheckCircle2,
-    color: "text-teal-500",
-    bg: "bg-teal-50 dark:bg-teal-900/20",
+    color: "text-[#527255]",
+    bg: "bg-[#ADEBB3]/35 dark:bg-white/[0.06]",
   },
   request_cancelled: {
     icon: XCircle,
     color: "text-slate-500",
-    bg: "bg-slate-50 dark:bg-slate-800/40",
+    bg: "bg-slate-50 dark:bg-white/[0.04]",
   },
 };
 
@@ -167,11 +166,11 @@ function NotifItem({
       className={cn(
         "flex items-start gap-3 px-4 py-3 transition-colors duration-150 border-b last:border-0",
         isRequester
-          ? "border-[#ADEBB3]/35 dark:border-emerald-900/45"
-          : "border-slate-100/60 dark:border-slate-800/60",
+          ? "border-[#ADEBB3]/70 dark:border-white/10"
+          : "border-[#ADEBB3]/70 dark:border-white/10",
         notif.read_at === null
-          ? "bg-blue-50/40 dark:bg-blue-950/10 hover:bg-blue-50/70 dark:hover:bg-blue-950/20"
-          : "hover:bg-slate-50/60 dark:hover:bg-slate-800/30",
+          ? "bg-blue-50/40 dark:bg-white/[0.04] hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]"
+          : "hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]",
       )}
       onClick={handleClick}
     >
@@ -189,22 +188,22 @@ function NotifItem({
             "text-sm leading-snug truncate",
             notif.read_at === null
               ? "font-semibold text-slate-900 dark:text-white"
-              : "font-medium text-slate-700 dark:text-slate-300",
+              : "font-medium text-slate-700 dark:text-white/80",
           )}
         >
           {notif.subject}
         </p>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2 leading-relaxed">
+        <p className="text-xs text-slate-500 dark:text-white/60 mt-0.5 line-clamp-2 leading-relaxed">
           {notif.message}
         </p>
         <div className="flex items-center gap-2 mt-1.5">
-          <span className="text-[11px] text-slate-400 dark:text-slate-500">
+          <span className="text-[11px] text-slate-400 dark:text-white/45">
             {relativeTime(notif.created_at)}
           </span>
           {notif.requests?.ticket_number && (
             <>
               <span className="text-slate-200 dark:text-slate-700">·</span>
-              <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500 truncate">
+              <span className="text-[11px] font-mono text-slate-400 dark:text-white/45 truncate">
                 {notif.requests.ticket_number}
               </span>
             </>
@@ -226,7 +225,13 @@ function NotifItem({
   return inner;
 }
 
-export function NotificationBell() {
+export function NotificationBell({
+  className,
+  panelPlacement = "default",
+}: {
+  className?: string;
+  panelPlacement?: "default" | "sidebar";
+} = {}) {
   const count = useNotificationStore((s) => s.unreadCount);
   const setUnreadCount = useNotificationStore((s) => s.setUnreadCount);
   const pathname = usePathname();
@@ -304,13 +309,14 @@ export function NotificationBell() {
         className={cn(
           "relative w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-150",
           open
-            ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-            : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200",
+            ? "bg-blue-50 dark:bg-white/[0.06] text-blue-600 dark:text-blue-400"
+            : "text-slate-500 dark:text-white/60 hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] hover:text-[#527255] dark:hover:text-emerald-300",
+          className
         )}
       >
         <Bell className="h-4.5 w-4.5" />
         {count > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-4 min-w-4 px-0.5 items-center justify-center rounded-full bg-gradient-to-br from-rose-500 to-pink-600 text-[10px] font-bold text-white shadow-sm leading-none">
+          <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-gradient-to-br from-rose-500 to-pink-600 px-0.5 text-[10px] font-bold leading-none text-white shadow-sm">
             {count > 99 ? "99+" : count}
           </span>
         )}
@@ -326,26 +332,30 @@ export function NotificationBell() {
           <div
             ref={panelRef}
             className={cn(
-              "absolute right-0 top-full mt-2 z-50",
-              "w-[360px] max-w-[calc(100vw-1rem)]",
-              "rounded-2xl",
+              "absolute z-50",
+              panelPlacement === "sidebar"
+                ? "left-full top-0 ml-3 w-[340px] max-w-[calc(100vw-18rem)]"
+                : "right-0 top-full mt-2 w-[360px] max-w-[calc(100vw-1rem)]",
+              "rounded-xl",
               "shadow-2xl shadow-black/20 dark:shadow-black/40",
               "overflow-hidden",
-              "animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200",
+              panelPlacement === "sidebar"
+                ? "animate-in fade-in-0 zoom-in-95 slide-in-from-left-2 duration-200"
+                : "animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200",
             )}
             style={{
-              background: "var(--glass-sidebar)",
-              backdropFilter: "blur(16px)",
+              background: isRequester ? "var(--background)" : "var(--glass-sidebar)",
+              backdropFilter: isRequester ? "none" : "blur(16px)",
               border: isRequester ? "1px solid rgba(173, 235, 179, 0.65)" : "1px solid rgba(255, 255, 255, 0.2)",
             }}
           >
-            <div className={cn('flex items-center justify-between px-4 py-3 border-b bg-white/30 dark:bg-slate-900/30', isRequester ? 'border-[#ADEBB3]/55 dark:border-emerald-900/50' : 'border-white/20 dark:border-white/5')}>
+            <div className={cn('flex items-center justify-between px-4 py-3 border-b bg-white/30 dark:bg-white/[0.04]', isRequester ? 'border-[#ADEBB3]/70 dark:border-white/10' : 'border-[#ADEBB3]/70 dark:border-white/10')}>
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">
                   Notifications
                 </h3>
                 {unread.length > 0 && (
-                  <span className="text-[11px] font-bold bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 px-1.5 py-0.5 rounded-full">
+                  <span className="text-[11px] font-bold bg-blue-100 dark:bg-white/[0.06] text-blue-600 dark:text-blue-300 px-1.5 py-0.5 rounded-full">
                     {unread.length} new
                   </span>
                 )}
@@ -354,7 +364,7 @@ export function NotificationBell() {
                 {unread.length > 0 && (
                   <button
                     onClick={handleMarkAllRead}
-                    className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 px-2 py-1 rounded-lg hover:bg-blue-50/70 dark:hover:bg-blue-900/20 transition-colors"
+                    className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:text-[#527255] px-2 py-1 rounded-lg hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] transition-colors"
                   >
                     <CheckCheck className="h-3.5 w-3.5" />
                     Mark all read
@@ -362,7 +372,7 @@ export function NotificationBell() {
                 )}
                 <button
                   onClick={() => setOpen(false)}
-                  className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition-colors"
+                  className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:text-[#527255] hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] transition-colors"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -375,26 +385,26 @@ export function NotificationBell() {
                   {[...Array(4)].map((_, i) => (
                     <div
                       key={i}
-                      className={cn('flex items-start gap-3 px-4 py-3 border-b last:border-0', isRequester ? 'border-[#ADEBB3]/35 dark:border-emerald-900/45' : 'border-white/10 dark:border-white/5')}
+                      className={cn('flex items-start gap-3 px-4 py-3 border-b last:border-0', isRequester ? 'border-[#ADEBB3]/70 dark:border-white/10' : 'border-[#ADEBB3]/70 dark:border-white/10')}
                     >
-                      <div className="w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-slate-700/60 animate-pulse shrink-0" />
+                      <div className="w-8 h-8 rounded-lg bg-[#ADEBB3]/45 dark:bg-white/[0.07] animate-pulse shrink-0" />
                       <div className="flex-1 space-y-1.5">
-                        <div className="h-3.5 bg-slate-200/60 dark:bg-slate-700/60 rounded-full animate-pulse w-3/4" />
-                        <div className="h-3 bg-slate-100/60 dark:bg-slate-800/60 rounded-full animate-pulse w-full" />
-                        <div className="h-2.5 bg-slate-100/60 dark:bg-slate-800/60 rounded-full animate-pulse w-1/3" />
+                        <div className="h-3.5 bg-[#ADEBB3]/45 dark:bg-white/[0.07] rounded-full animate-pulse w-3/4" />
+                        <div className="h-3 bg-slate-100/60 dark:bg-white/[0.05] rounded-full animate-pulse w-full" />
+                        <div className="h-2.5 bg-slate-100/60 dark:bg-white/[0.05] rounded-full animate-pulse w-1/3" />
                       </div>
                     </div>
                   ))}
                 </div>
               ) : notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-100/50 dark:bg-slate-800/50 flex items-center justify-center mb-3">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-100/50 dark:bg-white/[0.05] flex items-center justify-center mb-3">
                     <Bell className="h-5 w-5 text-slate-400" />
                   </div>
-                  <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">
+                  <p className="text-sm font-semibold text-slate-600 dark:text-white/60">
                     All caught up!
                   </p>
-                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                  <p className="text-xs text-slate-400 dark:text-white/45 mt-1">
                     No notifications yet.
                   </p>
                 </div>
@@ -411,11 +421,11 @@ export function NotificationBell() {
             </div>
 
             {notifications.length > 0 && (
-              <div className={cn('px-4 py-2.5 border-t bg-slate-50/30 dark:bg-slate-900/30', isRequester ? 'border-[#ADEBB3]/55 dark:border-emerald-900/50' : 'border-white/20 dark:border-white/5')}>
+              <div className={cn('px-4 py-2.5 border-t bg-slate-50/30 dark:bg-white/[0.04]', isRequester ? 'border-[#ADEBB3]/70 dark:border-white/10' : 'border-[#ADEBB3]/70 dark:border-white/10')}>
                 <Link
                   href={allNotifsHref}
                   onClick={() => setOpen(false)}
-                  className="flex items-center justify-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 py-1 rounded-lg hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors w-full"
+                  className="flex items-center justify-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-[#527255] py-1 rounded-lg hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] transition-colors w-full"
                 >
                   View all notifications
                   <ExternalLink className="h-3 w-3" />
