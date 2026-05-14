@@ -39,7 +39,7 @@ export const STATUS_STYLES: Record<string, { bg: string; text: string; dot: stri
   approved:     { bg: 'bg-blue-100', text: 'text-blue-800', dot: 'bg-blue-500' },
   assigned:     { bg: 'bg-indigo-100', text: 'text-indigo-800', dot: 'bg-indigo-500' },
   in_progress:  { bg: 'bg-orange-100', text: 'text-orange-800', dot: 'bg-orange-500' },
-  completed:    { bg: 'bg-green-100', text: 'text-green-800', dot: 'bg-green-500' },
+  completed:    { bg: 'bg-[#ADEBB3]/45', text: 'text-[#1e2c1f]', dot: 'bg-[#ADEBB3]/350' },
   cancelled:    { bg: 'bg-red-100', text: 'text-red-800', dot: 'bg-red-500' },
   rejected:     { bg: 'bg-red-100', text: 'text-red-800', dot: 'bg-red-500' },
 };
@@ -51,6 +51,6 @@ export const STATUS_STYLES: Record<string, { bg: string; text: string; dot: stri
 export const PRIORITY_STYLES: Record<string, { bg: string; text: string }> = {
   emergency: { bg: 'bg-red-100', text: 'text-red-800' },
   high:      { bg: 'bg-amber-100', text: 'text-amber-800' },
-  normal:    { bg: 'bg-emerald-100', text: 'text-emerald-700' },
+  normal:    { bg: 'bg-[#ADEBB3]/45', text: 'text-[#374e39]' },
   low:       { bg: 'bg-slate-100', text: 'text-slate-600' },
 };

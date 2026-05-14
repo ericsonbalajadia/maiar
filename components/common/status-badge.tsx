@@ -35,9 +35,9 @@ interface StatusBadgeProps {
 export function StatusBadge({ status, className, compact = false }: StatusBadgeProps) {
   const normalizedStatus = status.toLowerCase().replace(/\s+/g, '_') as StatusType
   const style = BADGE_STYLES.status[normalizedStatus] ?? {
-    bg: 'bg-slate-100 dark:bg-slate-900/20',
+    bg: 'bg-slate-100 dark:bg-white/[0.04]',
     text: 'text-slate-600 dark:text-slate-400',
-    dot: 'bg-slate-400 dark:bg-slate-500',
+    dot: 'bg-slate-400 dark:bg-white/[0.08]',
   }
   const dotSize = compact ? BADGE_SIZING.dot.compact : BADGE_SIZING.dot.size
   const padding = compact ? BADGE_SIZING.compact : BADGE_SIZING.padding
@@ -78,7 +78,7 @@ interface PriorityBadgeProps {
 export function PriorityBadge({ level, className, compact = false }: PriorityBadgeProps) {
   const normalizedLevel = level.toLowerCase() as PriorityType
   const style = BADGE_STYLES.priority[normalizedLevel] ?? {
-    bg: 'bg-slate-100 dark:bg-slate-900/20',
+    bg: 'bg-slate-100 dark:bg-white/[0.04]',
     text: 'text-slate-600 dark:text-slate-400',
     border: 'border-slate-200 dark:border-slate-800',
   }
@@ -124,7 +124,7 @@ export function RequestTypeBadge({
 }: RequestTypeBadgeProps) {
   const normalizedType = type.toLowerCase() as RequestTypeType
   const style = BADGE_STYLES.requestType[normalizedType] ?? {
-    bg: 'bg-slate-50 dark:bg-slate-900/20',
+    bg: 'bg-slate-50 dark:bg-white/[0.04]',
     text: 'text-slate-700 dark:text-slate-400',
     border: 'border-slate-200 dark:border-slate-800',
     label: 'Unknown',
@@ -160,7 +160,7 @@ export function RequestTypeBadge({
 export function RoleBadge({ role, className, compact = false }: { role: string; className?: string; compact?: boolean }) {
   const normalizedRole = role.toLowerCase() as RoleType
   const style = BADGE_STYLES.role[normalizedRole] ?? {
-    bg: 'bg-slate-50 dark:bg-slate-900/20',
+    bg: 'bg-slate-50 dark:bg-white/[0.04]',
     text: 'text-slate-600 dark:text-slate-400',
     border: 'border-slate-200 dark:border-slate-800',
   }
@@ -198,7 +198,7 @@ export function SignupStatusBadge({
 }: { status: string; className?: string; compact?: boolean }) {
   const normalizedStatus = status.toLowerCase() as SignupStatusType
   const style = BADGE_STYLES.signupStatus[normalizedStatus] ?? {
-    bg: 'bg-slate-50 dark:bg-slate-900/20',
+    bg: 'bg-slate-50 dark:bg-white/[0.04]',
     text: 'text-slate-600 dark:text-slate-400',
     border: 'border-slate-200 dark:border-slate-800',
   }
