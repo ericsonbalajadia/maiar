@@ -23,10 +23,10 @@ export function CreateUserForm() {
 
   if (state.success) {
     return (
-      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center">
-        <CheckCircle2 className="h-8 w-8 text-emerald-600 mx-auto mb-2" />
-        <p className="text-base font-semibold text-emerald-800">User created successfully!</p>
-        <p className="text-sm text-emerald-600 mt-1">The user can now log in with the provided email and password.</p>
+      <div className="rounded-2xl border border-[#ADEBB3]/70 bg-[#ADEBB3]/35 p-6 text-center">
+        <CheckCircle2 className="h-8 w-8 text-[#527255] mx-auto mb-2" />
+        <p className="text-base font-semibold text-[#1e2c1f]">User created successfully!</p>
+        <p className="text-sm text-[#527255] mt-1">The user can now log in with the provided email and password.</p>
       </div>
     );
   }

@@ -57,10 +57,10 @@ export function RequestsTable({
   return (
     <div className="h-full flex flex-col gap-6">
       {/* Filter bar (glassmorphic) */}
-      <div className="rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md shadow-lg p-4 shrink-0">
+      <div className="rounded-2xl border border-[#ADEBB3]/70 bg-white/10 backdrop-blur-md shadow-lg p-4 shrink-0">
         <div className="flex flex-wrap gap-3 items-end">
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wide">
+            <label className="block text-xs font-semibold text-slate-600 dark:text-white/80 mb-1 uppercase tracking-wide">
               Search
             </label>
             <div className="relative">
@@ -72,19 +72,19 @@ export function RequestsTable({
                   e.key === "Enter" && setParam("search", e.currentTarget.value)
                 }
                 placeholder="Ticket # or title..."
-                className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all"
+                className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-[#8dc192]/50 focus:border-transparent transition-all"
               />
             </div>
           </div>
 
           <div className="w-40">
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wide">
+            <label className="block text-xs font-semibold text-slate-600 dark:text-white/80 mb-1 uppercase tracking-wide">
               Status
             </label>
             <select
               defaultValue={params.get("status") ?? ""}
               onChange={(e) => setParam("status", e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer"
+              className="w-full px-3 py-2 rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-[#8dc192]/50 appearance-none cursor-pointer"
             >
               <option value="">All</option>
               {[
@@ -104,13 +104,13 @@ export function RequestsTable({
           </div>
 
           <div className="w-40">
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wide">
+            <label className="block text-xs font-semibold text-slate-600 dark:text-white/80 mb-1 uppercase tracking-wide">
               Priority
             </label>
             <select
               defaultValue={params.get("priority") ?? ""}
               onChange={(e) => setParam("priority", e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer"
+              className="w-full px-3 py-2 rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-[#8dc192]/50 appearance-none cursor-pointer"
             >
               <option value="">All</option>
               {["emergency", "high", "normal", "low"].map((p) => (
@@ -122,13 +122,13 @@ export function RequestsTable({
           </div>
 
           <div className="w-32">
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wide">
+            <label className="block text-xs font-semibold text-slate-600 dark:text-white/80 mb-1 uppercase tracking-wide">
               Month
             </label>
             <select
               defaultValue={params.get("month") ?? ""}
               onChange={(e) => setParam("month", e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer"
+              className="w-full px-3 py-2 rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-[#8dc192]/50 appearance-none cursor-pointer"
             >
               <option value="">All</option>
               {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
@@ -142,13 +142,13 @@ export function RequestsTable({
           </div>
 
           <div className="w-32">
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wide">
+            <label className="block text-xs font-semibold text-slate-600 dark:text-white/80 mb-1 uppercase tracking-wide">
               Year
             </label>
             <select
               defaultValue={params.get("year") ?? ""}
               onChange={(e) => setParam("year", e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer"
+              className="w-full px-3 py-2 rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-[#8dc192]/50 appearance-none cursor-pointer"
             >
               <option value="">All</option>
               {Array.from(
@@ -165,7 +165,7 @@ export function RequestsTable({
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="h-10 px-4 text-sm text-slate-700 dark:text-slate-200 bg-white/40 dark:bg-slate-800/40 backdrop-blur-sm rounded-xl border border-slate-200/60 dark:border-slate-700/60 hover:bg-white/60 dark:hover:bg-slate-800/60 transition-all flex items-center gap-1"
+              className="h-10 px-4 text-sm text-slate-700 dark:text-white/90 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] transition-all flex items-center gap-1"
             >
               <X className="w-4 h-4" />
               Clear
@@ -175,11 +175,11 @@ export function RequestsTable({
       </div>
 
       {/* Table container (scrolls) */}
-      <div className="flex-1 min-h-0 rounded-2xl border border-white/10 bg-white/10 backdrop-blur-md shadow-lg flex flex-col overflow-hidden">
+      <div className="flex-1 min-h-0 rounded-2xl border border-[#ADEBB3]/70 bg-white/10 backdrop-blur-md shadow-lg flex flex-col overflow-hidden">
         <div className="flex-1 overflow-auto">
           <div className="min-w-[800px]">
             {/* Header */}
-            <div className="sticky top-0 z-10 backdrop-blur-sm bg-white/80 dark:bg-gray-900/10 border-b px-4 py-3 grid grid-cols-12 text-sm font-bold text-white dark:text-white-600">
+            <div className="sticky top-0 z-10 backdrop-blur-sm bg-white/80 dark:bg-white/[0.05] border-b border-[#ADEBB3]/70 dark:border-white/10 px-4 py-3 grid grid-cols-12 text-sm font-bold text-[#1e2c1f] dark:text-white">
               <div className="col-span-2">Ticket</div>
               <div className="col-span-4">Request</div>
               <div className="col-span-2">Requester</div>
@@ -189,7 +189,7 @@ export function RequestsTable({
             </div>
 
             {/* Rows */}
-            <div className="divide-y divide-white/10">
+            <div className="divide-y divide-[#ADEBB3]/45 dark:divide-[#ADEBB3]/30">
               {requests.map((r) => (
                 <div
                   key={r.id}
@@ -200,10 +200,10 @@ export function RequestsTable({
                       : `${detailBasePath}/${r.id}`;
                     router.push(targetPath);
                   }}
-                  className="grid grid-cols-12 px-4 py-3 items-center cursor-pointer transition-all duration-200 hover:bg-white/10 hover:backdrop-blur-md group"
+                  className="grid grid-cols-12 px-4 py-3 items-center cursor-pointer transition-all duration-200 hover:bg-[#ADEBB3]/35 hover:backdrop-blur-md group"
                 >
                   <div className="col-span-2">
-                    <p className="font-mono text-xs text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-200">
+                    <p className="font-mono text-xs text-gray-500 group-hover:text-[#527255] dark:group-hover:text-emerald-300">
                       {r.ticket_number}
                     </p>
                   </div>
@@ -263,7 +263,7 @@ export function RequestsTable({
           <button
             onClick={() => setParam("page", String(currentPage - 1))}
             disabled={currentPage === 1}
-            className="px-3 py-1 text-sm rounded-lg border border-slate-200/60 dark:border-slate-700/60 bg-white/40 dark:bg-slate-800/40 backdrop-blur-sm hover:bg-white/60 dark:hover:bg-slate-800/60 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1 text-sm rounded-lg border border-[#ADEBB3]/70 dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Previous
           </button>
@@ -299,8 +299,8 @@ export function RequestsTable({
                   onClick={() => setParam("page", String(pageNum))}
                   className={`px-3 py-1 text-sm rounded-lg border ${
                     pageNum === currentPage
-                      ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                      : "border-slate-200/60 dark:border-slate-700/60 bg-white/40 dark:bg-slate-800/40 backdrop-blur-sm hover:bg-white/60 dark:hover:bg-slate-800/60"
+                      ? "bg-[#527255] text-white border-[#ADEBB3]/70 shadow-sm"
+                      : "border-[#ADEBB3]/70 dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]"
                   } transition-all`}
                 >
                   {pageNum}
@@ -311,7 +311,7 @@ export function RequestsTable({
           <button
             onClick={() => setParam("page", String(currentPage + 1))}
             disabled={currentPage === totalPages}
-            className="px-3 py-1 text-sm rounded-lg border border-slate-200/60 dark:border-slate-700/60 bg-white/40 dark:bg-slate-800/40 backdrop-blur-sm hover:bg-white/60 dark:hover:bg-slate-800/60 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1 text-sm rounded-lg border border-[#ADEBB3]/70 dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
           </button>

@@ -15,7 +15,7 @@ const roleColorMap: Record<string, string> = {
   student: "bg-blue-100 text-blue-700",
   staff: "bg-indigo-100 text-indigo-700",
   clerk: "bg-amber-100 text-amber-700",
-  technician: "bg-teal-100 text-teal-700",
+  technician: "bg-[#ADEBB3]/45 text-[#374e39]",
   supervisor: "bg-violet-100 text-violet-700",
   admin: "bg-rose-100 text-rose-700",
 };
