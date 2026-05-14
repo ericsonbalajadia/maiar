@@ -31,14 +31,14 @@ export default async function AdminUsersPage() {
         <h1 className="text-2xl font-bold">User Management</h1>
         <Link
           href="/admin/users/create"
-          className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-800"
+          className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-white/[0.04] dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-white/[0.08]"
         >
           <Plus className="h-4 w-4" />
           Add User
         </Link>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-white/[0.04] overflow-hidden">
         <UserManagementTable users={users ?? []} />
       </div>
     </div>

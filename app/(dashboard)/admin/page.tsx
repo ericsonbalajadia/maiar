@@ -37,7 +37,7 @@ function StatCard({
 }) {
   const inner = (
     <div
-      className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 transition-all hover:shadow-md hover:-translate-y-0.5 fade-in flex flex-col h-full"
+      className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-white/[0.04] p-5 transition-all hover:shadow-md hover:-translate-y-0.5 fade-in flex flex-col h-full"
       style={{ animationDelay: `${delay}ms`, animationFillMode: "forwards", opacity: 0 }}
     >
       <div className="flex items-start justify-between flex-1">
@@ -75,7 +75,7 @@ function BacklogCard({
   icon: React.ElementType;
 }) {
   return (
-    <div className="flex items-center gap-3 p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-800/50">
+    <div className="flex items-center gap-3 p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-white/[0.05]">
       <div className={`p-1.5 rounded-lg shrink-0 ${color}`}>
         <Icon className="h-4 w-4 text-white" />
       </div>
@@ -107,7 +107,7 @@ function QuickAction({
   return (
     <Link
       href={href}
-      className="flex items-start gap-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 transition-all hover:shadow-md group"
+      className="flex items-start gap-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-white/[0.04] p-4 transition-all hover:shadow-md group"
     >
       <div className={`p-2 rounded-lg shrink-0 ${iconColor}`}>
         <Icon className="h-4 w-4 text-white" />
@@ -159,10 +159,10 @@ export default async function AdminPage() {
   const firstName = profile.full_name?.split(" ")[0] ?? "Admin";
 
   const roleColors: Record<string, string> = {
-    student: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
-    staff: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300",
+    student: "bg-blue-100 text-blue-700 dark:bg-white/[0.06] dark:text-blue-300",
+    staff: "bg-indigo-100 text-indigo-700 dark:bg-white/[0.06] dark:text-indigo-300",
     clerk: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
-    technician: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300",
+    technician: "bg-[#ADEBB3]/45 text-[#374e39] dark:bg-white/[0.06] dark:text-emerald-300",
     supervisor: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300",
     admin: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
   };
@@ -222,13 +222,13 @@ export default async function AdminPage() {
           label="Completed this month"
           value={b?.completed ?? 0}
           icon={CheckCircle2}
-          iconColor="bg-emerald-500"
-          valueColor="text-emerald-600 dark:text-emerald-400"
+          iconColor="bg-[#ADEBB3]/350"
+          valueColor="text-[#527255] dark:text-[#8dc192]"
         />
       </div>
 
       {/* Request Backlog (full width, horizontal row) */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-white/[0.04] overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -256,7 +256,7 @@ export default async function AdminPage() {
             <BacklogCard
               label="Approved"
               value={b?.approved ?? 0}
-              color="bg-teal-500"
+              color="bg-[#ADEBB3]/350"
               icon={CheckCircle2}
             />
             <BacklogCard
@@ -284,7 +284,7 @@ export default async function AdminPage() {
       {/* Three‑column layout: Users by Role / Quick Actions / Recent Registrations */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: Users by Role */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-white/[0.04] overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5 text-slate-500" />
@@ -312,7 +312,7 @@ export default async function AdminPage() {
                       <span className="font-medium capitalize text-slate-700 dark:text-slate-300">{role}</span>
                       <span className="font-semibold text-slate-800 dark:text-slate-200">{count}</span>
                     </div>
-                    <div className="mt-1.5 bg-slate-100 dark:bg-slate-800 rounded-full h-1.5">
+                    <div className="mt-1.5 bg-slate-100 dark:bg-white/[0.05] rounded-full h-1.5">
                       <div
                         className={`h-1.5 rounded-full transition-all ${colorClass}`}
                         style={{ width: `${pct}%` }}
@@ -326,7 +326,7 @@ export default async function AdminPage() {
         </div>
 
         {/* Middle: Quick Actions */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-white/[0.04] overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-5 w-5 text-slate-500" />
@@ -354,7 +354,7 @@ export default async function AdminPage() {
             <QuickAction
               href="/admin/analytics/feedback"
               icon={ClipboardList}
-              iconColor="bg-emerald-500"
+              iconColor="bg-[#ADEBB3]/350"
               label="Feedback Analytics"
               description="Service satisfaction and ratings"
             />
@@ -362,7 +362,7 @@ export default async function AdminPage() {
         </div>
 
         {/* Right: Recent Registrations */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-white/[0.04] overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -394,7 +394,7 @@ export default async function AdminPage() {
                       {user.full_name}
                     </p>
                     <div className="flex items-center gap-2 text-xs">
-                      <span className={`capitalize ${isPending ? "text-amber-500" : "text-emerald-500"}`}>
+                      <span className={`capitalize ${isPending ? "text-amber-500" : "text-[#527255]"}`}>
                         {user.signup_status}
                       </span>
                       <span className="text-slate-300 dark:text-slate-600">•</span>
