@@ -20,7 +20,6 @@ import { StatusTimeline, type StatusHistoryEntry } from "@/components/requests/s
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { STATUS_NAMES } from "@/lib/constants/statuses";
-import { AttachmentUploader } from "@/components/requests/attachment-uploader";
 import { AttachmentPreview } from "@/components/requests/attachment-preview";
 import {
   ChevronLeft,
@@ -516,13 +515,7 @@ async function RequestDetailContent({ id }: { id: string }) {
   const currentStatus = request.statuses?.status_name ?? 'pending';
 const canDelete = ['pending', 'under_review'].includes(currentStatus);
 
-// Compute total attachments size (same as before)
 const attachments = request.attachments ?? [];
-const totalAttachmentsSize = attachments.reduce((sum, a) => sum + (a.file_size || 0), 0);
-const canUpload = ['pending', 'under_review'].includes(currentStatusName);
-const uploadDisabledReason = canUpload 
-    ? undefined 
-    : 'Attachments can only be uploaded while the request is pending or under review.';
 
   return (
     <div className="space-y-5">
@@ -763,14 +756,6 @@ const uploadDisabledReason = canUpload
             canDelete={canDelete}
         />
     )}
-<div className="mt-4 pt-4 border-t">
-    <AttachmentUploader
-        requestId={id}
-        currentTotalSize={totalAttachmentsSize}
-        canUpload={canUpload}
-        disabledReason={uploadDisabledReason}
-    />
-</div>
 </div>
     </div>
   );
