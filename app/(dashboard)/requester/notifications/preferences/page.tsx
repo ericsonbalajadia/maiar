@@ -35,15 +35,15 @@ function PreferenceRow({
 }) {
   return (
     <div className={cn(
-      "flex items-start gap-3 rounded-xl border border-slate-200/60 dark:border-slate-700/60 p-4 transition-all",
-      "bg-white/60 dark:bg-slate-800/40 backdrop-blur-sm hover:bg-white/80 dark:hover:bg-slate-800/60"
+      "flex items-start gap-3 rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 p-4 transition-all",
+      "bg-white/60 dark:bg-white/[0.04] backdrop-blur-sm hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]"
     )}>
       <Checkbox id={id} name={id} defaultChecked={defaultChecked} className="mt-0.5" />
       <div className="grid gap-1.5 leading-none">
-        <Label htmlFor={id} className="text-sm font-medium text-slate-900 dark:text-slate-100">
+        <Label htmlFor={id} className="text-sm font-medium text-slate-900 dark:text-white">
           {label}
         </Label>
-        <p className="text-xs text-slate-500 dark:text-slate-400">{description}</p>
+        <p className="text-xs text-slate-500 dark:text-white/60">{description}</p>
       </div>
     </div>
   )
@@ -80,28 +80,28 @@ export default async function RequesterNotificationsPage({
   const prefs = dbUser as unknown as NotificationPreferences & { full_name: string }
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto fade-in">
+    <div className="space-y-8 max-w-3xl mx-auto fade-in">
       <div className="space-y-2">
-        <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+        <div className="flex items-center gap-2 text-[#527255] dark:text-emerald-300">
           <Bell className="h-4 w-4" />
           <p className="text-sm font-semibold uppercase tracking-widest">Notifications</p>
         </div>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
           Notification preferences
         </h1>
-        <p className="max-w-2xl text-sm text-slate-500 dark:text-slate-400">
+        <p className="max-w-2xl text-sm text-slate-500 dark:text-white/60">
           Control which request updates you receive by email or in-app. Status updates stay on by default so important request changes are never missed.
         </p>
       </div>
 
       {saved === '1' && (
-        <div className="rounded-xl border border-emerald-200/60 bg-emerald-50/80 dark:bg-emerald-950/30 backdrop-blur-sm px-4 py-3 text-sm text-emerald-800 dark:text-emerald-300">
+        <div className="rounded-xl border border-[#ADEBB3]/70 bg-[#ADEBB3]/35 dark:bg-white/[0.06] backdrop-blur-sm px-4 py-3 text-sm text-[#1e2c1f] dark:text-emerald-300">
           Your notification preferences were saved.
         </div>
       )}
 
       <form action={updateNotificationPreferences} className="space-y-6">
-        <Card className="border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/40 backdrop-blur-sm">
+        <Card className="border-[#ADEBB3]/70 dark:border-white/10 bg-white/60 dark:bg-white/[0.04] backdrop-blur-sm">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Mail className="h-5 w-5 text-slate-500" />
@@ -139,7 +139,7 @@ export default async function RequesterNotificationsPage({
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/40 backdrop-blur-sm">
+        <Card className="border-[#ADEBB3]/70 dark:border-white/10 bg-white/60 dark:bg-white/[0.04] backdrop-blur-sm">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Settings2 className="h-5 w-5 text-slate-500" />
@@ -166,7 +166,7 @@ export default async function RequesterNotificationsPage({
         </Card>
 
         <div className="flex justify-end">
-          <Button type="submit" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20">
+          <Button type="submit" className="bg-[#8dc192] text-[#0b130b] shadow-md shadow-[#ADEBB3]/35 hover:bg-[#ADEBB3]/35">
             Save preferences
           </Button>
         </div>

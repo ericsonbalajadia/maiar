@@ -1,8 +1,7 @@
 import Link from 'next/link'
 import { StatusBadge } from '@/components/common/status-badge'
-import { PriorityBadge } from '@/components/common/status-badge'
 import { RequestTypeBadge } from '@/components/common/status-badge'
-import { Calendar, MapPin, Hash } from 'lucide-react'
+import { Calendar, MapPin } from 'lucide-react'
 
 interface RequestCardProps {
   request: {
@@ -16,10 +15,11 @@ interface RequestCardProps {
     location: { building_name: string }
   }
   fullHref?: string;
+  variant?: 'default' | 'requester';
   hideStatus?: boolean; // new – hides the status badge when true
 }
 
-export function RequestCard({ request, fullHref, hideStatus = false }: RequestCardProps) {
+export function RequestCard({ request, fullHref, hideStatus = false, variant = 'default' }: RequestCardProps) {
   const formattedDate = new Date(request.created_at).toLocaleDateString('en-PH', {
     year: 'numeric',
     month: 'short',
@@ -27,24 +27,29 @@ export function RequestCard({ request, fullHref, hideStatus = false }: RequestCa
   })
 
   const linkHref = fullHref ? fullHref : `/clerk/requests/${request.id}/review`;
+  const isRequester = variant === 'requester'
 
   return (
     <Link href={linkHref} className="block">
       <div
-        className="group relative rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-blue-200 dark:hover:border-blue-800 hover:bg-white dark:hover:bg-slate-900"
+        className={
+          isRequester
+            ? "group relative rounded-[20px] border border-[#ADEBB3]/70 dark:border-white/10 bg-white/75 dark:bg-white/[0.05] backdrop-blur-sm p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#ADEBB3]/70 hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]"
+            : "group relative rounded-2xl border border-[#ADEBB3]/70 dark:border-white/10 bg-white/80 dark:bg-white/[0.05] backdrop-blur-sm p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-[#ADEBB3]/70 dark:hover:border-[#ADEBB3]/80 hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]"
+        }
       >
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-2 flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-mono text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+              <span className={isRequester ? "font-mono text-xs font-semibold text-[#527255] dark:text-emerald-300 bg-[#ADEBB3]/30 dark:bg-white/[0.06] px-2 py-0.5 rounded-md" : "font-mono text-xs font-semibold text-slate-500 dark:text-white/60 bg-slate-100 dark:bg-white/[0.05] px-2 py-0.5 rounded-md"}>
                 {request.ticket_number || 'N/A'}
               </span>
               <RequestTypeBadge type={request.request_type} />
             </div>
-            <h3 className="text-base font-semibold text-slate-800 dark:text-slate-100 line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+            <h3 className={isRequester ? "text-base font-semibold text-[#0b130b] dark:text-white line-clamp-1 group-hover:text-[#1e2c1f] dark:group-hover:text-emerald-300 transition-colors" : "text-base font-semibold text-slate-800 dark:text-white line-clamp-1 group-hover:text-[#527255] dark:group-hover:text-emerald-300 transition-colors"}>
               {request.title}
             </h3>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-white/60">
               <span className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
                 {formattedDate}
@@ -61,7 +66,7 @@ export function RequestCard({ request, fullHref, hideStatus = false }: RequestCa
             </div>
           )}
         </div>
-        <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-r from-blue-500/5 to-indigo-500/5" />
+        <div className={isRequester ? "absolute inset-0 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-[#ADEBB3]/15" : "absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-r from-blue-500/5 to-indigo-500/5"} />
       </div>
     </Link>
   )

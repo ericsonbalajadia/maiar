@@ -15,7 +15,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="w-full rounded-lg bg-teal-600 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50 transition-colors"
+      className="w-full rounded-lg bg-[#8dc192] py-2.5 text-sm font-semibold text-white hover:bg-[#6f9873] disabled:opacity-50 transition-colors"
     >
       {pending ? 'Submitting...' : 'Confirm'}
     </button>
@@ -52,7 +52,7 @@ export function AcceptanceForm({ requestId, assignmentId }: AcceptanceFormProps)
             name="acceptance_status"
             value="accepted"
             required
-            className="h-4 w-4 border-slate-300 text-teal-600"
+            className="h-4 w-4 border-slate-300 text-[#527255]"
           />
           <span className="text-sm text-slate-700">Accept</span>
         </label>
@@ -61,7 +61,7 @@ export function AcceptanceForm({ requestId, assignmentId }: AcceptanceFormProps)
             type="radio"
             name="acceptance_status"
             value="rejected"
-            className="h-4 w-4 border-slate-300 text-teal-600"
+            className="h-4 w-4 border-slate-300 text-[#527255]"
           />
           <span className="text-sm text-slate-700">Reject</span>
         </label>
@@ -78,7 +78,7 @@ export function AcceptanceForm({ requestId, assignmentId }: AcceptanceFormProps)
           id="notes"
           name="notes"
           rows={2}
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm resize-none focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm resize-none focus:border-[#8dc192] focus:outline-none focus:ring-1 focus:ring-[#ADEBB3]"
         />
       </div>
 

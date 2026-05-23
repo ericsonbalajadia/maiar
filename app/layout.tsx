@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Electrolize, Montserrat } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import "./globals.css";
@@ -14,10 +14,17 @@ export const metadata: Metadata = {
   description: "The fastest way to build apps with Next.js and Supabase",
 };
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   display: "swap",
   subsets: ["latin"],
+});
+
+const electrolize = Electrolize({
+  variable: "--font-electrolize",
+  display: "swap",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 export default function RootLayout({
@@ -27,7 +34,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} h-screen overflow-hidden`}>
+      <body
+        suppressHydrationWarning
+        className={`${montserrat.variable} ${electrolize.variable} h-screen overflow-hidden`}
+      >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
             <div className="h-full flex flex-col overflow-hidden">

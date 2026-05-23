@@ -40,19 +40,19 @@ const TRANSITION_CONFIG: Record<
     label: "Approve",
     icon: CheckCircle2,
     className:
-      "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-sm shadow-emerald-500/20 border-0",
+      "bg-gradient-to-r from-[#6f9873] to-[#6f9873] hover:from-[#527255] hover:to-[#527255] text-white shadow-sm shadow-[#ADEBB3]/35 border-0",
   },
   rejected: {
     label: "Reject",
     icon: XCircle,
     className:
-      "bg-white dark:bg-slate-800 border border-rose-200 dark:border-rose-800/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20",
+      "bg-white dark:bg-white/[0.05] border border-rose-200 dark:border-rose-800/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20",
   },
   cancelled: {
     label: "Cancel",
     icon: XCircle,
     className:
-      "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50",
+      "bg-white dark:bg-white/[0.05] border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/[0.1]",
   },
 };
 
@@ -113,7 +113,7 @@ export function StatusUpdatePanel({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
-            className="resize-none text-sm bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-amber-400 dark:focus:border-amber-500 focus:ring-2 focus:ring-amber-400/20 transition-all placeholder:text-slate-400"
+            className="resize-none text-sm bg-white/60 dark:bg-white/[0.05] border-slate-200 dark:border-slate-700 focus:border-amber-400 dark:focus:border-amber-500 focus:ring-2 focus:ring-amber-400/20 transition-all placeholder:text-slate-400"
           />
         </div>
       )}
@@ -153,7 +153,7 @@ export function StatusUpdatePanel({
           className={cn(
             "flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-xs font-medium transition-all",
             feedback.type === "success"
-              ? "bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300"
+              ? "bg-[#ADEBB3]/35 dark:bg-white/[0.06] border border-[#ADEBB3]/70 dark:border-white/10 text-[#374e39] dark:text-emerald-300"
               : "bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800/50 text-rose-600 dark:text-rose-400"
           )}
         >

@@ -5,9 +5,8 @@ import { useFormState, useFormStatus } from 'react-dom';
 import { useState } from 'react';
 import { createRequest } from '@/actions/request.actions';
 import { PpsrServiceDataForm } from '@/components/forms/PpsrServiceDataForm';
-import { REQUEST_TYPES } from '@/lib/constants/request-types';
-import { PPSR_SERVICE_TYPES, PPSR_SERVICE_LABELS } from '@/lib/constants/ppsr-service-types';
-import type { DbLocation, DbCategory, DbPriority } from '@/types/models';
+import { PPSR_SERVICE_TYPES, PPSR_SERVICE_LABELS, type PpsrServiceType } from '@/lib/constants/ppsr-service-types';
+import type { DbLocation, DbCategory } from '@/types/models';
 import type { ActionResult } from '@/lib/utils/errors';
 
 const INITIAL_STATE: ActionResult = { success: false, errors: {} };
@@ -18,7 +17,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="w-full rounded-lg bg-teal-600 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50 transition-colors"
+      className="w-full rounded-lg bg-[#6f9873] py-2.5 text-sm font-semibold text-white shadow-sm shadow-[#ADEBB3]/35 hover:bg-[#ADEBB3]/35 disabled:opacity-50 transition-colors"
     >
       {pending ? 'Submitting...' : 'Submit Request'}
     </button>
@@ -48,8 +47,8 @@ export function NewRequestForm({ locations, categories }: NewRequestFormProps) {
             onClick={() => setRequestType('rmr')}
             className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
               requestType === 'rmr'
-                ? 'border-teal-500 bg-teal-50 text-teal-700'
-                : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                ? 'border-[#ADEBB3] bg-[#ADEBB3]/30 text-[#1e2c1f]'
+                : 'border-[#ADEBB3]/70 bg-white text-slate-600 hover:bg-[#ADEBB3]/35'
             }`}
           >
             FM-GSO-09 – Repair & Maintenance
@@ -59,8 +58,8 @@ export function NewRequestForm({ locations, categories }: NewRequestFormProps) {
             onClick={() => setRequestType('ppsr')}
             className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
               requestType === 'ppsr'
-                ? 'border-teal-500 bg-teal-50 text-teal-700'
-                : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                ? 'border-[#ADEBB3] bg-[#ADEBB3]/30 text-[#1e2c1f]'
+                : 'border-[#ADEBB3]/70 bg-white text-slate-600 hover:bg-[#ADEBB3]/35'
             }`}
           >
             FM-GSO-15 – Physical Plant Service
@@ -79,7 +78,7 @@ export function NewRequestForm({ locations, categories }: NewRequestFormProps) {
           id="title"
           name="title"
           required
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+          className="mt-1 w-full rounded-md border border-[#ADEBB3]/70 px-3 py-2 text-sm focus:border-[#ADEBB3] focus:outline-none focus:ring-1 focus:ring-[#ADEBB3]"
         />
         {!state.success && state.errors?.title && (
           <p className="mt-1 text-xs text-red-600">{state.errors.title[0]}</p>
@@ -96,7 +95,7 @@ export function NewRequestForm({ locations, categories }: NewRequestFormProps) {
           name="description"
           rows={4}
           required
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm resize-none focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+          className="mt-1 w-full rounded-md border border-[#ADEBB3]/70 px-3 py-2 text-sm resize-none focus:border-[#ADEBB3] focus:outline-none focus:ring-1 focus:ring-[#ADEBB3]"
         />
         {!state.success && state.errors?.description && (
           <p className="mt-1 text-xs text-red-600">{state.errors.description[0]}</p>
@@ -113,7 +112,7 @@ export function NewRequestForm({ locations, categories }: NewRequestFormProps) {
             id="category_id"
             name="category_id"
             required
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+            className="mt-1 w-full rounded-md border border-[#ADEBB3]/70 px-3 py-2 text-sm focus:border-[#ADEBB3] focus:outline-none focus:ring-1 focus:ring-[#ADEBB3]"
           >
             <option value="">Select a category</option>
             {categories.map((cat) => (
@@ -140,7 +139,7 @@ export function NewRequestForm({ locations, categories }: NewRequestFormProps) {
             required
             value={selectedPpsrType}
             onChange={(e) => setSelectedPpsrType(e.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+            className="mt-1 w-full rounded-md border border-[#ADEBB3]/70 px-3 py-2 text-sm focus:border-[#ADEBB3] focus:outline-none focus:ring-1 focus:ring-[#ADEBB3]"
           >
             <option value="">Select a service type</option>
             {PPSR_SERVICE_TYPES.map((type) => (
@@ -154,7 +153,7 @@ export function NewRequestForm({ locations, categories }: NewRequestFormProps) {
           )}
 
           {/* Dynamic sub‑fields for the selected service type */}
-          {selectedPpsrType && <PpsrServiceDataForm serviceType={selectedPpsrType as any} />}
+          {selectedPpsrType && <PpsrServiceDataForm serviceType={selectedPpsrType as PpsrServiceType} />}
         </div>
       )}
 
@@ -167,7 +166,7 @@ export function NewRequestForm({ locations, categories }: NewRequestFormProps) {
           id="location_id"
           name="location_id"
           required
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+          className="mt-1 w-full rounded-md border border-[#ADEBB3]/70 px-3 py-2 text-sm focus:border-[#ADEBB3] focus:outline-none focus:ring-1 focus:ring-[#ADEBB3]"
         >
           <option value="">Select a location</option>
           {locations.map((loc) => (

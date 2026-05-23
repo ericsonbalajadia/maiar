@@ -48,7 +48,7 @@ export function AttachmentUploader({
     return (
       <div className="flex justify-end items-center mt-1">
         <div className="relative group">
-          <Info className="h-3.5 w-3.5 text-gray-300 hover:text-gray-400 transition-colors cursor-help" />
+          <Info className="h-3.5 w-3.5 text-gray-300 hover:text-[#527255] transition-colors cursor-help" />
           <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block z-10">
             <div className="bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
               {disabledReason || "Attachments can only be uploaded while the request is pending."}
@@ -157,7 +157,7 @@ export function AttachmentUploader({
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <label className="cursor-pointer inline-flex items-center gap-2 rounded-lg bg-teal-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-700 transition-colors">
+        <label className="cursor-pointer inline-flex items-center gap-2 rounded-lg bg-[#8dc192] px-3 py-1.5 text-sm font-medium text-[#0b130b] hover:bg-[#ADEBB3]/35 transition-colors">
           <Upload className="h-4 w-4" />
           Upload Attachment
           <input
@@ -171,7 +171,7 @@ export function AttachmentUploader({
 
         {/* Tooltip icon right after the button */}
         <div className="relative inline-block group">
-          <Info className="h-4 w-4 text-gray-400 hover:text-gray-500 transition-colors cursor-help" />
+          <Info className="h-4 w-4 text-gray-400 hover:text-[#527255] transition-colors cursor-help" />
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10 whitespace-nowrap">
             <div className="bg-gray-800 text-white text-xs rounded px-3 py-1.5 relative">
               Max 5 MB per file.<br />
@@ -186,7 +186,7 @@ export function AttachmentUploader({
           <div className="flex-1">
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
-                className="bg-teal-600 h-2 rounded-full transition-all duration-300"
+                className="bg-[#8dc192] h-2 rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -195,7 +195,7 @@ export function AttachmentUploader({
         )}
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
-      {success && <p className="text-sm text-green-600">Upload successful!</p>}
+      {success && <p className="text-sm text-[#527255]">Upload successful!</p>}
     </div>
   );
 }

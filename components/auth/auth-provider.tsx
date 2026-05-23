@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { User, AuthChangeEvent, Session } from '@supabase/supabase-js'
 import type { DbUser } from '@/types/models'
@@ -29,6 +29,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSupabase(client)
   }, [])
 
+  const fetchDbUser = useCallback(async (authId: string) => {
+    if (!supabase) return
+    const { data } = await supabase
+      .from('users')
+      .select('*')
+      .eq('auth_id', authId)
+      .single()
+    setDbUser(data)
+    setLoading(false)
+  }, [supabase])
+
   useEffect(() => {
     if (!supabase) return
 
@@ -52,18 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     )
 
     return () => subscription.unsubscribe()
-  }, [supabase])
-
-  async function fetchDbUser(authId: string) {
-    if (!supabase) return
-    const { data } = await supabase
-      .from('users')
-      .select('*')
-      .eq('auth_id', authId)
-      .single()
-    setDbUser(data)
-    setLoading(false)
-  }
+  }, [supabase, fetchDbUser])
 
   return (
     <AuthContext.Provider value={{ user, dbUser, loading }}>

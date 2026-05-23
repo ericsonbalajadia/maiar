@@ -66,7 +66,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
     student: "bg-blue-100 text-blue-700",
     staff: "bg-indigo-100 text-indigo-700",
     clerk: "bg-amber-100 text-amber-700",
-    technician: "bg-teal-100 text-teal-700",
+    technician: "bg-[#ADEBB3]/45 text-[#374e39]",
     supervisor: "bg-violet-100 text-violet-700",
     admin: "bg-rose-100 text-rose-700",
   };
@@ -125,7 +125,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
         </Link>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-white/[0.04] overflow-hidden">
         <div className="p-6 space-y-4">
           <div className="flex items-start gap-4">
             <div
@@ -148,7 +148,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
                 <span
                   className={`text-xs font-semibold px-2 py-1 rounded-full ${
                     user.signup_status === "approved"
-                      ? "bg-emerald-100 text-emerald-700"
+                      ? "bg-[#ADEBB3]/45 text-[#374e39]"
                       : "bg-amber-100 text-amber-700"
                   }`}
                 >
@@ -181,7 +181,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
 
       {/* Requests section (only for relevant roles) */}
       {showRequestTable && (
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-white/[0.04] overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
             <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
               {requestTitle}
@@ -203,7 +203,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
                   </div>
                 ) : (
                   <table className="w-full text-sm border-collapse">
-                    <thead className="sticky top-0 bg-white dark:bg-slate-900 z-10">
+                    <thead className="sticky top-0 bg-white dark:bg-white/[0.04] z-10">
                       <tr className="border-b border-slate-200 dark:border-slate-800">
                         <th className="px-4 py-2 text-left font-semibold text-slate-600 dark:text-slate-400">
                           Ticket
@@ -228,7 +228,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
                       {userRequests.map((req: any) => (
                         <tr
                           key={req.id}
-                          className="hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                          className="hover:bg-slate-50 dark:hover:bg-white/[0.08]"
                         >
                           <td className="px-4 py-2 font-mono text-xs">
                             <Link
@@ -266,7 +266,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
       )}
 
       {/* Administrative Actions */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-white/[0.04] p-6">
         <h2 className="text-base font-semibold mb-4">Administrative Actions</h2>
         <UserRoleForm
           userId={user.id}

@@ -38,7 +38,7 @@ function GlassSectionHeader({
   title: string;
 }) {
   return (
-    <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100/80 dark:border-slate-800/60 bg-white/30 dark:bg-slate-900/30">
+    <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100/80 dark:border-slate-800/60 bg-white/30 dark:bg-white/[0.04]">
       <div className={`w-7 h-7 rounded-lg flex items-center justify-center shadow-sm ${iconGradient}`}>
         <Icon className="h-3.5 w-3.5 text-white" />
       </div>
@@ -98,7 +98,7 @@ function RatingBar({
         <span className="text-xs font-bold text-slate-600 dark:text-slate-400">{star}</span>
         <span className="text-yellow-400 text-xs">★</span>
       </div>
-      <div className="flex-1 bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+      <div className="flex-1 bg-slate-100 dark:bg-white/[0.05] rounded-full h-2 overflow-hidden">
         <div
           className={`h-2 rounded-full transition-all duration-700 ${barColor}`}
           style={{ width: `${pct}%` }}
@@ -142,7 +142,7 @@ export default async function FeedbackAnalyticsPage() {
           className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-700/60 flex flex-col items-center justify-center py-16 text-center"
           style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
         >
-          <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4">
+          <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-white/[0.05] flex items-center justify-center mb-4">
             <Star className="h-7 w-7 text-slate-400" />
           </div>
           <p className="text-base font-semibold text-slate-600 dark:text-slate-400">No feedback yet</p>
@@ -204,7 +204,7 @@ export default async function FeedbackAnalyticsPage() {
         </div>
         <Link
           href="/admin/analytics/reports"
-          className="inline-flex items-center gap-1.5 self-start rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3.5 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm shrink-0"
+          className="inline-flex items-center gap-1.5 self-start rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-white/[0.05] px-3.5 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-white/[0.08] transition-all shadow-sm shrink-0"
         >
           ← Reports
         </Link>
@@ -216,7 +216,7 @@ export default async function FeedbackAnalyticsPage() {
           label="Avg. Service Satisfaction"
           value={serviceAvg}
           total={total}
-          gradient="bg-gradient-to-br from-teal-400 to-emerald-600"
+          gradient="bg-gradient-to-br from-[#8dc192] to-[#527255]"
           icon={Star}
         />
         <StatCard
@@ -233,13 +233,13 @@ export default async function FeedbackAnalyticsPage() {
         <GlassSection>
           <GlassSectionHeader
             icon={Star}
-            iconGradient="bg-gradient-to-br from-teal-400 to-emerald-600"
+            iconGradient="bg-gradient-to-br from-[#8dc192] to-[#527255]"
             title="Service Satisfaction"
           />
           <div className="p-5 space-y-3">
             {serviceDistribution.map((d) => (
               <RatingBar key={d.star} star={d.star} count={d.count} total={total}
-                barColor="bg-gradient-to-r from-teal-400 to-emerald-500" />
+                barColor="bg-gradient-to-r from-[#8dc192] to-[#6f9873]" />
             ))}
           </div>
         </GlassSection>
@@ -277,7 +277,7 @@ export default async function FeedbackAnalyticsPage() {
               </thead>
               <tbody className="divide-y divide-slate-50 dark:divide-slate-800/30">
                 {(byCategory as any[]).map((row, i) => (
-                  <tr key={row.category_name} className={i % 2 === 0 ? "" : "bg-slate-50/30 dark:bg-slate-800/10"}>
+                  <tr key={row.category_name} className={i % 2 === 0 ? "" : "bg-slate-50/30 dark:bg-white/[0.05]"}>
                     <td className="px-5 py-3 font-medium text-slate-700 dark:text-slate-300 capitalize">{row.category_name}</td>
                     <td className="px-5 py-3">
                       <span className="inline-flex items-center gap-1 font-semibold text-slate-800 dark:text-white">

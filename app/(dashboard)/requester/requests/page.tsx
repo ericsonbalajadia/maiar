@@ -7,7 +7,7 @@ import { getRoleDashboard, isRequesterRole } from '@/lib/rbac'
 import { getRequesterRequests } from '@/actions/request/request.actions'
 import { RequestListClient } from '@/components/requests/request-list-client'
 import { Skeleton } from '@/components/ui/skeleton'
-import { FileText, ListFilter } from 'lucide-react'
+import { ListFilter, Plus } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -87,33 +87,33 @@ export default async function RequesterRequestsPage({ searchParams }: PageProps)
   const page = Math.max(1, parseInt(sp.page ?? '1', 10))
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 fade-in">
+    <div className="max-w-3xl mx-auto space-y-6 fade-in">
       {/* Page header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-blue-500 dark:text-blue-400 mb-1">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#3f8f4a] dark:text-emerald-300 mb-1">
             My Requests
           </p>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">All Requests</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-sm text-slate-500 dark:text-white/60 mt-0.5">
             Track and manage all your submitted service requests.
           </p>
         </div>
         <Link
           href="/requester/requests/new"
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-500/20 transition-all duration-200 hover:-translate-y-0.5 shrink-0"
+          className="inline-flex items-center gap-2 rounded-lg border border-[#ADEBB3]/70 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-[#ADEBB3]/70 hover:bg-[#ADEBB3]/35 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/90 dark:hover:border-[#ADEBB3]/80 dark:hover:bg-white/[0.08] shrink-0"
         >
-          <FileText className="h-4 w-4" />
+          <Plus className="h-4 w-4" />
           New Request
         </Link>
       </div>
 
       {/* Filter info badge */}
       {(sp.status || sp.request_type || sp.date_from || sp.date_to) && (
-        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 rounded-xl px-3 py-2">
-          <ListFilter className="h-3.5 w-3.5 text-blue-400" />
+        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-white/60 bg-[#ADEBB3]/30 dark:bg-white/[0.06] border border-[#ADEBB3]/70 dark:border-white/10 rounded-xl px-3 py-2">
+          <ListFilter className="h-3.5 w-3.5 text-[#3f8f4a] dark:text-emerald-300" />
           Filters applied —{' '}
-          <Link href="/requester/requests" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">
+          <Link href="/requester/requests" className="text-[#527255] dark:text-emerald-300 hover:underline font-medium">
             Clear all
           </Link>
         </div>

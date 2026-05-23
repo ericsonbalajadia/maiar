@@ -66,7 +66,7 @@ export function StaffActionButtons({ userId, onSuccess }: StaffActionButtonsProp
             type="submit"
             size="sm"
             disabled={approvePending}
-            className="h-8 px-3 gap-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-sm shadow-emerald-500/20 border-0 text-xs font-semibold"
+            className="h-8 px-3 gap-1.5 bg-gradient-to-r from-[#6f9873] to-[#6f9873] hover:from-[#527255] hover:to-[#527255] text-white shadow-sm shadow-[#ADEBB3]/35 border-0 text-xs font-semibold"
           >
             {approvePending ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -86,7 +86,7 @@ export function StaffActionButtons({ userId, onSuccess }: StaffActionButtonsProp
           size="sm"
           disabled={rejectPending}
           onClick={() => setShowRejectDialog(true)}
-          className="h-8 px-3 gap-1.5 bg-white dark:bg-slate-800 border border-rose-200 dark:border-rose-800/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 shadow-sm text-xs font-semibold"
+          className="h-8 px-3 gap-1.5 bg-white dark:bg-white/[0.05] border border-rose-200 dark:border-rose-800/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 shadow-sm text-xs font-semibold"
         >
           {rejectPending ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -127,7 +127,7 @@ export function StaffActionButtons({ userId, onSuccess }: StaffActionButtonsProp
               placeholder="Reason for declining (optional)…"
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
-              className="min-h-[100px] resize-none bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20 transition-all text-sm placeholder:text-slate-400"
+              className="min-h-[100px] resize-none bg-white/60 dark:bg-white/[0.05] border-slate-200 dark:border-slate-700 focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20 transition-all text-sm placeholder:text-slate-400"
             />
             {rejectState.error && (
               <p className="text-xs text-rose-500 flex items-center gap-1">
