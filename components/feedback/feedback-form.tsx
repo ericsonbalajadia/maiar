@@ -32,7 +32,7 @@ function SubmitBtn() {
     <button
       type="submit"
       disabled={pending}
-      className="w-full rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-teal-500/20 hover:from-teal-600 hover:to-emerald-600 focus:outline-none focus:ring-2 focus:ring-teal-400/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+      className="w-full rounded-xl bg-[#8dc192] px-4 py-2.5 text-sm font-semibold text-[#0b130b] shadow-lg shadow-[#ADEBB3]/35 hover:bg-[#ADEBB3]/35 focus:outline-none focus:ring-2 focus:ring-[#ADEBB3]/40 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {pending ? 'Sending...' : 'Submit Feedback'}
     </button>
@@ -40,14 +40,14 @@ function SubmitBtn() {
 }
 
 export function FeedbackForm({ requestId }: { requestId: string }) {
-  if (!FEATURES.FEEDBACK_ENABLED) return null;
   const [state, action] = useActionState(submitFeedback, INITIAL);
+  if (!FEATURES.FEEDBACK_ENABLED) return null;
 
   if (state.success) {
     return (
-      <div className="rounded-xl backdrop-blur-md bg-white/30 border border-white/40 shadow-xl p-6 text-center">
-        <p className="text-base font-semibold text-green-800">Thank you for your feedback!</p>
-        <p className="mt-1 text-sm text-green-600">Your response has been recorded.</p>
+      <div className="rounded-xl backdrop-blur-md bg-white/30 border border-[#ADEBB3]/70 shadow-xl p-6 text-center">
+        <p className="text-base font-semibold text-[#1e2c1f]">Thank you for your feedback!</p>
+        <p className="mt-1 text-sm text-[#527255]">Your response has been recorded.</p>
       </div>
     );
   }
@@ -59,13 +59,13 @@ export function FeedbackForm({ requestId }: { requestId: string }) {
   };
 
   return (
-    <div className="rounded-2xl backdrop-blur-lg bg-white/20 border border-white/20 shadow-2xl p-6 space-y-5">
+    <div className="rounded-2xl backdrop-blur-lg bg-white/20 border border-[#ADEBB3]/70 shadow-2xl p-6 space-y-5">
       <form action={handleSubmit} className="space-y-5">
         <input type="hidden" name="request_id" value={requestId} />
 
         {/* Service satisfaction rating */}
         <div>
-          <label className="block text-sm text-white font-medium  mb-2">
+          <label className="block text-sm font-medium text-[#0b130b] dark:text-white mb-2">
             Service Satisfaction <span className="text-red-500">*</span>
           </label>
           <StarRating name="service_satisfaction" required labels={serviceLabels} />
@@ -76,7 +76,7 @@ export function FeedbackForm({ requestId }: { requestId: string }) {
 
         {/* Overall rating */}
         <div>
-          <label className="block text-sm text-white font-medium  mb-2">
+          <label className="block text-sm font-medium text-[#0b130b] dark:text-white mb-2">
             Overall Rating <span className="text-red-500">*</span>
           </label>
           <StarRating name="overall_rating" required labels={overallLabels} />
@@ -87,15 +87,15 @@ export function FeedbackForm({ requestId }: { requestId: string }) {
 
         {/* Comments */}
         <div>
-          <label className="block text-sm text-white font-medium mb-1">
+          <label className="block text-sm font-medium text-[#0b130b] dark:text-white mb-1">
             Comments <span className="ml-1 text-slate-500 font-normal">(optional)</span>
           </label>
           <textarea
             name="comments"
             rows={4}
             placeholder="Tell us about your experience..."
-            className="w-full rounded-xl bg-white/20 backdrop-blur-sm border border-white/50 px-4 py-3 text-sm text-slate-800 placeholder:text-slate-500 
-                       focus:bg-white/60 focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-400/30 
+            className="w-full rounded-xl bg-white/20 backdrop-blur-sm border border-[#ADEBB3]/70 px-4 py-3 text-sm text-slate-800 placeholder:text-slate-500 
+                       focus:bg-white/60 focus:border-[#ADEBB3] focus:outline-none focus:ring-2 focus:ring-[#ADEBB3]/35 
                        transition-all duration-200 resize-y"
           />
         </div>

@@ -73,7 +73,7 @@ export default async function ClerkAllRequestsPage({ searchParams }: Props) {
         </div>
         <Link
           href="/clerk"
-          className="inline-flex items-center gap-2 self-start rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3.5 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm shrink-0"
+          className="inline-flex items-center gap-2 self-start rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-white/[0.04] dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-white/[0.08] shrink-0"
         >
           <ClipboardList className="h-4 w-4" />
           Review Queue
@@ -82,7 +82,7 @@ export default async function ClerkAllRequestsPage({ searchParams }: Props) {
 
       {/* Main card (flex‑1, takes remaining height) */}
       <div
-        className="flex-1 min-h-0 rounded-2xl border border-white/60 dark:border-slate-700/60 shadow-sm flex flex-col bg-white/60 dark:bg-slate-800/40 backdrop-blur-sm"
+        className="flex-1 min-h-0 rounded-2xl border border-white/60 dark:border-slate-700/60 shadow-sm flex flex-col bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm"
       >
         {/* Card header */}
         <div className="flex items-center gap-2.5 px-5 py-4 border-b border-slate-100/80 dark:border-slate-800/60 shrink-0">

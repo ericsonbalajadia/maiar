@@ -67,8 +67,6 @@ function resolveChangedBy(entry: StatusHistoryEntry): string {
   return entry.changed_by_user?.full_name ?? 'System'
 }
 
-const TERMINAL = ['completed', 'cancelled']
-
 /**
  * StatusDot Component
  * Displays a colored dot with appropriate icon based on status.
@@ -145,7 +143,7 @@ function getStatusStyles(status: string): { bg: string; text: string } {
 export function StatusTimeline({ history }: Props) {
   if (!history || history.length === 0) {
     return (
-      <p className="text-sm text-slate-400 dark:text-slate-500 italic">No status history recorded yet.</p>
+      <p className="text-sm text-slate-400 dark:text-white/45 italic">No status history recorded yet.</p>
     )
   }
 
@@ -161,15 +159,13 @@ export function StatusTimeline({ history }: Props) {
         const oldStatus = resolveOldStatus(entry)
         const changedBy = resolveChangedBy(entry)
         const isLast = idx === sorted.length - 1
-        const isTerminal = TERMINAL.includes(newStatus.toLowerCase().replace(/\s+/g, '_'))
-
         return (
           <div key={entry.id} className="flex gap-4">
             {/* Left: dot + connector line */}
             <div className="flex flex-col items-center">
               <StatusDot status={newStatus} />
               {!isLast && (
-                <div className="w-px flex-1 bg-slate-200 dark:bg-slate-700 mt-1 mb-1 min-h-[1.5rem]" />
+                <div className="w-px flex-1 bg-[#ADEBB3]/65 dark:bg-white/[0.08] mt-1 mb-1 min-h-[1.5rem]" />
               )}
             </div>
 
@@ -191,24 +187,24 @@ export function StatusTimeline({ history }: Props) {
                     )
                   })()}
                   {oldStatus && (
-                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 mb-1">
+                    <p className="text-xs text-slate-400 dark:text-white/45 mt-1 mb-1">
                       from{' '}
                       <span className="italic">{statusLabel(oldStatus)}</span>
                     </p>
                   )}
                   {entry.change_reason && (
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm">
+                    <p className="text-xs text-slate-500 dark:text-white/60 mt-1 max-w-sm">
                       {entry.change_reason}
                     </p>
                   )}
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-xs text-slate-400 dark:text-slate-500">
+                  <p className="text-xs text-slate-400 dark:text-white/45">
                     {formatDateTime(entry.changed_at)}
                   </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 dark:text-white/60 mt-0.5">
                     by{' '}
-                    <span className="font-medium text-slate-600 dark:text-slate-300">
+                    <span className="font-medium text-slate-600 dark:text-white/80">
                       {changedBy}
                     </span>
                   </p>

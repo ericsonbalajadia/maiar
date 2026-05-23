@@ -34,7 +34,7 @@ export function ScheduleForm({
     <div className="space-y-4">
       <h3 className="text-base font-semibold">Set Schedule</h3>
       {state.success && (
-        <div className="rounded-md bg-green-50 border border-green-200 px-4 py-2 text-sm text-green-800">
+        <div className="rounded-md bg-[#ADEBB3]/35 border border-[#ADEBB3]/70 px-4 py-2 text-sm text-[#1e2c1f]">
           Schedule updated successfully.
         </div>
       )}
@@ -86,7 +86,7 @@ export function ScheduleForm({
           />
         </div>
         <div className="sm:col-span-2">
-          <Button type="submit" disabled={isPending} className="bg-teal-600 hover:bg-teal-700 text-white">
+          <Button type="submit" disabled={isPending} className="bg-[#8dc192] hover:bg-[#6f9873] text-white">
             {isPending
               ? "Saving..."
               : scheduledStart

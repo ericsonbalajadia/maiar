@@ -67,7 +67,7 @@ export default async function AdminRequestDetailPage({ params }: Props) {
       {/* Two‑column grid: Request Info + Work Details */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Request Information */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+        <div className="bg-white dark:bg-white/[0.04] border border-slate-200 dark:border-slate-800 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
             <User className="h-4 w-4 text-slate-400" />
             Request Information
@@ -93,7 +93,7 @@ export default async function AdminRequestDetailPage({ params }: Props) {
         </div>
 
         {/* Work Details */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+        <div className="bg-white dark:bg-white/[0.04] border border-slate-200 dark:border-slate-800 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
             <Wrench className="h-4 w-4 text-slate-400" />
             Work Details
@@ -105,14 +105,14 @@ export default async function AdminRequestDetailPage({ params }: Props) {
               </p>
               {request.request_type === 'rmr' ? (
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                  <CheckCircle2 className="h-4 w-4 text-[#527255] shrink-0" />
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
                     {request.categories?.category_name ?? '—'}
                   </span>
                 </div>
               ) : ppsr ? (
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                  <CheckCircle2 className="h-4 w-4 text-[#527255] shrink-0" />
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-300 capitalize">
                     {ppsr.service_type?.replace(/_/g, ' ') ?? '—'}
                   </span>
@@ -152,7 +152,7 @@ export default async function AdminRequestDetailPage({ params }: Props) {
 
       {/* Inspection Report (RMR only) */}
       {request.request_type === 'rmr' && rmr && (rmr.inspection_date || rmr.inspector_notes) && (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+        <div className="bg-white dark:bg-white/[0.04] border border-slate-200 dark:border-slate-800 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
             <Wrench className="h-4 w-4 text-slate-400" />
             Inspection Report
@@ -177,14 +177,14 @@ export default async function AdminRequestDetailPage({ params }: Props) {
 
       {/* Feedback Panel (only if completed) */}
       {isCompleted && (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+        <div className="bg-white dark:bg-white/[0.04] border border-slate-200 dark:border-slate-800 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">Requester Feedback</h3>
           <FeedbackPanel requestId={id} />
         </div>
       )}
 
       {/* Attachments (with admin delete permission) */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+      <div className="bg-white dark:bg-white/[0.04] border border-slate-200 dark:border-slate-800 rounded-xl p-5">
         <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
           <Paperclip className="h-4 w-4 text-slate-400" />
           Attachments
@@ -197,7 +197,7 @@ export default async function AdminRequestDetailPage({ params }: Props) {
       </div>
 
 {/* Status History Timeline */}
-<div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+<div className="bg-white dark:bg-white/[0.04] border border-slate-200 dark:border-slate-800 rounded-xl p-5">
   <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-5 flex items-center gap-2">
     <ClipboardList className="h-4 w-4 text-slate-400" />
     Status History

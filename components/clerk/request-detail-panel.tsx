@@ -76,7 +76,7 @@ function InfoCell({
 }) {
   return (
     <div className="flex items-start gap-3">
-      <div className="w-6 h-6 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 mt-0.5">
+      <div className="w-6 h-6 rounded-md bg-slate-100 dark:bg-white/[0.05] flex items-center justify-center shrink-0 mt-0.5">
         <Icon className="h-3 w-3 text-slate-500 dark:text-slate-400" />
       </div>
       <div className="min-w-0">
@@ -142,7 +142,7 @@ export function RequestDetailPanel({
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
         <div>
           <div className="flex items-center gap-2 flex-wrap mb-1">
-            <span className="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+            <span className="font-mono text-xs bg-slate-100 dark:bg-white/[0.05] px-2 py-0.5 rounded-md">
               {request.ticket_number}
             </span>
             <StatusBadge status={status} />
@@ -156,7 +156,7 @@ export function RequestDetailPanel({
       {/* Two‑column: Request Details + Timeline */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Left: Request Details */}
-        <div className="rounded-xl border p-5 bg-white/40 dark:bg-slate-900/40">
+        <div className="rounded-xl border p-5 bg-white/40 dark:bg-white/[0.04]">
           <SectionHeader
             icon={Tag}
             iconGradient="bg-gradient-to-br from-amber-400 to-orange-500"
@@ -172,7 +172,7 @@ export function RequestDetailPanel({
           {request.description && (
             <div className="mt-4">
               <p className="text-xs font-semibold text-slate-400 mb-1">Description</p>
-              <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 text-sm">
+              <div className="bg-slate-50 dark:bg-white/[0.05] rounded-lg p-3 text-sm">
                 {request.description}
               </div>
             </div>
@@ -180,7 +180,7 @@ export function RequestDetailPanel({
         </div>
 
         {/* Right: Timeline */}
-        <div className="rounded-xl border p-5 bg-white/40 dark:bg-slate-900/40">
+        <div className="rounded-xl border p-5 bg-white/40 dark:bg-white/[0.04]">
           <SectionHeader
             icon={History}
             iconGradient="bg-gradient-to-br from-slate-400 to-slate-600"
@@ -192,7 +192,7 @@ export function RequestDetailPanel({
 
       {/* Attachments (if any) – full width */}
       {attachments.length > 0 && (
-        <div className="rounded-xl border p-5 bg-white/40 dark:bg-slate-900/40 mb-6">
+        <div className="rounded-xl border p-5 bg-white/40 dark:bg-white/[0.04] mb-6">
           <SectionHeader
             icon={Paperclip}
             iconGradient="bg-gradient-to-br from-slate-500 to-slate-700"
@@ -200,7 +200,7 @@ export function RequestDetailPanel({
           />
           <div className="grid sm:grid-cols-2 gap-3">
             {attachments.map((a) => (
-              <div key={a.id} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 p-2 rounded-lg">
+              <div key={a.id} className="flex items-center gap-2 bg-slate-50 dark:bg-white/[0.05] p-2 rounded-lg">
                 <Paperclip className="h-4 w-4 text-slate-400" />
                 <span className="text-sm truncate">{a.file_name}</span>
               </div>
@@ -212,7 +212,7 @@ export function RequestDetailPanel({
       {/* Vertical stack of info cards (Requester, Technician, Review, Actions) */}
       <div className="space-y-4">
         {/* Requester card */}
-        <div className="rounded-xl border p-4 bg-white/40 dark:bg-slate-900/40">
+        <div className="rounded-xl border p-4 bg-white/40 dark:bg-white/[0.04]">
           <SectionHeader
             icon={User}
             iconGradient="bg-gradient-to-br from-blue-500 to-indigo-600"
@@ -226,10 +226,10 @@ export function RequestDetailPanel({
 
         {/* Technician card (if assigned) */}
         {request.assigned_technician && (
-          <div className="rounded-xl border p-4 bg-white/40 dark:bg-slate-900/40">
+          <div className="rounded-xl border p-4 bg-white/40 dark:bg-white/[0.04]">
             <SectionHeader
               icon={User}
-              iconGradient="bg-gradient-to-br from-teal-400 to-emerald-600"
+              iconGradient="bg-gradient-to-br from-[#8dc192] to-[#527255]"
               title="Technician"
             />
             <InfoGrid>
@@ -241,10 +241,10 @@ export function RequestDetailPanel({
 
         {/* Review card (if exists) */}
         {review && (
-          <div className="rounded-xl border p-4 bg-white/40 dark:bg-slate-900/40">
+          <div className="rounded-xl border p-4 bg-white/40 dark:bg-white/[0.04]">
             <SectionHeader
               icon={ClipboardCheck}
-              iconGradient="bg-gradient-to-br from-emerald-400 to-teal-600"
+              iconGradient="bg-gradient-to-br from-[#8dc192] to-[#6f9873]"
               title="Review"
             />
             <InfoGrid>
@@ -256,7 +256,7 @@ export function RequestDetailPanel({
 
         {/* Status Actions card (if applicable) */}
         {showStatusActions && (
-          <div className="rounded-xl border p-4 bg-white/40 dark:bg-slate-900/40">
+          <div className="rounded-xl border p-4 bg-white/40 dark:bg-white/[0.04]">
             <SectionHeader
               icon={CheckCircle2}
               iconGradient="bg-gradient-to-br from-amber-400 to-orange-500"

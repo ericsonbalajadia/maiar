@@ -28,7 +28,7 @@ export default async function CreateUserPage() {
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Create New User</h1>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-white/[0.04] p-6">
         <CreateUserForm />
       </div>
     </div>

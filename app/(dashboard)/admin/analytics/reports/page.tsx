@@ -33,7 +33,7 @@ function GlassSectionHeader({
   title: string;
 }) {
   return (
-    <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100/80 dark:border-slate-800/60 bg-white/30 dark:bg-slate-900/30">
+    <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100/80 dark:border-slate-800/60 bg-white/30 dark:bg-white/[0.04]">
       <div className={`w-7 h-7 rounded-lg flex items-center justify-center shadow-sm ${iconGradient}`}>
         <Icon className="h-3.5 w-3.5 text-white" />
       </div>
@@ -89,14 +89,14 @@ export default async function ReportsPage() {
       label: "Approved (Awaiting Assignment)",
       value: b?.approved ?? 0,
       icon: CheckCircle2,
-      bg: "bg-teal-50 dark:bg-teal-900/20 border-teal-200/60 dark:border-teal-800/40",
-      color: "text-teal-600 dark:text-teal-400",
+      bg: "bg-[#ADEBB3]/35 dark:bg-white/[0.06] border-[#ADEBB3]/60 dark:border-white/10",
+      color: "text-[#527255] dark:text-[#8dc192]",
     },
     {
       label: "Assigned",
       value: b?.assigned ?? 0,
       icon: Wrench,
-      bg: "bg-blue-50 dark:bg-blue-900/20 border-blue-200/60 dark:border-blue-800/40",
+      bg: "bg-blue-50 dark:bg-white/[0.06] border-blue-200/60 dark:border-blue-800/40",
       color: "text-blue-600 dark:text-blue-400",
     },
     {
@@ -110,21 +110,21 @@ export default async function ReportsPage() {
       label: "Completed",
       value: b?.completed ?? 0,
       icon: CheckCircle2,
-      bg: "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200/60 dark:border-emerald-800/40",
-      color: "text-emerald-600 dark:text-emerald-400",
+      bg: "bg-[#ADEBB3]/35 dark:bg-white/[0.06] border-[#ADEBB3]/60 dark:border-white/10",
+      color: "text-[#527255] dark:text-[#8dc192]",
     },
     {
       label: "Cancelled",
       value: b?.cancelled ?? 0,
       icon: XCircle,
-      bg: "bg-slate-50 dark:bg-slate-800/40 border-slate-200/60 dark:border-slate-700/50",
+      bg: "bg-slate-50 dark:bg-white/[0.05] border-slate-200/60 dark:border-slate-700/50",
       color: "text-slate-500 dark:text-slate-400",
     },
   ];
 
   const ROLE_COLORS: Record<string, string> = {
     student: "bg-blue-500", staff: "bg-indigo-500",
-    clerk: "bg-amber-500", technician: "bg-teal-500",
+    clerk: "bg-amber-500", technician: "bg-[#ADEBB3]/350",
     supervisor: "bg-violet-500", admin: "bg-rose-500",
   };
 
@@ -147,14 +147,14 @@ export default async function ReportsPage() {
         <div className="flex gap-2 self-start shrink-0">
           <Link
             href="/admin/analytics/feedback"
-            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3.5 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-white/[0.05] px-3.5 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-white/[0.08] transition-all shadow-sm"
           >
             <BarChart3 className="h-3.5 w-3.5" />
             Feedback Analytics
           </Link>
           <Link
             href="/admin"
-            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3.5 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-white/[0.05] px-3.5 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-white/[0.08] transition-all shadow-sm"
           >
             ← Dashboard
           </Link>
@@ -181,7 +181,7 @@ export default async function ReportsPage() {
       <GlassSection>
         <GlassSectionHeader
           icon={Wrench}
-          iconGradient="bg-gradient-to-br from-teal-400 to-emerald-600"
+          iconGradient="bg-gradient-to-br from-[#8dc192] to-[#527255]"
           title="Technician Workload Balance"
         />
         <div className="overflow-x-auto">
@@ -207,21 +207,21 @@ export default async function ReportsPage() {
                 {technicians.data.map((tech: any, i: number) => (
                   <tr
                     key={tech.id}
-                    className={i % 2 === 0 ? "" : "bg-slate-50/30 dark:bg-slate-800/10"}
+                    className={i % 2 === 0 ? "" : "bg-slate-50/30 dark:bg-white/[0.05]"}
                   >
                     <td className="px-5 py-3 font-medium text-slate-700 dark:text-slate-300">
                       {tech.name}
                     </td>
                     <td className="px-5 py-3">
-                      <span className="text-xs font-semibold bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800/50 px-2 py-0.5 rounded-full capitalize">
+                      <span className="text-xs font-semibold bg-[#ADEBB3]/35 dark:bg-white/[0.06] text-[#374e39] dark:text-emerald-300 border border-[#ADEBB3]/70 dark:border-white/10 px-2 py-0.5 rounded-full capitalize">
                         {tech.specialization}
                       </span>
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="flex-1 max-w-[120px] bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                        <div className="flex-1 max-w-[120px] bg-slate-100 dark:bg-white/[0.05] rounded-full h-1.5 overflow-hidden">
                           <div
-                            className="h-1.5 rounded-full bg-gradient-to-r from-teal-400 to-emerald-500"
+                            className="h-1.5 rounded-full bg-gradient-to-r from-[#8dc192] to-[#6f9873]"
                             style={{
                               width: `${Math.min(100, (tech.activeAssignments / 5) * 100)}%`,
                             }}
@@ -288,7 +288,7 @@ export default async function ReportsPage() {
 
         {/* Role breakdown */}
         <GlassSection>
-          <div className="flex items-center gap-2.5 px-4 py-3 border-b border-slate-100/80 dark:border-slate-800/60 bg-white/30 dark:bg-slate-900/30">
+          <div className="flex items-center gap-2.5 px-4 py-3 border-b border-slate-100/80 dark:border-slate-800/60 bg-white/30 dark:bg-white/[0.04]">
             <div className="w-6 h-6 rounded-md bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-sm">
               <Users className="h-3 w-3 text-white" />
             </div>
@@ -306,7 +306,7 @@ export default async function ReportsPage() {
                   <span className="text-xs font-medium text-slate-600 dark:text-slate-400 capitalize w-20 shrink-0">
                     {role}
                   </span>
-                  <div className="flex-1 bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                  <div className="flex-1 bg-slate-100 dark:bg-white/[0.05] rounded-full h-1.5 overflow-hidden">
                     <div className={`h-1.5 rounded-full ${color}`} style={{ width: `${pct}%` }} />
                   </div>
                   <span className="text-xs font-bold text-slate-700 dark:text-slate-300 w-5 text-right tabular-nums">

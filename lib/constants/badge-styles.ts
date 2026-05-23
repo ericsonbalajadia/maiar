@@ -53,10 +53,10 @@ export const BADGE_STYLES = {
       label: ' In Progress ',
     },
     completed: {
-      bg: 'bg-emerald-100 dark:bg-emerald-900/20',
-      text: 'text-emerald-800 dark:text-emerald-400',
-      dot: 'bg-emerald-500 dark:bg-emerald-400',
-      border: 'border-emerald-200 dark:border-emerald-800',
+      bg: 'bg-[#ADEBB3]/45 dark:bg-white/[0.06]',
+      text: 'text-[#1e2c1f] dark:text-[#8dc192]',
+      dot: 'bg-[#ADEBB3] dark:bg-[#8dc192]',
+      border: 'border-[#ADEBB3]/70 dark:border-white/10',
       label: '  Completed  ',
     },
     cancelled: {
@@ -96,9 +96,9 @@ export const BADGE_STYLES = {
       label: 'Clerk',
     },
     technician: {
-      bg: 'bg-emerald-50 dark:bg-emerald-900/20',
-      text: 'text-emerald-700 dark:text-emerald-400',
-      border: 'border-emerald-200 dark:border-emerald-800',
+      bg: 'bg-[#ADEBB3]/35 dark:bg-white/[0.06]',
+      text: 'text-[#374e39] dark:text-[#8dc192]',
+      border: 'border-[#ADEBB3]/70 dark:border-white/10',
       label: 'Technician',
     },
     supervisor: {
@@ -130,9 +130,9 @@ export const BADGE_STYLES = {
       label: 'High',
     },
     normal: {
-      bg: 'bg-emerald-100 dark:bg-emerald-900/20',
-      text: 'text-emerald-700 dark:text-emerald-400',
-      border: 'border-emerald-200 dark:border-emerald-800',
+      bg: 'bg-[#ADEBB3]/45 dark:bg-white/[0.06]',
+      text: 'text-[#374e39] dark:text-[#8dc192]',
+      border: 'border-[#ADEBB3]/70 dark:border-white/10',
       label: 'Normal',
     },
     low: {
@@ -170,9 +170,9 @@ export const BADGE_STYLES = {
       label: 'Pending',
     },
     approved: {
-      bg: 'bg-emerald-50 dark:bg-emerald-900/20',
-      text: 'text-emerald-700 dark:text-emerald-400',
-      border: 'border-emerald-200 dark:border-emerald-800',
+      bg: 'bg-[#ADEBB3]/35 dark:bg-white/[0.06]',
+      text: 'text-[#374e39] dark:text-[#8dc192]',
+      border: 'border-[#ADEBB3]/70 dark:border-white/10',
       label: 'Approved',
     },
     rejected: {
@@ -186,9 +186,9 @@ export const BADGE_STYLES = {
   // ─── TIMELINE COLORS (For StatusDot/Timeline Components) ───────────────────
   timeline: {
     completed: {
-      dot: 'bg-emerald-100 dark:bg-emerald-900/30',
-      border: 'border-emerald-400 dark:border-emerald-600',
-      icon: 'text-emerald-600 dark:text-emerald-400',
+      dot: 'bg-[#ADEBB3]/45 dark:bg-white/[0.06]',
+      border: 'border-[#8dc192] dark:border-white/10',
+      icon: 'text-[#527255] dark:text-[#8dc192]',
     },
     cancelled: {
       dot: 'bg-red-100 dark:bg-red-900/30',

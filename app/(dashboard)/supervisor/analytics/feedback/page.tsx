@@ -41,7 +41,7 @@ function GlassSectionHeader({
   title: string;
 }) {
   return (
-    <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100/80 dark:border-slate-800/60 bg-white/30 dark:bg-slate-900/30">
+    <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100/80 dark:border-slate-800/60 bg-white/30 dark:bg-white/[0.04]">
       <div
         className={`w-7 h-7 rounded-lg flex items-center justify-center shadow-sm ${iconGradient}`}
       >
@@ -121,7 +121,7 @@ function RatingBar({
         </span>
         <span className="text-yellow-400 text-xs">★</span>
       </div>
-      <div className="flex-1 bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+      <div className="flex-1 bg-slate-100 dark:bg-white/[0.05] rounded-full h-2 overflow-hidden">
         <div
           className={`h-2 rounded-full transition-all duration-700 ${barColor}`}
           style={{ width: `${pct}%` }}
@@ -170,7 +170,7 @@ export default async function SupervisorFeedbackAnalyticsPage() {
             backdropFilter: "blur(12px)",
           }}
         >
-          <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4">
+          <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-white/[0.05] flex items-center justify-center mb-4">
             <Star className="h-7 w-7 text-slate-400" />
           </div>
           <p className="text-base font-semibold text-slate-600 dark:text-slate-400">
@@ -247,7 +247,7 @@ export default async function SupervisorFeedbackAnalyticsPage() {
         </div>
         <Link
           href="/supervisor"
-          className="inline-flex items-center gap-2 self-start shrink-0 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3.5 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm"
+          className="inline-flex items-center gap-2 self-start shrink-0 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-white/[0.04] dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-white/[0.08]"
         >
           ← Dashboard
         </Link>
@@ -259,7 +259,7 @@ export default async function SupervisorFeedbackAnalyticsPage() {
           label="Avg. Service Satisfaction"
           value={serviceAvg}
           total={total}
-          gradient="bg-gradient-to-br from-teal-400 to-emerald-600"
+          gradient="bg-gradient-to-br from-[#8dc192] to-[#527255]"
           icon={Star}
         />
         <StatCard
@@ -340,7 +340,7 @@ export default async function SupervisorFeedbackAnalyticsPage() {
                   <tr
                     key={row.category_name}
                     className={
-                      i % 2 === 0 ? "" : "bg-slate-50/30 dark:bg-slate-800/10"
+                      i % 2 === 0 ? "" : "bg-slate-50/30 dark:bg-white/[0.05]"
                     }
                   >
                     <td className="px-5 py-3 font-medium text-slate-700 dark:text-slate-300 capitalize">
@@ -380,7 +380,7 @@ export default async function SupervisorFeedbackAnalyticsPage() {
               {commentsWithText.map((f, idx) => (
                 <div
                   key={idx}
-                  className="rounded-xl border border-slate-100 dark:border-slate-800/60 bg-white/60 dark:bg-slate-800/30 p-4"
+                  className="rounded-xl border border-slate-100 dark:border-slate-800/60 bg-white/60 dark:bg-white/[0.05] p-4"
                 >
                   {/* Comment meta */}
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
@@ -410,7 +410,7 @@ export default async function SupervisorFeedbackAnalyticsPage() {
                       )}
                     </div>
                     <div className="flex gap-2">
-                      <span className="text-[11px] font-semibold bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800/50 px-2 py-0.5 rounded-full">
+                      <span className="text-[11px] font-semibold bg-[#ADEBB3]/35 dark:bg-white/[0.06] text-[#374e39] dark:text-emerald-300 border border-[#ADEBB3]/70 dark:border-white/10 px-2 py-0.5 rounded-full">
                         Service:{" "}
                         {SERVICE_LABELS[f.service_satisfaction] ??
                           f.service_satisfaction}

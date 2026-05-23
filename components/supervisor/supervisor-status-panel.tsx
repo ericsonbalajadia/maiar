@@ -38,13 +38,13 @@ const TRANSITION_CONFIG: Record<
     label: "Mark Completed",
     icon: CheckCircle2,
     className:
-      "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-sm shadow-emerald-500/20 border-0",
+      "bg-gradient-to-r from-[#6f9873] to-[#6f9873] hover:from-[#527255] hover:to-[#527255] text-white shadow-sm shadow-[#ADEBB3]/35 border-0",
   },
   cancelled: {
     label: "Cancel Request",
     icon: XCircle,
     className:
-      "bg-white dark:bg-slate-800 border border-rose-200 dark:border-rose-800/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20",
+      "bg-white dark:bg-white/[0.05] border border-rose-200 dark:border-rose-800/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20",
   },
 };
 
@@ -63,9 +63,9 @@ export function SupervisorStatusPanel({ requestId, currentStatus }: Props) {
 
   if (allowedNext.length === 0) {
     return (
-      <div className="flex items-center gap-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 px-4 py-3">
-        <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center shrink-0">
-          <CheckCheck className="h-4 w-4 text-emerald-500" />
+      <div className="flex items-center gap-3 rounded-xl bg-slate-50 dark:bg-white/[0.05] border border-slate-100 dark:border-slate-800/60 px-4 py-3">
+        <div className="w-7 h-7 rounded-lg bg-[#ADEBB3]/35 dark:bg-white/[0.06] flex items-center justify-center shrink-0">
+          <CheckCheck className="h-4 w-4 text-[#527255]" />
         </div>
         <p className="text-sm text-slate-500 dark:text-slate-400">
           No further status updates available for this request.
@@ -78,7 +78,7 @@ export function SupervisorStatusPanel({ requestId, currentStatus }: Props) {
     <div className="space-y-4">
       {/* Success feedback */}
       {state.success && (
-        <div className="flex items-center gap-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-300">
+        <div className="flex items-center gap-2.5 rounded-xl bg-[#ADEBB3]/35 dark:bg-white/[0.06] border border-[#ADEBB3]/70 dark:border-white/10 px-4 py-3 text-sm text-[#374e39] dark:text-emerald-300">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
           Status updated successfully.
         </div>
@@ -135,7 +135,7 @@ export function SupervisorStatusPanel({ requestId, currentStatus }: Props) {
                 className={cn(
                   "h-9 px-4 gap-2 text-xs font-semibold transition-all",
                   config?.className ??
-                    "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                    "bg-slate-100 dark:bg-white/[0.05] text-slate-700 dark:text-slate-300"
                 )}
               >
                 {isPending ? (
