@@ -12,6 +12,47 @@ iTrack is a web-based application that streamlines the submission, tracking, and
 | [MA.010.005](#ma010005-release-notes) | 2026-04-15 |
 | [MA.010.006](#ma010006-release-notes) | 2026-04-22 |
 | [MA.010.007](#ma010007-release-notes) | 2026-05-22 |
+| [MA.010.008](#ma010008-release-notes) | 2026-05-28 |
+
+---
+
+<h2 id="ma010008-release-notes">📦 MA.010.008 Release Notes</h2>
+
+##### Admin Dashboard Redesign
+- **Stats cards** with totals, pending approvals, active/completed requests.
+- **Backlog cards** for each status (Pending+Review, Approved, Assigned, In Progress, Cancelled).
+- **Users by role** distribution bars with icons.
+- **Recent registrations** list (last 5 users) and quick action buttons.
+- **“Create User”** button for fast account creation.  
+
+#####  Full User Management
+- **Users list** table with filtering (name, email, role, department, status) – modern glass design.
+- **User detail page** with profile info, role badge, activation toggle (with confirmation), and **request history**:
+  - Students/Staff → submitted requests.
+  - Technicians → assigned requests.
+  - Clerks → reviewed requests (with decision).
+  - Tables scroll vertically with sticky headers and custom scrollbars.
+- **Create user** form for any role (student, staff, clerk, technician, supervisor, admin). Auto‑confirms email and sets approved status.
+
+#####  Admin Request Management
+- **All requests** list (filterable, paginated) with breadcrumb.
+- **Request detail** (read‑only) showing full info, attachments (admin can delete), feedback, and status timeline. 
+
+#####  Feedback Analytics Enhancements
+- Paginated “Load more” for recent comments (5 at a time).
+- Fixed comment links to point to admin request detail page.
+
+#####  Profile Page (All Roles)
+- Shared page accessible from sidebar, showing user’s own information (name, email, role, department, member since, account status).
+
+#####  Improvements & fixes
+- Fixed stat card height alignment.
+- Fixed sidebar highlighting for “Users” vs “Pending Approvals”.
+- Fixed “unknown” status in user request tables.
+- Made all tables vertically scrollable with modern custom scrollbars.
+- Unified glassmorphic styling across admin components.
+- Removed orphaned `/admin/supervisor` stub.
+- Added confirmation dialog for deactivation.
 
 ---
 
