@@ -11,6 +11,40 @@ iTrack is a web-based application that streamlines the submission, tracking, and
 | [MA.010.004](#ma010004-release-notes) | 2026-04-09 |
 | [MA.010.005](#ma010005-release-notes) | 2026-04-15 |
 | [MA.010.006](#ma010006-release-notes) | 2026-04-22 |
+| [MA.010.007](#ma010007-release-notes) | 2026-05-22 |
+
+---
+
+<h2 id="ma010007-release-notes">📦 MA.010.007 Release Notes</h2>
+
+##### Attachments Management
+- Requesters can upload images (JPEG, PNG, GIF, WebP) up to 5 MB per file, with a total limit of 20 MB per request.
+- Upload progress bar, file type/size validation, and auto‑dismiss success message.
+- Preview modal for images and PDFs using signed URLs (60s expiry).
+- Delete attachment with modern confirmation dialog (shadcn AlertDialog); removes both database record and storage file.
+- Role‑based access: requester (upload/delete own), supervisor (read‑only), admin (full delete).
+- Conditional uploads: only allowed while request is `pending` or `under_review`.
+
+##### Reporting & Analytics
+- Admin reports page (`/admin/analytics/reports`) with backlog analysis, technician workload balance, and user summary.
+- Feedback analytics for admin and supervisor: averages, distribution bars, per‑category ratings, and recent comments compilation.
+- Requester dashboard redesigned with accurate stats cards and glassmorphic table.
+
+##### Glassmorphism UI Redesign
+- **Sidebar:** frosted glass background, gradient accent stripe, role‑based colours, animated active state.
+- **Header:** glass panel, avatar gradient, modern dropdown with skeleton loading and direct auth subscription (fixes missing header on first load).
+- **PPSR & RMR forms:** four‑step wizards with progress bar, step indicators, glass card styling, service type cards with icons/colours (PPSR), category selection with formatted names and icons (RMR).
+- **Requester dashboard & request list:** glass cards, fade‑in animations, tooltips, custom scrollbar.
+- **Notification bell dropdown & full page:** glass panel, pagination, filter tabs, type‑specific icons.
+
+##### Improvements & Fixes
+- **Attachments:** Fixed storage bucket setup, RLS policies, and added storage cleanup on delete.
+- **Reporting:** Added backend queries (`getBacklogCounts`, `getTechnicianWorkload`, `getUserSummary`) and RPC for category averages.
+- **Header:** Resolved header not appearing on first load (added skeleton and direct auth listener). Fixed TypeScript errors in auth event handling.
+- **Sidebar:** Replaced static active highlight with role‑based gradient backgrounds.
+- **Forms:** Fixed portal‑based success modal centering; added category name formatting and icons for RMR.
+- **Notification bell:** Moved unread count fetch to client‑side to avoid server blocking; added database index for faster queries.
+- **General:** Removed global dashboard skeleton to prevent double‑loading conflicts; each role now controls its own loading state.
 
 ---
 
