@@ -63,7 +63,7 @@ export function SupervisorStatusPanel({ requestId, currentStatus }: Props) {
 
   if (allowedNext.length === 0) {
     return (
-      <div className="flex items-center gap-3 rounded-xl bg-slate-50 dark:bg-white/[0.05] border border-slate-100 dark:border-slate-800/60 px-4 py-3">
+      <div className="flex items-center gap-3 rounded-xl bg-[#0D3311]/5 dark:bg-white/[0.05] border border-[#0D3311]/15 dark:border-white/10 px-4 py-3">
         <div className="w-7 h-7 rounded-lg bg-[#0D3311]/10 dark:bg-white/[0.06] flex items-center justify-center shrink-0">
           <CheckCheck className="h-4 w-4 text-[#0D3311]" />
         </div>

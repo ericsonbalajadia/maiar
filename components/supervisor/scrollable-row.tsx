@@ -25,8 +25,8 @@ function SectionHeader({
 }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-white/[0.05] flex items-center justify-center shrink-0">
-        <Icon className="h-4 w-4 text-slate-600 dark:text-slate-300" />
+      <div className="supervisor-tile w-8 h-8 rounded-xl flex items-center justify-center shrink-0">
+        <Icon className="h-4 w-4 text-[#0D3311] dark:text-emerald-300" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
@@ -45,8 +45,8 @@ function SectionHeader({
 
 function EmptySection({ text }: { text: string }) {
   return (
-    <div className="flex flex-col items-center justify-center py-10 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700/60 text-center">
-      <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/[0.05] flex items-center justify-center mb-3">
+    <div className="supervisor-surface flex flex-col items-center justify-center py-10 rounded-2xl border-dashed text-center">
+      <div className="supervisor-tile w-10 h-10 rounded-xl flex items-center justify-center mb-3">
         <InboxIcon className="h-5 w-5 text-slate-400" />
       </div>
       <p className="text-sm text-slate-500 dark:text-slate-400">{text}</p>
@@ -128,7 +128,7 @@ export function ScrollableRow({ items, sectionKey }: ScrollableRowProps) {
               className="w-80 shrink-0 fade-in"
               style={{ animationDelay: `${i * 50}ms` }}
             >
-              <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-white/[0.05] transition-all duration-200 hover:shadow-md">
+              <div className="supervisor-surface rounded-2xl transition-all duration-200 hover:shadow-md">
                 <RequestCard request={r} fullHref={`/supervisor/requests/${r.id}`} hideStatus={true} />
               </div>
             </div>

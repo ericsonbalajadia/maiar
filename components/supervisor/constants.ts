@@ -6,8 +6,8 @@ export const SECTIONS = [
     label: "Approved",
     sub: "Ready to assign a technician",
     icon: CheckCircle2,
-    countBg: "bg-[#ADEBB3]/45 text-[#374e39] dark:bg-white/[0.06] dark:text-emerald-300",
-    chipBg: "border-[#ADEBB3]/70 bg-[#ADEBB3]/35 text-[#374e39] dark:border-white/10 dark:bg-white/[0.06] dark:text-emerald-300",
+    countBg: "bg-[#0D3311]/10 text-[#0D3311] dark:bg-white/[0.06] dark:text-emerald-300",
+    chipBg: "border-[#0D3311]/20 bg-[#0D3311]/10 text-[#0D3311] dark:border-white/10 dark:bg-white/[0.06] dark:text-emerald-300",
     emptyText: "No approved requests awaiting assignment.",
   },
   {
