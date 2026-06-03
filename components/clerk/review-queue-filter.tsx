@@ -24,8 +24,8 @@ export function ReviewQueueFilter({ currentType }: Props) {
 
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-      {/* Type filter group */}
-      <div className="flex items-center gap-1.5 rounded-full border border-slate-200/60 bg-white/60 p-1 dark:border-slate-700/60 dark:bg-slate-800/60">
+      {/* Type filter group – neutral slate active, green glass container */}
+      <div className="flex items-center gap-1.5 rounded-full border border-[#ADEBB3]/70 bg-white/60 p-1 backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.05]">
         {[
           { value: 'all', label: 'All' },
           { value: 'rmr', label: 'R&M' },
@@ -34,10 +34,10 @@ export function ReviewQueueFilter({ currentType }: Props) {
           <button
             key={opt.value}
             onClick={() => setType(opt.value)}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
               currentType === opt.value
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                ? 'bg-slate-700 text-white shadow-sm hover:bg-slate-800 dark:bg-slate-600 dark:hover:bg-slate-500'
+                : 'text-slate-700 dark:text-slate-300 hover:bg-[#ADEBB3]/35 hover:backdrop-blur-sm dark:hover:bg-white/[0.08]'
             }`}
           >
             {opt.label}
@@ -45,10 +45,10 @@ export function ReviewQueueFilter({ currentType }: Props) {
         ))}
       </div>
 
-      {/* Separator (optional, visible on larger screens) */}
+      {/* Separator */}
       <span className="hidden sm:inline text-slate-300 dark:text-slate-600">|</span>
 
-
+      {/* Status filter (currently unused, kept for future) */}
     </div>
   );
 }
