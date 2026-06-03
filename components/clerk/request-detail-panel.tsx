@@ -5,15 +5,25 @@ import { RequestTimeline } from "@/components/tracking/requestTimeline";
 import { StatusBadge } from "@/components/common/status-badge";
 import type { RequestDetail } from "@/types/requests.model";
 import type { StatusHistoryEntry } from "@/lib/types/tracking";
+import { AttachmentPreview } from "@/components/requests/attachment-preview";
 import {
-  Tag, MapPin, Calendar, User, Mail, Paperclip,
-  ClipboardCheck, History, CheckCircle2, Clock, Hash,
+  Tag,
+  MapPin,
+  Calendar,
+  User,
+  Mail,
+  Paperclip,
+  ClipboardCheck,
+  History,
+  CheckCircle2,
+  Clock,
+  Hash,
 } from "lucide-react";
 
 // ─── Helper (unchanged) ───────────────────────────────────────────────────────
 
 function mapToStatusHistoryEntry(
-  history: NonNullable<RequestDetail["status_history"]>
+  history: NonNullable<RequestDetail["status_history"]>,
 ): StatusHistoryEntry[] {
   return history.map((item) => ({
     id: item.id,
@@ -31,7 +41,11 @@ function mapToStatusHistoryEntry(
       : { id: "", status_name: "N/A" },
     new_status: { id: "", status_name: item.new_status.status_name },
     changed_by_user: item.changed_by_user
-      ? { id: "", full_name: item.changed_by_user.full_name, role: item.changed_by_user.role }
+      ? {
+          id: "",
+          full_name: item.changed_by_user.full_name,
+          role: item.changed_by_user.role,
+        }
       : { id: "", full_name: "System", role: "system" },
   }));
 }
@@ -54,13 +68,17 @@ function SectionHeader({
       >
         <Icon className="h-3.5 w-3.5 text-white" />
       </div>
-      <h3 className="text-sm font-bold text-slate-800 dark:text-white">{title}</h3>
+      <h3 className="text-sm font-bold text-slate-800 dark:text-white">
+        {title}
+      </h3>
     </div>
   );
 }
 
 function InfoGrid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{children}</div>;
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{children}</div>
+  );
 }
 
 function InfoCell({
@@ -163,15 +181,25 @@ export function RequestDetailPanel({
             title="Request Details"
           />
           <InfoGrid>
-            <InfoCell icon={Tag} label="Category" value={request.categories?.category_name} />
+            <InfoCell
+              icon={Tag}
+              label="Category"
+              value={request.categories?.category_name}
+            />
             <InfoCell icon={Clock} label="Priority" value={priority} />
             <InfoCell icon={MapPin} label="Location" value={locationFull} />
-            <InfoCell icon={Calendar} label="Submitted" value={new Date(request.created_at).toLocaleString()} />
+            <InfoCell
+              icon={Calendar}
+              label="Submitted"
+              value={new Date(request.created_at).toLocaleString()}
+            />
             <InfoCell icon={Hash} label="Type" value={request.request_type} />
           </InfoGrid>
           {request.description && (
             <div className="mt-4">
-              <p className="text-xs font-semibold text-slate-400 mb-1">Description</p>
+              <p className="text-xs font-semibold text-slate-400 mb-1">
+                Description
+              </p>
               <div className="bg-slate-50 dark:bg-white/[0.05] rounded-lg p-3 text-sm">
                 {request.description}
               </div>
@@ -190,7 +218,7 @@ export function RequestDetailPanel({
         </div>
       </div>
 
-      {/* Attachments (if any) – full width */}
+      {/* Attachments (full preview component) */}
       {attachments.length > 0 && (
         <div className="rounded-xl border p-5 bg-white/40 dark:bg-white/[0.04] mb-6">
           <SectionHeader
@@ -198,14 +226,11 @@ export function RequestDetailPanel({
             iconGradient="bg-gradient-to-br from-slate-500 to-slate-700"
             title={`Attachments (${attachments.length})`}
           />
-          <div className="grid sm:grid-cols-2 gap-3">
-            {attachments.map((a) => (
-              <div key={a.id} className="flex items-center gap-2 bg-slate-50 dark:bg-white/[0.05] p-2 rounded-lg">
-                <Paperclip className="h-4 w-4 text-slate-400" />
-                <span className="text-sm truncate">{a.file_name}</span>
-              </div>
-            ))}
-          </div>
+          <AttachmentPreview
+            attachments={attachments}
+            requestId={request.id}
+            canDelete={false}
+          />
         </div>
       )}
 
@@ -233,8 +258,16 @@ export function RequestDetailPanel({
               title="Technician"
             />
             <InfoGrid>
-              <InfoCell icon={User} label="Name" value={request.assigned_technician.full_name} />
-              <InfoCell icon={Mail} label="Email" value={request.assigned_technician.email} />
+              <InfoCell
+                icon={User}
+                label="Name"
+                value={request.assigned_technician.full_name}
+              />
+              <InfoCell
+                icon={Mail}
+                label="Email"
+                value={request.assigned_technician.email}
+              />
             </InfoGrid>
           </div>
         )}
@@ -248,8 +281,16 @@ export function RequestDetailPanel({
               title="Review"
             />
             <InfoGrid>
-              <InfoCell icon={CheckCircle2} label="Decision" value={review.decision} />
-              <InfoCell icon={User} label="Reviewer" value={review.reviewer?.full_name} />
+              <InfoCell
+                icon={CheckCircle2}
+                label="Decision"
+                value={review.decision}
+              />
+              <InfoCell
+                icon={User}
+                label="Reviewer"
+                value={review.reviewer?.full_name}
+              />
             </InfoGrid>
           </div>
         )}
