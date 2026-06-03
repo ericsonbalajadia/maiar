@@ -1,4 +1,3 @@
-// app/(dashboard)/clerk/page.tsx
 import React, { Suspense } from "react";
 import Link from "next/link";
 import { Eye, InboxIcon } from "lucide-react";
@@ -15,7 +14,7 @@ function EmptySection() {
         <InboxIcon className="h-5 w-5 text-slate-400" />
       </div>
       <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-        No requests in review
+        No pending requests
       </p>
       <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
         All caught up.
@@ -52,10 +51,10 @@ async function ClerkDashboardContent({ searchParams }: Props) {
   const typeFilter = sp.type === "rmr" || sp.type === "ppsr" ? sp.type : "all";
 
   const { data: requests } = await getRequestsForClerk();
-  let underReview = requests?.filter((r) => r.status.status_name === "under_review") ?? [];
+  let pending = requests?.filter((r) => r.status.status_name === "pending") ?? [];
 
   if (typeFilter !== "all") {
-    underReview = underReview.filter((r) => r.request_type === typeFilter);
+    pending = pending.filter((r) => r.request_type === typeFilter);
   }
 
   return (
@@ -73,18 +72,18 @@ async function ClerkDashboardContent({ searchParams }: Props) {
         </div>
       </div>
 
-      {/* Filter bar – current styling */}
+      {/* Filter bar */}
       <div className="flex flex-col gap-3 rounded-2xl border border-white/60 p-4 dark:border-slate-700/60 md:flex-row md:items-center md:justify-between">
         <ReviewQueueFilter currentType={typeFilter} />
-        <div className="inline-flex w-fit items-center gap-2 rounded-xl border border-blue-200/60 bg-blue-50 px-3.5 py-2 text-sm font-semibold text-blue-700 dark:border-blue-800/40 dark:bg-white/[0.06] dark:text-blue-300">
-          {underReview.length} request{underReview.length !== 1 ? "s" : ""} in review
+        <div className="inline-flex w-fit items-center gap-2 rounded-xl border border-amber-200/60 bg-amber-50 px-3.5 py-2 text-sm font-semibold text-amber-700 dark:border-amber-800/40 dark:bg-white/[0.06] dark:text-amber-300">
+          {pending.length} pending request{pending.length !== 1 ? "s" : ""}
         </div>
       </div>
 
       {/* Scrollable request list */}
-      {underReview.length > 0 ? (
+      {pending.length > 0 ? (
         <div className="max-h-[calc(100vh-280px)] space-y-4 overflow-y-auto pr-2 pb-6 custom-scrollbar">
-          {underReview.map((r) => (
+          {pending.map((r) => (
             <ReviewCard key={r.id} request={r} />
           ))}
         </div>
