@@ -6,37 +6,17 @@ import { createPortal } from "react-dom";
 import { createRequest } from "@/actions/request/request.actions";
 import type { Category } from "@/types/requests.model";
 import type { DbUser } from "@/types/models";
+import { TempAttachmentUploader } from "@/components/requests/temp-attachment-uploader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import {
-  ChevronRight,
-  ChevronLeft,
-  Check,
-  Loader2,
-  CheckCircle2,
-  X,
-  Building2,
-  User,
-  Phone,
-  Mail,
-  Wrench,
-  Zap,
-  Droplet,
-  Fan,
-  Hammer,
-  Paintbrush,
-  Droplets,
-  Sofa,
-  Key,
-  DoorClosed,
-  Square,
-  Home,
-  Lightbulb,
-  Bug,
-  Info,
+  ChevronRight, ChevronLeft, Check, Loader2, CheckCircle2, X,
+  Building2, User, Phone, Mail,
+  Wrench, Zap, Droplet, Fan, Hammer, Paintbrush, Droplets, Sofa,
+  Key, DoorClosed, Square, Home, Lightbulb, Bug, Info,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -65,7 +45,8 @@ const STEPS = [
   { number: 1, label: "Request Info" },
   { number: 2, label: "Nature of Work" },
   { number: 3, label: "Description" },
-  { number: 4, label: "Review" },
+  { number: 4, label: "Attachments" },
+  { number: 5, label: "Review" },
 ];
 
 // ─── Helpers for category formatting and icons ───────────────────────────────
@@ -106,7 +87,7 @@ function getCategoryIcon(categoryName: string): React.ElementType {
   return categoryIcons.default;
 }
 
-// ─── Step indicator with progress bar ────────────────────────────────────────
+// ─── Step indicator with progress bar (green theme) ──────────────────────────
 
 function StepIndicator({ current }: { current: number }) {
   return (
@@ -115,10 +96,7 @@ function StepIndicator({ current }: { current: number }) {
         const isPast = step.number < current;
         const isCurrent = step.number === current;
         return (
-          <div
-            key={step.number}
-            className="flex items-start flex-1 last:flex-none"
-          >
+          <div key={step.number} className="flex items-start flex-1 last:flex-none">
             <div className="flex flex-col items-center gap-1.5">
               <div
                 className={cn(
@@ -158,7 +136,7 @@ function StepIndicator({ current }: { current: number }) {
   );
 }
 
-// ─── Field wrapper with label, tooltip, error ─────────────────────────────────
+// ─── Field wrapper with label, tooltip, error (green theme) ───────────────────
 
 function Field({
   label,
@@ -178,8 +156,7 @@ function Field({
   return (
     <div className={className}>
       <Label className="text-xs font-semibold text-slate-500 dark:text-white/60 uppercase tracking-wide mb-1.5 block">
-        {label}
-        {required && <span className="text-rose-500 ml-0.5">*</span>}
+        {label}{required && <span className="text-rose-500 ml-0.5">*</span>}
         {tip && (
           <span
             className="ml-1.5 inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#ADEBB3]/55 dark:bg-white/[0.07] text-slate-500 dark:text-white/60 text-[10px] cursor-help"
@@ -200,7 +177,7 @@ function Field({
   );
 }
 
-// ─── Input with icon (glass style) ───────────────────────────────────────────
+// ─── Input with icon (glass style, green) ─────────────────────────────────────
 
 function IconInput({
   icon: Icon,
@@ -215,9 +192,8 @@ function IconInput({
       <Input
         {...props}
         className={cn(
-          "h-10 bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] dark:focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all",
-          error &&
-            "border-rose-400 dark:border-rose-500 focus:border-rose-400 focus:ring-rose-400/20",
+          "h-10 bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all",
+          error && "border-rose-400 dark:border-rose-500 focus:border-rose-400 focus:ring-rose-400/20",
           props.className,
         )}
       />
@@ -230,9 +206,8 @@ function IconInput({
       <Input
         {...props}
         className={cn(
-          "h-10 pl-9 bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] dark:focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all",
-          error &&
-            "border-rose-400 dark:border-rose-500 focus:border-rose-400 focus:ring-rose-400/20",
+          "h-10 pl-9 bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all",
+          error && "border-rose-400 dark:border-rose-500 focus:border-rose-400 focus:ring-rose-400/20",
           props.className,
         )}
       />
@@ -240,7 +215,7 @@ function IconInput({
   );
 }
 
-// ─── Section header ───────────────────────────────────────────────────────────
+// ─── Section header (green) ───────────────────────────────────────────────────
 
 function SectionHeader({
   number,
@@ -257,20 +232,14 @@ function SectionHeader({
         <span className="text-xs font-bold text-[#1e2c1f]">{number}</span>
       </div>
       <div>
-        <h2 className="text-base font-bold text-slate-900 dark:text-white">
-          {title}
-        </h2>
-        {subtitle && (
-          <p className="text-sm text-slate-500 dark:text-white/60 mt-0.5">
-            {subtitle}
-          </p>
-        )}
+        <h2 className="text-base font-bold text-slate-900 dark:text-white">{title}</h2>
+        {subtitle && <p className="text-sm text-slate-500 dark:text-white/60 mt-0.5">{subtitle}</p>}
       </div>
     </div>
   );
 }
 
-// ─── Portal Success Modal (centered, redirects to request detail) ─────────────
+// ─── Portal Success Modal (green theme) ───────────────────────────────────────
 
 function SuccessModal({
   ticketNumber,
@@ -290,26 +259,16 @@ function SuccessModal({
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div
         className="rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center border border-[#ADEBB3]/70 dark:border-white/10"
-        style={{
-          background: "var(--glass-bg)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-        }}
+        style={{ background: "var(--glass-bg)", backdropFilter: "blur(20px)" }}
       >
         <div className="w-16 h-16 bg-[#8dc192] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#ADEBB3]/35">
           <CheckCircle2 className="h-8 w-8 text-white" />
         </div>
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-          Request Submitted!
-        </h2>
-        <p className="text-sm text-black dark:text-white/80 mb-2">
-          Your request has been received and is pending review.
-        </p>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Request Submitted!</h2>
+        <p className="text-sm text-black dark:text-white/80 mb-2">Your request has been received and is pending review.</p>
         <div className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-white/[0.05] rounded-lg px-3 py-1.5 mb-6">
           <span className="text-xs text-slate-400">Ticket</span>
-          <span className="text-sm font-bold font-mono text-slate-800 dark:text-white">
-            {ticketNumber}
-          </span>
+          <span className="text-sm font-bold font-mono text-slate-800 dark:text-white">{ticketNumber}</span>
         </div>
         <div className="flex flex-col gap-2.5">
           <Button
@@ -328,7 +287,7 @@ function SuccessModal({
   );
 }
 
-// ─── Main Form Component ──────────────────────────────────────────────────────
+// ─── Main Form Component (green theme, with attachments) ──────────────────────
 
 export function RmrForm({ categories, dbUser }: RmrFormProps) {
   const router = useRouter();
@@ -354,6 +313,17 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
     title: "",
     description: "",
   });
+
+  const [tempAttachments, setTempAttachments] = useState<
+    Array<{
+      id: string;
+      file_name: string;
+      file_size: number;
+      mime_type: string;
+      uploaded: boolean;
+      tempPath?: string;
+    }>
+  >([]);
 
   const set = (key: keyof FormData, value: string | string[]) => {
     setForm((f) => ({ ...f, [key]: value }));
@@ -395,12 +365,43 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
   const back = () => setStep((s) => s - 1);
   const cancel = () => router.push("/requester/requests/new");
 
+  // ─── Attachment handlers ────────────────────────────────────────────────────
+  const handleTempUpload = (fileData: {
+    tempPath: string;
+    fileName: string;
+    fileSize: number;
+    mimeType: string;
+  }) => {
+    setTempAttachments((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        file_name: fileData.fileName,
+        file_size: fileData.fileSize,
+        mime_type: fileData.mimeType,
+        uploaded: true,
+        tempPath: fileData.tempPath,
+      },
+    ]);
+  };
+
+  const removeTempAttachment = (id: string) => {
+    setTempAttachments((prev) => prev.filter((a) => a.id !== id));
+  };
+
+  // ─── Submit ─────────────────────────────────────────────────────────────────
   const handleSubmit = () => {
     if (!validateStep(3)) return;
+    const uploadedAttachments = tempAttachments
+      .filter((a) => a.uploaded && a.tempPath)
+      .map((a) => ({
+        tempPath: a.tempPath!,
+        fileName: a.file_name,
+        fileSize: a.file_size,
+        mimeType: a.mime_type,
+      }));
+    const primaryCategory = categories.find((c) => form.category_ids.includes(c.id));
     startTransition(async () => {
-      const primaryCategory = categories.find((c) =>
-        form.category_ids.includes(c.id),
-      );
       const result = await createRequest("rmr", {
         title: form.title,
         description: form.description,
@@ -410,14 +411,13 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
         location_room: form.location_room,
         designation: form.designation,
         contact_email: form.email,
+        tempAttachments: uploadedAttachments,
       });
       if (result.success && result.ticketNumber && result.requestId) {
         setTicketNumber(result.ticketNumber);
         setRequestId(result.requestId);
       } else {
-        setErrors({
-          submit: result.error ?? "Submission failed. Please try again.",
-        });
+        setErrors({ submit: result.error ?? "Submission failed. Please try again." });
       }
     });
   };
@@ -440,6 +440,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
       title: "",
       description: "",
     });
+    setTempAttachments([]);
   };
 
   if (ticketNumber && requestId) {
@@ -455,13 +456,9 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
   return (
     <div
       className="rounded-2xl border border-[#ADEBB3]/70 dark:border-white/10 shadow-sm overflow-hidden"
-      style={{
-        background: "var(--glass-bg)",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-      }}
+      style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
     >
-      {/* Progress bar */}
+      {/* Progress bar (green) */}
       <div className="h-1 bg-slate-100 dark:bg-white/[0.05]">
         <div
           className="h-full bg-[#8dc192] transition-all duration-500 ease-out rounded-full"
@@ -472,14 +469,10 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
       <div className="p-6 sm:p-8">
         <StepIndicator current={step} />
 
-        {/* ── Step 1: Request Info ── */}
+        {/* ── Step 1: Request Info (green themed) ── */}
         {step === 1 && (
           <div className="fade-in">
-            <SectionHeader
-              number={1}
-              title="Request Information"
-              subtitle="Tell us who you are and where the issue is located"
-            />
+            <SectionHeader number={1} title="Request Information" subtitle="Tell us who you are and where the issue is located" />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Date Filled">
                 <IconInput
@@ -489,14 +482,10 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                 />
               </Field>
 
-              <Field
-                label="Building / Department"
-                required
-                error={errors.building}
-              >
+              <Field label="Building / Department" required error={errors.building}>
                 <IconInput
                   icon={Building2}
-                  placeholder="e.g. Engineering Block A"
+                  placeholder="e.g. Engineering Building"
                   value={form.building}
                   onChange={(e) => set("building", e.target.value)}
                   error={!!errors.building}
@@ -504,24 +493,16 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
               </Field>
 
               <div className="sm:col-span-2">
-                <Field
-                  label="Location"
-                  required
-                  error={errors.location_building}
-                  tip="Specify the exact location of the repair needed"
-                >
+                <Field label="Location" required error={errors.location_building} tip="Specify the exact location of the repair needed">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1.5">
                     <div>
                       <Input
-                        placeholder="Building name *"
+                        placeholder="Building site *"
                         value={form.location_building}
-                        onChange={(e) =>
-                          set("location_building", e.target.value)
-                        }
+                        onChange={(e) => set("location_building", e.target.value)}
                         className={cn(
                           "h-10 bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all",
-                          errors.location_building &&
-                            "border-rose-400 focus:border-rose-400 focus:ring-rose-400/20",
+                          errors.location_building && "border-rose-400 focus:border-rose-400 focus:ring-rose-400/20",
                         )}
                       />
                     </div>
@@ -545,11 +526,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                 </Field>
               </div>
 
-              <Field
-                label="Requesting Party Name"
-                required
-                error={errors.requesting_party}
-              >
+              <Field label="Requesting Party Name" required error={errors.requesting_party}>
                 <IconInput
                   icon={User}
                   value={form.requesting_party}
@@ -558,12 +535,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                 />
               </Field>
 
-              <Field
-                label="Designation / Position"
-                required
-                error={errors.designation}
-                tip="Your role or position in the university"
-              >
+              <Field label="Designation / Position" required error={errors.designation} tip="Your role or position in the university">
                 <IconInput
                   placeholder="e.g. Lab Technician"
                   value={form.designation}
@@ -572,11 +544,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                 />
               </Field>
 
-              <Field
-                label="Contact Number"
-                required
-                error={errors.contact_number}
-              >
+              <Field label="Contact Number" required error={errors.contact_number}>
                 <IconInput
                   icon={Phone}
                   placeholder="09xxxxxxxxx"
@@ -599,14 +567,10 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
           </div>
         )}
 
-        {/* ── Step 2: Nature of Work (with formatted names and icons) ── */}
+        {/* ── Step 2: Nature of Work (green theme, larger buttons) ── */}
         {step === 2 && (
           <div className="fade-in">
-            <SectionHeader
-              number={2}
-              title="Nature of Work"
-              subtitle="Select all applicable types of work needed"
-            />
+            <SectionHeader number={2} title="Nature of Work" subtitle="Select all applicable types of work needed" />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
               {categories.map((cat) => {
@@ -649,16 +613,13 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                       <div className="flex items-center gap-1">
                         <span
                           className={cn(
-                            "text-sm font-medium leading-tight",
-                            checked
-                              ? "text-blue-700 dark:text-blue-300"
-                              : "text-slate-700 dark:text-slate-300",
+                            "block truncate text-sm font-medium leading-tight",
+                            checked ? "text-[#1e2c1f] dark:text-white" : "text-slate-700 dark:text-white/75",
                           )}
                         >
                           {displayName}
                         </span>
-                        {(cat.category_name === "machining_works" ||
-                          cat.category_name === "h_v_a_c") && (
+                        {(cat.category_name === "machining_works" || cat.category_name === "h_v_a_c") && (
                           <span
                             className="inline-flex items-center justify-center cursor-help"
                             title={
@@ -686,9 +647,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
 
             {form.category_ids.length > 0 && (
               <div className="mt-3">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">
-                  Selected
-                </p>
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Selected</p>
                 <div className="flex flex-wrap gap-2">
                   {form.category_ids.map((id) => {
                     const cat = categories.find((c) => c.id === id);
@@ -720,28 +679,19 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
           </div>
         )}
 
-        {/* ── Step 3: Description ── */}
+        {/* ── Step 3: Description (green) ── */}
         {step === 3 && (
           <div className="fade-in">
-            <SectionHeader
-              number={3}
-              title="Describe the Issue"
-              subtitle="Give the team enough detail to handle the repair effectively"
-            />
+            <SectionHeader number={3} title="Describe the Issue" subtitle="Give the team enough detail to handle the repair effectively" />
             <div className="space-y-4">
-              <Field
-                label="Brief title of the work requested"
-                required
-                error={errors.title}
-              >
+              <Field label="Brief title of the work requested" required error={errors.title}>
                 <Input
                   placeholder="e.g. Faulty electrical outlets in Room 201"
                   value={form.title}
                   onChange={(e) => set("title", e.target.value)}
                   className={cn(
                     "h-10 bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all",
-                    errors.title &&
-                      "border-rose-400 focus:border-rose-400 focus:ring-rose-400/20",
+                    errors.title && "border-rose-400 focus:border-rose-400 focus:ring-rose-400/20",
                   )}
                 />
               </Field>
@@ -756,21 +706,37 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
               </Field>
 
               <div className="rounded-xl bg-[#ADEBB3]/30 dark:bg-white/[0.05] border border-[#ADEBB3]/70 dark:border-white/10 px-4 py-3 text-xs text-[#527255] dark:text-emerald-300">
-                💡 The more detail you provide, the faster and more accurately
-                we can handle your request.
+                💡 The more detail you provide, the faster and more accurately we can handle your request.
               </div>
             </div>
           </div>
         )}
 
-        {/* ── Step 4: Review & Submit ── */}
+        {/* ── Step 4: Attachments (green themed) ── */}
         {step === 4 && (
           <div className="fade-in">
-            <SectionHeader
-              number={4}
-              title="Review &amp; Submit"
-              subtitle="Please verify all details before submitting"
-            />
+            <SectionHeader number={4} title="Attachments" subtitle="Upload supporting photos or documents (optional)" />
+            <TempAttachmentUploader onUpload={handleTempUpload} />
+            {tempAttachments.length > 0 && (
+              <div className="mt-4 space-y-2">
+                {tempAttachments.map((att) => (
+                  <div key={att.id} className="flex justify-between items-center p-2 border rounded-lg border-[#ADEBB3]/70 dark:border-white/10">
+                    <span className="text-sm truncate">{att.file_name}</span>
+                    {att.uploaded && <CheckCircle2 className="h-4 w-4 text-[#527255] shrink-0" />}
+                    <button onClick={() => removeTempAttachment(att.id)} className="text-rose-500 hover:text-rose-700">
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Step 5: Review & Submit (green) ── */}
+        {step === 5 && (
+          <div className="fade-in">
+            <SectionHeader number={5} title="Review &amp; Submit" subtitle="Please verify all details before submitting" />
 
             <div className="space-y-3 text-sm">
               <div className="rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 overflow-hidden bg-white/40 dark:bg-white/[0.04]">
@@ -788,36 +754,24 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                     key={label}
                     className={cn(
                       "flex gap-4 px-4 py-2.5",
-                      i % 2 === 0
-                        ? "bg-transparent"
-                        : "bg-slate-50/50 dark:bg-white/[0.04]",
+                      i % 2 === 0 ? "bg-transparent" : "bg-slate-50/50 dark:bg-white/[0.04]",
                     )}
                   >
-                    <span className="text-slate-400 dark:text-white/45 min-w-[130px] shrink-0 text-xs font-semibold uppercase tracking-wide">
-                      {label}
-                    </span>
-                    <span className="font-medium text-slate-700 dark:text-white/80 break-all text-sm">
-                      {value || "—"}
-                    </span>
+                    <span className="text-slate-400 dark:text-white/45 min-w-[130px] shrink-0 text-xs font-semibold uppercase tracking-wide">{label}</span>
+                    <span className="font-medium text-slate-700 dark:text-white/80 break-all text-sm">{value || "—"}</span>
                   </div>
                 ))}
               </div>
 
               <div className="rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 px-4 py-3 bg-white/40 dark:bg-white/[0.04]">
-                <p className="text-xs font-semibold text-slate-400 dark:text-white/45 uppercase tracking-wide mb-2">
-                  Nature of Work
-                </p>
+                <p className="text-xs font-semibold text-slate-400 dark:text-white/45 uppercase tracking-wide mb-2">Nature of Work</p>
                 <div className="flex flex-wrap gap-2">
                   {form.category_ids.map((id) => {
                     const cat = categories.find((c) => c.id === id);
                     if (!cat) return null;
-                    const displayName = formatCategoryName(cat.category_name);
                     return (
-                      <span
-                        key={id}
-                        className="text-xs bg-[#ADEBB3]/40 dark:bg-white/[0.07] text-[#1e2c1f] dark:text-emerald-300 px-2.5 py-1 rounded-full font-medium"
-                      >
-                        {displayName}
+                      <span key={id} className="text-xs bg-[#ADEBB3]/40 dark:bg-white/[0.07] text-[#1e2c1f] dark:text-emerald-300 px-2.5 py-1 rounded-full font-medium">
+                        {formatCategoryName(cat.category_name)}
                       </span>
                     );
                   })}
@@ -826,22 +780,25 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
 
               {form.title && (
                 <div className="rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 px-4 py-3 bg-white/40 dark:bg-white/[0.04]">
-                  <p className="text-xs font-semibold text-slate-400 dark:text-white/45 uppercase tracking-wide mb-1">
-                    Title
-                  </p>
-                  <p className="font-semibold text-slate-800 dark:text-white">
-                    {form.title}
-                  </p>
+                  <p className="text-xs font-semibold text-slate-400 dark:text-white/45 uppercase tracking-wide mb-1">Title</p>
+                  <p className="font-semibold text-slate-800 dark:text-white">{form.title}</p>
                   {form.description && (
                     <>
-                      <p className="text-xs font-semibold text-slate-400 dark:text-white/45 uppercase tracking-wide mt-3 mb-1">
-                        Description
-                      </p>
-                      <p className="text-slate-600 dark:text-white/60 leading-relaxed">
-                        {form.description}
-                      </p>
+                      <p className="text-xs font-semibold text-slate-400 dark:text-white/45 uppercase tracking-wide mt-3 mb-1">Description</p>
+                      <p className="text-slate-600 dark:text-white/60 leading-relaxed">{form.description}</p>
                     </>
                   )}
+                </div>
+              )}
+
+              {tempAttachments.length > 0 && (
+                <div className="rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 px-4 py-3 bg-white/40 dark:bg-white/[0.04]">
+                  <p className="text-xs font-semibold text-slate-400 dark:text-white/45 uppercase tracking-wide mb-2">Attachments</p>
+                  <ul className="list-disc list-inside text-sm text-slate-600 dark:text-white/60">
+                    {tempAttachments.map((att) => (
+                      <li key={att.id}>{att.file_name}</li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </div>
@@ -855,24 +812,14 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
           </div>
         )}
 
-        {/* ── Navigation Buttons ── */}
+        {/* ── Navigation Buttons (green) ── */}
         <div className="flex items-center justify-between mt-8 pt-5 border-t border-[#ADEBB3]/70 dark:border-white/10">
           {step === 1 ? (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={cancel}
-              className="text-slate-500 border-[#ADEBB3]/70 dark:border-white/10"
-            >
+            <Button type="button" variant="outline" onClick={cancel} className="text-slate-500 border-[#ADEBB3]/70 dark:border-white/10">
               Cancel
             </Button>
           ) : (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={back}
-              className="gap-1.5 text-slate-500 border-[#ADEBB3]/70 dark:border-white/10"
-            >
+            <Button type="button" variant="outline" onClick={back} className="gap-1.5 text-slate-500 border-[#ADEBB3]/70 dark:border-white/10">
               <ChevronLeft className="h-4 w-4" />
               Back
             </Button>
@@ -895,7 +842,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
               ))}
             </div>
 
-            {step < 4 ? (
+            {step < STEPS.length ? (
               <Button
                 type="button"
                 onClick={next}

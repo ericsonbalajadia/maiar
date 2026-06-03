@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notifyRequesterByEmail } from '@/lib/notifications/request-email';
 import { getUserIdsByRole, sendBulkNotification } from '@/actions/notifications/notifications.actions';
+import { createServiceClient } from '@/lib/supabase/service';
 import { revalidatePath } from "next/cache";
 import type {
   RmrFormInput,
@@ -144,6 +145,7 @@ export async function createRequest(
     location_room?: string;
     designation: string;
     contact_email: string;
+    tempAttachments?: Array<{ tempPath: string; fileName: string; fileSize: number; mimeType: string }>;
   },
 ): Promise<RequestActionState>;
 export async function createRequest(
@@ -199,6 +201,32 @@ export async function createRequest(
     console.error("createRequest insert error:", requestError);
     return { error: requestError?.message ?? "Failed to submit request." };
   }
+
+  if (input.tempAttachments?.length) {
+  const service = createServiceClient(); // already imported at top
+  for (const att of input.tempAttachments) {
+    const newPath = `requests/${newRequest.id}/${Date.now()}_${att.fileName}`;
+    const { error: moveError } = await supabase.storage
+      .from('attachments')
+      .move(att.tempPath, newPath);
+    if (moveError) {
+      console.error('Move error:', moveError);
+      continue;
+    }
+    // Use service client to insert (bypasses RLS)
+    const { error: insertError } = await service.from('attachments').insert({
+      request_id: newRequest.id,
+      file_name: att.fileName,
+      file_path: newPath,
+      file_size: att.fileSize,
+      mime_type: att.mimeType,
+      uploaded_by: dbUser.id,
+    });
+    if (insertError) {
+      console.error('Insert error:', insertError);
+    }
+  }
+}
 
   // --- INSERT BULK NOTIFICATION AFTER SUCCESSFUL REQUEST CREATION ---
   const clerkIds = await getUserIdsByRole('clerk');
