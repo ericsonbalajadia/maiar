@@ -14,10 +14,10 @@ function EmptySection() {
         <InboxIcon className="h-5 w-5 text-slate-400" />
       </div>
       <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-        No pending requests
+        No requests match the filters
       </p>
       <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
-        All caught up.
+        Try changing the type or status filter.
       </p>
     </div>
   );
@@ -29,9 +29,16 @@ function ReviewCard({ request }: { request: any }) {
       className="relative z-0 overflow-hidden rounded-2xl border border-white/60 dark:border-slate-700/60"
       style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
     >
-      <RequestCard request={request} fullHref={`/clerk/requests/${request.id}/review`} />
+      <RequestCard
+        request={request}
+        fullHref={`/clerk/requests/${request.id}/review`}
+      />
       <div className="border-t border-slate-100/80 bg-slate-50/40 px-4 py-3 dark:border-slate-800/60 dark:bg-white/[0.04]">
-        <Button size="sm" asChild className="gap-1.5 bg-[#527255] hover:bg-[#6f9873] text-white shadow-sm">
+        <Button
+          size="sm"
+          asChild
+          className="gap-1.5 bg-[#527255] hover:bg-[#6f9873] text-white shadow-sm"
+        >
           <Link href={`/clerk/requests/${request.id}/review`}>
             <Eye className="h-3.5 w-3.5" />
             Start Review
@@ -43,18 +50,26 @@ function ReviewCard({ request }: { request: any }) {
 }
 
 interface Props {
-  searchParams: Promise<{ type?: string }>;
+  searchParams: Promise<{ type?: string; status?: string }>;
 }
 
 async function ClerkDashboardContent({ searchParams }: Props) {
   const sp = await searchParams;
   const typeFilter = sp.type === "rmr" || sp.type === "ppsr" ? sp.type : "all";
+  const statusFilter =
+    sp.status === "pending" || sp.status === "under_review" ? sp.status : "all";
 
   const { data: requests } = await getRequestsForClerk();
-  let pending = requests?.filter((r) => r.status.status_name === "pending") ?? [];
+  let filtered = requests ?? [];
 
+  // Apply status filter
+  if (statusFilter !== "all") {
+    filtered = filtered.filter((r) => r.status.status_name === statusFilter);
+  }
+
+  // Apply type filter
   if (typeFilter !== "all") {
-    pending = pending.filter((r) => r.request_type === typeFilter);
+    filtered = filtered.filter((r) => r.request_type === typeFilter);
   }
 
   return (
@@ -65,7 +80,9 @@ async function ClerkDashboardContent({ searchParams }: Props) {
           <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-amber-500 dark:text-amber-400">
             Clerk · Review Queue
           </p>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Review Queue</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+            Review Queue
+          </h1>
           <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
             Requests ready for review — oldest first
           </p>
@@ -73,17 +90,22 @@ async function ClerkDashboardContent({ searchParams }: Props) {
       </div>
 
       {/* Filter bar */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-white/60 p-4 dark:border-slate-700/60 md:flex-row md:items-center md:justify-between">
-        <ReviewQueueFilter currentType={typeFilter} />
-        <div className="inline-flex w-fit items-center gap-2 rounded-xl border border-amber-200/60 bg-amber-50 px-3.5 py-2 text-sm font-semibold text-amber-700 dark:border-amber-800/40 dark:bg-white/[0.06] dark:text-amber-300">
-          {pending.length} pending request{pending.length !== 1 ? "s" : ""}
+      <div className="flex flex-col gap-4 rounded-2xl border border-white/60 bg-white/40 p-5 dark:border-slate-700/60 dark:bg-white/[0.04] backdrop-blur-sm md:flex-row md:items-center md:justify-between">
+        <ReviewQueueFilter
+          currentType={typeFilter}
+          currentStatus={statusFilter}
+        />
+        {/* Results count – responsive */}
+        <div className="self-start rounded-full bg-slate-100 px-3.5 py-1.5 text-sm font-medium text-slate-700 dark:bg-white/[0.06] dark:text-slate-300 md:self-auto">
+          <span className="font-semibold">{filtered.length}</span> request
+          {filtered.length !== 1 ? "s" : ""} found
         </div>
       </div>
 
       {/* Scrollable request list */}
-      {pending.length > 0 ? (
+      {filtered.length > 0 ? (
         <div className="max-h-[calc(100vh-280px)] space-y-4 overflow-y-auto pr-2 pb-6 custom-scrollbar">
-          {pending.map((r) => (
+          {filtered.map((r) => (
             <ReviewCard key={r.id} request={r} />
           ))}
         </div>
