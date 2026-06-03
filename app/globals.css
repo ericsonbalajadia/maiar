@@ -190,6 +190,38 @@
     background: rgba(88, 133, 92, 0.1);
   }
 
+  .supervisor-shell {
+    color: var(--brand-600);
+  }
+
+  .supervisor-surface {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(13, 51, 17, 0.3);
+    box-shadow: none;
+  }
+
+  .supervisor-surface-soft {
+    background: rgba(255, 255, 255, 0.58);
+    border: 1px solid rgba(13, 51, 17, 0.24);
+    box-shadow: none;
+  }
+
+  .supervisor-tile {
+    background: rgba(13, 51, 17, 0.1);
+    border: 0;
+  }
+
+  .supervisor-button {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(13, 51, 17, 0.3);
+    color: #0d3311;
+    box-shadow: none;
+  }
+
+  .supervisor-button:hover {
+    background: rgba(13, 51, 17, 0.1);
+  }
+
   .dark .requester-shell {
     color: #f4f6f8;
   }
@@ -241,6 +273,33 @@
   }
 
   .dark .clerk-button:hover {
+    background: rgba(255, 255, 255, 0.09);
+  }
+
+  .dark .supervisor-shell {
+    color: #f4f6f8;
+  }
+
+  .dark .supervisor-surface,
+  .dark .supervisor-surface-soft {
+    background: rgba(24, 27, 32, 0.9);
+    border-color: rgba(255, 255, 255, 0.09);
+    box-shadow: none;
+  }
+
+  .dark .supervisor-tile {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: transparent;
+  }
+
+  .dark .supervisor-button {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #adebb3;
+    box-shadow: none;
+  }
+
+  .dark .supervisor-button:hover {
     background: rgba(255, 255, 255, 0.09);
   }
 }
