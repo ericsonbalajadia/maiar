@@ -9,8 +9,8 @@ import { ReviewQueueFilter } from "@/components/clerk/review-queue-filter";
 
 function EmptySection() {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 py-10 text-center dark:border-slate-700/60">
-      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/[0.05]">
+    <div className="clerk-surface flex flex-col items-center justify-center rounded-2xl border-dashed py-10 text-center">
+      <div className="clerk-tile mb-3 flex h-10 w-10 items-center justify-center rounded-xl">
         <InboxIcon className="h-5 w-5 text-slate-400" />
       </div>
       <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
@@ -25,12 +25,9 @@ function EmptySection() {
 
 function ReviewCard({ request }: { request: any }) {
   return (
-    <div
-      className="relative z-0 overflow-hidden rounded-2xl border border-white/60 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-slate-700/60"
-      style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
-    >
+    <div className="clerk-surface relative z-0 overflow-hidden rounded-2xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
       <RequestCard request={request} fullHref={`/clerk/requests/${request.id}/review`} />
-      <div className="border-t border-slate-100/80 bg-slate-50/40 px-4 py-3 dark:border-slate-800/60 dark:bg-white/[0.04]">
+      <div className="border-t border-[#58855C]/20 bg-white/40 px-4 py-3 dark:border-white/10 dark:bg-white/[0.04]">
         <StatusUpdatePanel
           requestId={request.id}
           currentStatus={request.status.status_name}
@@ -57,10 +54,10 @@ async function ClerkDashboardContent({ searchParams }: Props) {
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 px-4 md:px-6 fade-in">
+    <div className="clerk-shell mx-auto max-w-7xl space-y-6 px-4 md:px-6 fade-in">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-amber-500 dark:text-amber-400">
+          <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-[#58855C] dark:text-emerald-300">
             Clerk - Review Queue
           </p>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Review Queue</h1>
@@ -70,16 +67,16 @@ async function ClerkDashboardContent({ searchParams }: Props) {
         </div>
         <Link
           href="/clerk/requests"
-          className="inline-flex items-center gap-2 self-start rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-white/[0.04] dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-white/[0.08]"
+          className="clerk-button inline-flex items-center gap-2 self-start rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors"
         >
           <Eye className="h-4 w-4" />
           View All Requests
         </Link>
       </div>
 
-      <div className="flex flex-col gap-3 rounded-2xl border border-white/60 p-4 dark:border-slate-700/60 md:flex-row md:items-center md:justify-between">
+      <div className="clerk-surface-soft flex flex-col gap-3 rounded-2xl p-4 md:flex-row md:items-center md:justify-between">
         <ReviewQueueFilter currentType={typeFilter} />
-        <div className="inline-flex w-fit items-center gap-2 rounded-xl border border-blue-200/60 bg-blue-50 px-3.5 py-2 text-sm font-semibold text-blue-700 dark:border-blue-800/40 dark:bg-white/[0.06] dark:text-blue-300">
+        <div className="inline-flex w-fit items-center gap-2 rounded-xl border border-[#58855C]/25 bg-[#58855C]/10 px-3.5 py-2 text-sm font-semibold text-[#58855C] dark:border-white/10 dark:bg-white/[0.06] dark:text-emerald-300">
           {underReview.length} under review
         </div>
       </div>

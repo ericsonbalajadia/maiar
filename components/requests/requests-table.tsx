@@ -34,6 +34,7 @@ export function RequestsTable({
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
+  const isClerk = detailBasePath.startsWith("/clerk");
 
   const setParam = (key: string, value: string) => {
     const next = new URLSearchParams(params.toString());
@@ -57,7 +58,7 @@ export function RequestsTable({
   return (
     <div className="h-full flex flex-col gap-6">
       {/* Filter bar (glassmorphic) */}
-      <div className="rounded-2xl border border-[#ADEBB3]/70 bg-white/10 backdrop-blur-md shadow-lg p-4 shrink-0">
+      <div className={cn("rounded-2xl border backdrop-blur-md shadow-lg p-4 shrink-0", isClerk ? "clerk-surface" : "border-[#ADEBB3]/70 bg-white/10")}>
         <div className="flex flex-wrap gap-3 items-end">
           <div className="flex-1 min-w-[200px]">
             <label className="block text-xs font-semibold text-slate-600 dark:text-white/80 mb-1 uppercase tracking-wide">
@@ -72,7 +73,7 @@ export function RequestsTable({
                   e.key === "Enter" && setParam("search", e.currentTarget.value)
                 }
                 placeholder="Ticket # or title..."
-                className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-[#8dc192]/50 focus:border-transparent transition-all"
+                className={cn("w-full pl-9 pr-3 py-2 rounded-xl border dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:border-transparent transition-all", isClerk ? "border-[#58855C]/25 focus:ring-[#58855C]/25" : "border-[#ADEBB3]/70 focus:ring-[#8dc192]/50")}
               />
             </div>
           </div>
@@ -84,7 +85,7 @@ export function RequestsTable({
             <select
               defaultValue={params.get("status") ?? ""}
               onChange={(e) => setParam("status", e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-[#8dc192]/50 appearance-none cursor-pointer"
+              className={cn("w-full px-3 py-2 rounded-xl border dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 appearance-none cursor-pointer", isClerk ? "border-[#58855C]/25 focus:ring-[#58855C]/25" : "border-[#ADEBB3]/70 focus:ring-[#8dc192]/50")}
             >
               <option value="">All</option>
               {[
@@ -110,7 +111,7 @@ export function RequestsTable({
             <select
               defaultValue={params.get("priority") ?? ""}
               onChange={(e) => setParam("priority", e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-[#8dc192]/50 appearance-none cursor-pointer"
+              className={cn("w-full px-3 py-2 rounded-xl border dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 appearance-none cursor-pointer", isClerk ? "border-[#58855C]/25 focus:ring-[#58855C]/25" : "border-[#ADEBB3]/70 focus:ring-[#8dc192]/50")}
             >
               <option value="">All</option>
               {["emergency", "high", "normal", "low"].map((p) => (
@@ -128,7 +129,7 @@ export function RequestsTable({
             <select
               defaultValue={params.get("month") ?? ""}
               onChange={(e) => setParam("month", e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-[#8dc192]/50 appearance-none cursor-pointer"
+              className={cn("w-full px-3 py-2 rounded-xl border dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 appearance-none cursor-pointer", isClerk ? "border-[#58855C]/25 focus:ring-[#58855C]/25" : "border-[#ADEBB3]/70 focus:ring-[#8dc192]/50")}
             >
               <option value="">All</option>
               {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
@@ -148,7 +149,7 @@ export function RequestsTable({
             <select
               defaultValue={params.get("year") ?? ""}
               onChange={(e) => setParam("year", e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-[#8dc192]/50 appearance-none cursor-pointer"
+              className={cn("w-full px-3 py-2 rounded-xl border dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 appearance-none cursor-pointer", isClerk ? "border-[#58855C]/25 focus:ring-[#58855C]/25" : "border-[#ADEBB3]/70 focus:ring-[#8dc192]/50")}
             >
               <option value="">All</option>
               {Array.from(
@@ -165,7 +166,7 @@ export function RequestsTable({
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="h-10 px-4 text-sm text-slate-700 dark:text-white/90 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] transition-all flex items-center gap-1"
+              className={cn("h-10 px-4 text-sm text-slate-700 dark:text-white/90 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm rounded-xl border dark:border-white/10 dark:hover:bg-white/[0.08] transition-all flex items-center gap-1", isClerk ? "border-[#58855C]/25 hover:bg-[#58855C]/10" : "border-[#ADEBB3]/70 hover:bg-[#ADEBB3]/35")}
             >
               <X className="w-4 h-4" />
               Clear
@@ -175,11 +176,11 @@ export function RequestsTable({
       </div>
 
       {/* Table container (scrolls) */}
-      <div className="flex-1 min-h-0 rounded-2xl border border-[#ADEBB3]/70 bg-white/10 backdrop-blur-md shadow-lg flex flex-col overflow-hidden">
+      <div className={cn("flex-1 min-h-0 rounded-2xl border backdrop-blur-md shadow-lg flex flex-col overflow-hidden", isClerk ? "clerk-surface" : "border-[#ADEBB3]/70 bg-white/10")}>
         <div className="flex-1 overflow-auto">
           <div className="min-w-[800px]">
             {/* Header */}
-            <div className="sticky top-0 z-10 backdrop-blur-sm bg-white/80 dark:bg-white/[0.05] border-b border-[#ADEBB3]/70 dark:border-white/10 px-4 py-3 grid grid-cols-12 text-sm font-bold text-[#1e2c1f] dark:text-white">
+            <div className={cn("sticky top-0 z-10 backdrop-blur-sm bg-white/80 dark:bg-white/[0.05] border-b dark:border-white/10 px-4 py-3 grid grid-cols-12 text-sm font-bold dark:text-white", isClerk ? "border-[#58855C]/20 text-[#58855C] dark:border-white/10" : "border-[#ADEBB3]/70 text-[#1e2c1f]")}>
               <div className="col-span-2">Ticket</div>
               <div className="col-span-4">Request</div>
               <div className="col-span-2">Requester</div>
@@ -189,7 +190,7 @@ export function RequestsTable({
             </div>
 
             {/* Rows */}
-            <div className="divide-y divide-[#ADEBB3]/45 dark:divide-[#ADEBB3]/30">
+            <div className={cn("divide-y", isClerk ? "divide-[#58855C]/20 dark:divide-white/10" : "divide-[#ADEBB3]/45 dark:divide-[#ADEBB3]/30")}>
               {requests.map((r) => (
                 <div
                   key={r.id}
@@ -200,10 +201,10 @@ export function RequestsTable({
                       : `${detailBasePath}/${r.id}`;
                     router.push(targetPath);
                   }}
-                  className="grid grid-cols-12 px-4 py-3 items-center cursor-pointer transition-all duration-200 hover:bg-[#ADEBB3]/35 hover:backdrop-blur-md group"
+                  className={cn("grid grid-cols-12 px-4 py-3 items-center cursor-pointer transition-all duration-200 hover:backdrop-blur-md group", isClerk ? "hover:bg-[#58855C]/10" : "hover:bg-[#ADEBB3]/35")}
                 >
                   <div className="col-span-2">
-                    <p className="font-mono text-xs text-gray-500 group-hover:text-[#527255] dark:group-hover:text-emerald-300">
+                    <p className={cn("font-mono text-xs text-gray-500 dark:group-hover:text-emerald-300", isClerk ? "group-hover:text-[#58855C]" : "group-hover:text-[#527255]")}>
                       {r.ticket_number}
                     </p>
                   </div>
@@ -263,7 +264,7 @@ export function RequestsTable({
           <button
             onClick={() => setParam("page", String(currentPage - 1))}
             disabled={currentPage === 1}
-            className="px-3 py-1 text-sm rounded-lg border border-[#ADEBB3]/70 dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className={cn("px-3 py-1 text-sm rounded-lg border dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm dark:hover:bg-white/[0.08] transition-all disabled:opacity-50 disabled:cursor-not-allowed", isClerk ? "border-[#58855C]/25 hover:bg-[#58855C]/10" : "border-[#ADEBB3]/70 hover:bg-[#ADEBB3]/35")}
           >
             Previous
           </button>
@@ -299,8 +300,12 @@ export function RequestsTable({
                   onClick={() => setParam("page", String(pageNum))}
                   className={`px-3 py-1 text-sm rounded-lg border ${
                     pageNum === currentPage
-                      ? "bg-[#527255] text-white border-[#ADEBB3]/70 shadow-sm"
-                      : "border-[#ADEBB3]/70 dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]"
+                      ? isClerk
+                        ? "bg-[#58855C] text-white border-[#58855C]/25 shadow-sm"
+                        : "bg-[#527255] text-white border-[#ADEBB3]/70 shadow-sm"
+                      : isClerk
+                        ? "border-[#58855C]/25 dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm hover:bg-[#58855C]/10 dark:hover:bg-white/[0.08]"
+                        : "border-[#ADEBB3]/70 dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]"
                   } transition-all`}
                 >
                   {pageNum}
@@ -311,7 +316,7 @@ export function RequestsTable({
           <button
             onClick={() => setParam("page", String(currentPage + 1))}
             disabled={currentPage === totalPages}
-            className="px-3 py-1 text-sm rounded-lg border border-[#ADEBB3]/70 dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className={cn("px-3 py-1 text-sm rounded-lg border dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm dark:hover:bg-white/[0.08] transition-all disabled:opacity-50 disabled:cursor-not-allowed", isClerk ? "border-[#58855C]/25 hover:bg-[#58855C]/10" : "border-[#ADEBB3]/70 hover:bg-[#ADEBB3]/35")}
           >
             Next
           </button>

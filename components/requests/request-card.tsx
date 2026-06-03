@@ -28,6 +28,7 @@ export function RequestCard({ request, fullHref, hideStatus = false, variant = '
 
   const linkHref = fullHref ? fullHref : `/clerk/requests/${request.id}/review`;
   const isRequester = variant === 'requester'
+  const isClerk = linkHref.startsWith('/clerk')
 
   return (
     <Link href={linkHref} className="block">
@@ -35,7 +36,9 @@ export function RequestCard({ request, fullHref, hideStatus = false, variant = '
         className={
           isRequester
             ? "group relative rounded-[20px] border border-[#ADEBB3]/70 dark:border-white/10 bg-white/75 dark:bg-white/[0.05] backdrop-blur-sm p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#ADEBB3]/70 hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]"
-            : "group relative rounded-2xl border border-[#ADEBB3]/70 dark:border-white/10 bg-white/80 dark:bg-white/[0.05] backdrop-blur-sm p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-[#ADEBB3]/70 dark:hover:border-[#ADEBB3]/80 hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]"
+            : isClerk
+              ? "group relative clerk-surface rounded-2xl backdrop-blur-sm p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:bg-[#58855C]/10 dark:hover:bg-white/[0.08]"
+              : "group relative rounded-2xl border border-[#ADEBB3]/70 dark:border-white/10 bg-white/80 dark:bg-white/[0.05] backdrop-blur-sm p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-[#ADEBB3]/70 dark:hover:border-[#ADEBB3]/80 hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]"
         }
       >
         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -46,7 +49,7 @@ export function RequestCard({ request, fullHref, hideStatus = false, variant = '
               </span>
               <RequestTypeBadge type={request.request_type} />
             </div>
-            <h3 className={isRequester ? "text-base font-semibold text-[#0b130b] dark:text-white line-clamp-1 group-hover:text-[#1e2c1f] dark:group-hover:text-emerald-300 transition-colors" : "text-base font-semibold text-slate-800 dark:text-white line-clamp-1 group-hover:text-[#527255] dark:group-hover:text-emerald-300 transition-colors"}>
+            <h3 className={isRequester ? "text-base font-semibold text-[#0b130b] dark:text-white line-clamp-1 group-hover:text-[#1e2c1f] dark:group-hover:text-emerald-300 transition-colors" : isClerk ? "text-base font-semibold text-slate-800 dark:text-white line-clamp-1 group-hover:text-[#58855C] dark:group-hover:text-emerald-300 transition-colors" : "text-base font-semibold text-slate-800 dark:text-white line-clamp-1 group-hover:text-[#527255] dark:group-hover:text-emerald-300 transition-colors"}>
               {request.title}
             </h3>
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-white/60">
@@ -66,7 +69,7 @@ export function RequestCard({ request, fullHref, hideStatus = false, variant = '
             </div>
           )}
         </div>
-        <div className={isRequester ? "absolute inset-0 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-[#ADEBB3]/15" : "absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-r from-blue-500/5 to-indigo-500/5"} />
+        <div className={isRequester ? "absolute inset-0 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-[#ADEBB3]/15" : isClerk ? "absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-[#58855C]/10" : "absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-r from-blue-500/5 to-indigo-500/5"} />
       </div>
     </Link>
   )

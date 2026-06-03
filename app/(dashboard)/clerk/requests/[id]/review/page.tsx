@@ -15,7 +15,7 @@ export default async function ClerkReviewPage({ params }: { params: Promise<{ id
     <div className="max-w-4xl mx-auto space-y-6 fade-in px-4 py-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-          <Link href="/clerk" className="hover:text-amber-600">Review Queue</Link>
+          <Link href="/clerk" className="hover:text-[#58855C]">Review Queue</Link>
           <span>›</span>
           <span className="font-mono text-xs text-slate-400">{request.ticket_number}</span>
         </div>

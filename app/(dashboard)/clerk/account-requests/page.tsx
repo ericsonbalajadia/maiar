@@ -18,8 +18,8 @@ type PendingRequester = {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const ROLE_STYLES: Record<string, string> = {
-  student: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-white/[0.06] dark:text-blue-300 dark:border-blue-800/50",
-  staff:   "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-white/[0.06] dark:text-indigo-300 dark:border-indigo-800/50",
+  student: "bg-[#58855C]/10 text-[#58855C] border-[#58855C]/25 dark:bg-white/[0.06] dark:text-emerald-300 dark:border-white/10",
+  staff:   "bg-[#58855C]/10 text-[#58855C] border-[#58855C]/25 dark:bg-white/[0.06] dark:text-emerald-300 dark:border-white/10",
 };
 
 const getInitials = (name: string) =>
@@ -27,9 +27,9 @@ const getInitials = (name: string) =>
 
 const AVATAR_GRADIENTS = [
   "from-blue-500 to-indigo-600",
-  "from-violet-500 to-purple-600",
-  "from-[#6f9873] to-[#6f9873]",
-  "from-orange-500 to-amber-600",
+  "from-[#58855C] to-[#58855C]",
+  "from-[#58855C] to-[#58855C]",
+  "from-[#58855C] to-[#58855C]",
   "from-rose-500 to-pink-600",
 ];
 
@@ -44,8 +44,7 @@ function LoadingSkeleton() {
       {[...Array(3)].map((_, i) => (
         <div
           key={i}
-          className="rounded-2xl border border-white/60 dark:border-slate-700/60 p-5 flex items-center gap-4"
-          style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
+          className="clerk-surface rounded-2xl p-5 flex items-center gap-4"
         >
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 animate-pulse shrink-0" />
           <div className="flex-1 space-y-2">
@@ -81,11 +80,11 @@ export default function ClerkAccountRequestsPage() {
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 fade-in">
+    <div className="clerk-shell max-w-4xl mx-auto space-y-6 fade-in">
 
       {/* ── Page header ── */}
       <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-amber-500 dark:text-amber-400 mb-1">
+        <p className="text-xs font-semibold uppercase tracking-widest text-[#58855C] dark:text-emerald-300 mb-1">
           Clerk · Account Requests
         </p>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
@@ -100,7 +99,7 @@ export default function ClerkAccountRequestsPage() {
 
       {/* ── Summary chip ── */}
       {!loading && !error && users.length > 0 && (
-        <div className="inline-flex items-center gap-2 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-800/40 px-3.5 py-2 text-sm font-semibold text-amber-700 dark:text-amber-300">
+        <div className="inline-flex items-center gap-2 rounded-xl bg-[#58855C]/10 dark:bg-white/[0.06] border border-[#58855C]/25 dark:border-white/10 px-3.5 py-2 text-sm font-semibold text-[#58855C] dark:text-emerald-300">
           <Users className="h-3.5 w-3.5" />
           {users.length} pending registration{users.length !== 1 ? "s" : ""}
         </div>
@@ -115,11 +114,10 @@ export default function ClerkAccountRequestsPage() {
         </div>
       ) : users.length === 0 ? (
         <div
-          className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-700/60 flex flex-col items-center justify-center py-16 text-center"
-          style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
+          className="clerk-surface rounded-2xl border-dashed flex flex-col items-center justify-center py-16 text-center"
         >
-          <div className="w-14 h-14 rounded-2xl bg-[#ADEBB3]/35 dark:bg-white/[0.06] flex items-center justify-center mb-4">
-            <UserCheck className="h-7 w-7 text-[#527255]" />
+          <div className="w-14 h-14 rounded-2xl bg-[#58855C]/10 dark:bg-white/[0.06] flex items-center justify-center mb-4">
+            <UserCheck className="h-7 w-7 text-[#58855C]" />
           </div>
           <p className="text-base font-semibold text-slate-700 dark:text-slate-300">
             All registrations reviewed
@@ -139,10 +137,8 @@ export default function ClerkAccountRequestsPage() {
             return (
               <div
                 key={user.id}
-                className="rounded-2xl border border-white/60 dark:border-slate-700/60 overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 fade-in"
+                className="clerk-surface rounded-2xl overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 fade-in"
                 style={{
-                  background: "var(--glass-bg)",
-                  backdropFilter: "blur(12px)",
                   animationDelay: `${i * 60}ms`,
                   animationFillMode: "forwards",
                   opacity: 0,
