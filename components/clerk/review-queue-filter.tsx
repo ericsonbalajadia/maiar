@@ -29,7 +29,7 @@ export function ReviewQueueFilter({ currentType }: Props) {
             onClick={() => setType(opt.value)}
             className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
               currentType === opt.value
-                ? 'bg-blue-600 text-white'
+                ? 'bg-[#d4e8cf] text-[#3a5a3a] dark:bg-[#2a3a2a] dark:text-[#b8d9b0] shadow-sm'
                 : 'bg-white/50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
             }`}
           >
