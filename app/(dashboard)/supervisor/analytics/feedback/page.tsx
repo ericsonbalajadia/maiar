@@ -22,10 +22,7 @@ interface FeedbackWithRequest {
 
 function GlassSection({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      className="rounded-2xl border border-white/60 dark:border-slate-700/60 overflow-hidden shadow-sm"
-      style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
-    >
+    <div className="supervisor-surface rounded-2xl overflow-hidden shadow-sm">
       {children}
     </div>
   );
@@ -41,7 +38,7 @@ function GlassSectionHeader({
   title: string;
 }) {
   return (
-    <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100/80 dark:border-slate-800/60 bg-white/30 dark:bg-white/[0.04]">
+    <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[#0D3311]/20 dark:border-white/10 bg-white/30 dark:bg-white/[0.04]">
       <div
         className={`w-7 h-7 rounded-lg flex items-center justify-center shadow-sm ${iconGradient}`}
       >
@@ -68,13 +65,7 @@ function StatCard({
   icon: React.ElementType;
 }) {
   return (
-    <div
-      className="relative overflow-hidden rounded-2xl border border-white/60 dark:border-slate-700/60 p-5"
-      style={{
-        background: "var(--gradient-card)",
-        backdropFilter: "blur(12px)",
-      }}
-    >
+    <div className="supervisor-surface relative overflow-hidden rounded-2xl p-5">
       <div
         className={`absolute -top-4 -right-4 w-20 h-20 rounded-full opacity-10 blur-xl ${gradient}`}
       />
@@ -154,7 +145,7 @@ export default async function SupervisorFeedbackAnalyticsPage() {
 
   if (!feedbacksRaw || feedbacksRaw.length === 0) {
     return (
-      <div className="max-w-4xl mx-auto space-y-6 fade-in">
+      <div className="supervisor-shell max-w-4xl mx-auto space-y-6 fade-in">
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-[#0D3311] dark:text-emerald-300 mb-1">
             Analytics
@@ -163,14 +154,8 @@ export default async function SupervisorFeedbackAnalyticsPage() {
             Feedback Analytics
           </h1>
         </div>
-        <div
-          className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-700/60 flex flex-col items-center justify-center py-16 text-center"
-          style={{
-            background: "var(--glass-bg)",
-            backdropFilter: "blur(12px)",
-          }}
-        >
-          <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-white/[0.05] flex items-center justify-center mb-4">
+        <div className="supervisor-surface rounded-2xl border-dashed flex flex-col items-center justify-center py-16 text-center">
+          <div className="supervisor-tile w-14 h-14 rounded-2xl flex items-center justify-center mb-4">
             <Star className="h-7 w-7 text-slate-400" />
           </div>
           <p className="text-base font-semibold text-slate-600 dark:text-slate-400">
@@ -231,7 +216,7 @@ export default async function SupervisorFeedbackAnalyticsPage() {
   );
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 fade-in">
+    <div className="supervisor-shell max-w-5xl mx-auto space-y-6 fade-in">
       {/* ── Page header ── */}
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -247,7 +232,7 @@ export default async function SupervisorFeedbackAnalyticsPage() {
         </div>
         <Link
           href="/supervisor"
-          className="inline-flex items-center gap-2 self-start shrink-0 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-white/[0.04] dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-white/[0.08]"
+          className="supervisor-button inline-flex items-center gap-2 self-start shrink-0 rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors"
         >
           ← Dashboard
         </Link>
@@ -324,7 +309,7 @@ export default async function SupervisorFeedbackAnalyticsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-100 dark:border-slate-800/60">
+                <tr className="border-b border-[#0D3311]/20 dark:border-white/10">
                   {["Category", "Avg Rating", "Reviews"].map((h) => (
                     <th
                       key={h}
@@ -335,12 +320,12 @@ export default async function SupervisorFeedbackAnalyticsPage() {
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50 dark:divide-slate-800/30">
+              <tbody className="divide-y divide-[#0D3311]/10 dark:divide-white/10">
                 {(byCategory as any[]).map((row, i) => (
                   <tr
                     key={row.category_name}
                     className={
-                      i % 2 === 0 ? "" : "bg-slate-50/30 dark:bg-white/[0.05]"
+                      i % 2 === 0 ? "" : "bg-[#0D3311]/5 dark:bg-white/[0.05]"
                     }
                   >
                     <td className="px-5 py-3 font-medium text-slate-700 dark:text-slate-300 capitalize">
@@ -380,7 +365,7 @@ export default async function SupervisorFeedbackAnalyticsPage() {
               {commentsWithText.map((f, idx) => (
                 <div
                   key={idx}
-                  className="rounded-xl border border-slate-100 dark:border-slate-800/60 bg-white/60 dark:bg-white/[0.05] p-4"
+                  className="supervisor-surface-soft rounded-xl p-4"
                 >
                   {/* Comment meta */}
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
@@ -410,7 +395,7 @@ export default async function SupervisorFeedbackAnalyticsPage() {
                       )}
                     </div>
                     <div className="flex gap-2">
-                      <span className="text-[11px] font-semibold bg-[#ADEBB3]/35 dark:bg-white/[0.06] text-[#374e39] dark:text-emerald-300 border border-[#ADEBB3]/70 dark:border-white/10 px-2 py-0.5 rounded-full">
+                      <span className="text-[11px] font-semibold bg-[#0D3311]/10 dark:bg-white/[0.06] text-[#0D3311] dark:text-emerald-300 border border-[#0D3311]/20 dark:border-white/10 px-2 py-0.5 rounded-full">
                         Service:{" "}
                         {SERVICE_LABELS[f.service_satisfaction] ??
                           f.service_satisfaction}

@@ -30,10 +30,7 @@ interface Props {
 
 function GlassSection({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      className="rounded-2xl border border-white/60 dark:border-slate-700/60 overflow-hidden shadow-sm"
-      style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
-    >
+    <div className="supervisor-surface rounded-2xl overflow-hidden shadow-sm">
       {children}
     </div>
   );
@@ -51,7 +48,7 @@ function GlassSectionHeader({
   badge?: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100/80 dark:border-slate-800/60 bg-white/30 dark:bg-white/[0.04]">
+    <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[#0D3311]/20 dark:border-white/10 bg-white/30 dark:bg-white/[0.04]">
       <div
         className={`w-7 h-7 rounded-lg flex items-center justify-center shadow-sm ${iconGradient}`}
       >
@@ -92,19 +89,19 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
   const ticketNumber = request.ticket_number ?? id.slice(0, 8).toUpperCase();
 
   return (
-    <div className="max-w-4xl mx-auto space-y-5 fade-in">
+    <div className="supervisor-shell max-w-4xl mx-auto space-y-5 fade-in">
       {/* ── Breadcrumb ── */}
       <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500">
         <Link
           href="/supervisor"
-          className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+          className="hover:text-[#0D3311] dark:hover:text-emerald-300 transition-colors"
         >
           Dashboard
         </Link>
         <span>/</span>
         <Link
           href="/supervisor/requests"
-          className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+          className="hover:text-[#0D3311] dark:hover:text-emerald-300 transition-colors"
         >
           All Requests
         </Link>

@@ -100,14 +100,14 @@ export function StaffActionButtons({ userId, onSuccess }: StaffActionButtonsProp
       {/* ── Decline dialog ── */}
       <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
         <DialogContent
-          className="max-w-md rounded-2xl border border-white/60 dark:border-slate-700/60 shadow-2xl p-0 overflow-hidden"
+          className="max-w-md rounded-2xl border border-[#0D3311]/20 dark:border-white/10 shadow-2xl p-0 overflow-hidden"
           style={{
             background: "rgba(255,255,255,0.97)",
             backdropFilter: "blur(20px)",
           }}
         >
           {/* Dialog header */}
-          <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-3 px-5 py-4 border-b border-[#0D3311]/15 dark:border-white/10">
             <div className="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center shrink-0">
               <AlertTriangle className="h-5 w-5 text-rose-500" />
             </div>
@@ -127,7 +127,7 @@ export function StaffActionButtons({ userId, onSuccess }: StaffActionButtonsProp
               placeholder="Reason for declining (optional)…"
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
-              className="min-h-[100px] resize-none bg-white/60 dark:bg-white/[0.05] border-slate-200 dark:border-slate-700 focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20 transition-all text-sm placeholder:text-slate-400"
+              className="min-h-[100px] resize-none bg-white/60 dark:bg-white/[0.05] border-[#0D3311]/15 dark:border-white/10 focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20 transition-all text-sm placeholder:text-slate-400"
             />
             {rejectState.error && (
               <p className="text-xs text-rose-500 flex items-center gap-1">
