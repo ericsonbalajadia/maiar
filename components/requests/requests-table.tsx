@@ -84,6 +84,7 @@ export function RequestsTable({
               Status
             </label>
             <select
+            aria-label="Filter by status"
               defaultValue={params.get("status") ?? ""}
               onChange={(e) => setParam("status", e.target.value)}
               className="w-full px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer"
@@ -117,6 +118,7 @@ export function RequestsTable({
               Priority
             </label>
             <select
+              aria-label="Filter by priority"
               defaultValue={params.get("priority") ?? ""}
               onChange={(e) => setParam("priority", e.target.value)}
               className="w-full px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer"
@@ -142,6 +144,7 @@ export function RequestsTable({
               Month
             </label>
             <select
+              aria-label="Filter by month"
               defaultValue={params.get("month") ?? ""}
               onChange={(e) => setParam("month", e.target.value)}
               className="w-full px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer"
@@ -169,6 +172,7 @@ export function RequestsTable({
               Year
             </label>
             <select
+              aria-label="Filter by year"
               defaultValue={params.get("year") ?? ""}
               onChange={(e) => setParam("year", e.target.value)}
               className="w-full px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer"

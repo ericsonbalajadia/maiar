@@ -392,6 +392,7 @@ export function NotificationBell({
                   </button>
                 )}
                 <button
+                aria-label="Close notifications panel"
                   onClick={() => setOpen(false)}
                   className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:text-[#527255] hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] transition-colors"
                 >
