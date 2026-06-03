@@ -98,7 +98,7 @@ export function RequestsTable({
               <option value="">All</option>
               {[
                 "pending",
-                "under_review",
+                // "under_review",
                 "approved",
                 "assigned",
                 "in_progress",

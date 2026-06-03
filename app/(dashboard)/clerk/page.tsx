@@ -50,22 +50,16 @@ function ReviewCard({ request }: { request: any }) {
 }
 
 interface Props {
-  searchParams: Promise<{ type?: string; status?: string }>;
+  searchParams: Promise<{ type?: string }>;
 }
 
 async function ClerkDashboardContent({ searchParams }: Props) {
   const sp = await searchParams;
   const typeFilter = sp.type === "rmr" || sp.type === "ppsr" ? sp.type : "all";
-  const statusFilter =
-    sp.status === "pending" || sp.status === "under_review" ? sp.status : "all";
 
   const { data: requests } = await getRequestsForClerk();
   let filtered = requests ?? [];
 
-  // Apply status filter
-  if (statusFilter !== "all") {
-    filtered = filtered.filter((r) => r.status.status_name === statusFilter);
-  }
 
   // Apply type filter
   if (typeFilter !== "all") {
@@ -89,16 +83,11 @@ async function ClerkDashboardContent({ searchParams }: Props) {
         </div>
       </div>
 
-      {/* Filter bar */}
+      {/* Filter bar – only type filter */}
       <div className="flex flex-col gap-4 rounded-2xl border border-white/60 bg-white/40 p-5 dark:border-slate-700/60 dark:bg-white/[0.04] backdrop-blur-sm md:flex-row md:items-center md:justify-between">
-        <ReviewQueueFilter
-          currentType={typeFilter}
-          currentStatus={statusFilter}
-        />
-        {/* Results count – responsive */}
-        <div className="self-start rounded-full bg-slate-100 px-3.5 py-1.5 text-sm font-medium text-slate-700 dark:bg-white/[0.06] dark:text-slate-300 md:self-auto">
-          <span className="font-semibold">{filtered.length}</span> request
-          {filtered.length !== 1 ? "s" : ""} found
+        <ReviewQueueFilter currentType={typeFilter} />
+        <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3.5 py-1.5 text-sm font-medium text-slate-700 dark:bg-white/[0.06] dark:text-slate-300">
+          <span className="font-semibold">{filtered.length}</span> pending request{filtered.length !== 1 ? "s" : ""}
         </div>
       </div>
 

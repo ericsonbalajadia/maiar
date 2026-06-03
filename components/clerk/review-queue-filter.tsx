@@ -4,16 +4,14 @@ import { useRouter } from 'next/navigation';
 
 interface Props {
   currentType: string;
-  currentStatus: string;
 }
 
-export function ReviewQueueFilter({ currentType, currentStatus }: Props) {
+export function ReviewQueueFilter({ currentType }: Props) {
   const router = useRouter();
 
   const setType = (type: string) => {
     const params = new URLSearchParams();
     if (type !== 'all') params.set('type', type);
-    if (currentStatus !== 'all') params.set('status', currentStatus);
     router.push(`/clerk?${params.toString()}`);
   };
 
@@ -50,26 +48,7 @@ export function ReviewQueueFilter({ currentType, currentStatus }: Props) {
       {/* Separator (optional, visible on larger screens) */}
       <span className="hidden sm:inline text-slate-300 dark:text-slate-600">|</span>
 
-      {/* Status filter group */}
-      <div className="flex items-center gap-1.5 rounded-full border border-slate-200/60 bg-white/60 p-1 dark:border-slate-700/60 dark:bg-slate-800/60">
-        {[
-          { value: 'all', label: 'All' },
-          { value: 'pending', label: 'Pending' },
-          { value: 'under_review', label: 'Under Review' },
-        ].map((opt) => (
-          <button
-            key={opt.value}
-            onClick={() => setStatus(opt.value)}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              currentStatus === opt.value
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
-            }`}
-          >
-            {opt.label}
-          </button>
-        ))}
-      </div>
+
     </div>
   );
 }
