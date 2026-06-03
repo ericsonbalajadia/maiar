@@ -66,7 +66,7 @@ export function StaffActionButtons({ userId, onSuccess }: StaffActionButtonsProp
             type="submit"
             size="sm"
             disabled={approvePending}
-            className="h-8 px-3 gap-1.5 bg-gradient-to-r from-[#6f9873] to-[#6f9873] hover:from-[#527255] hover:to-[#527255] text-white shadow-sm shadow-[#ADEBB3]/35 border-0 text-xs font-semibold"
+            className="h-8 px-3 gap-1.5 bg-[#0D3311] hover:bg-[#09250d] text-white shadow-sm shadow-[#0D3311]/20 border-0 text-xs font-semibold"
           >
             {approvePending ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />

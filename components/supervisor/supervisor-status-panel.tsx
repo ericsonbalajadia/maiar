@@ -38,7 +38,7 @@ const TRANSITION_CONFIG: Record<
     label: "Mark Completed",
     icon: CheckCircle2,
     className:
-      "bg-gradient-to-r from-[#6f9873] to-[#6f9873] hover:from-[#527255] hover:to-[#527255] text-white shadow-sm shadow-[#ADEBB3]/35 border-0",
+      "bg-[#0D3311] hover:bg-[#09250d] text-white shadow-sm shadow-[#0D3311]/20 border-0",
   },
   cancelled: {
     label: "Cancel Request",
@@ -64,8 +64,8 @@ export function SupervisorStatusPanel({ requestId, currentStatus }: Props) {
   if (allowedNext.length === 0) {
     return (
       <div className="flex items-center gap-3 rounded-xl bg-slate-50 dark:bg-white/[0.05] border border-slate-100 dark:border-slate-800/60 px-4 py-3">
-        <div className="w-7 h-7 rounded-lg bg-[#ADEBB3]/35 dark:bg-white/[0.06] flex items-center justify-center shrink-0">
-          <CheckCheck className="h-4 w-4 text-[#527255]" />
+        <div className="w-7 h-7 rounded-lg bg-[#0D3311]/10 dark:bg-white/[0.06] flex items-center justify-center shrink-0">
+          <CheckCheck className="h-4 w-4 text-[#0D3311]" />
         </div>
         <p className="text-sm text-slate-500 dark:text-slate-400">
           No further status updates available for this request.
@@ -78,7 +78,7 @@ export function SupervisorStatusPanel({ requestId, currentStatus }: Props) {
     <div className="space-y-4">
       {/* Success feedback */}
       {state.success && (
-        <div className="flex items-center gap-2.5 rounded-xl bg-[#ADEBB3]/35 dark:bg-white/[0.06] border border-[#ADEBB3]/70 dark:border-white/10 px-4 py-3 text-sm text-[#374e39] dark:text-emerald-300">
+        <div className="flex items-center gap-2.5 rounded-xl bg-[#0D3311]/10 dark:bg-white/[0.06] border border-[#0D3311]/20 dark:border-white/10 px-4 py-3 text-sm text-[#0D3311] dark:text-emerald-300">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
           Status updated successfully.
         </div>

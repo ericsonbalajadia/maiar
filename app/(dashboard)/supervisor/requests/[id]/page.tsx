@@ -117,7 +117,7 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
       {/* ── Page header ── */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-lg font-bold uppercase tracking-widest text-violet-500 dark:text-violet-400 mb-1">
+          <p className="text-lg font-bold uppercase tracking-widest text-[#0D3311] dark:text-emerald-300 mb-1">
             Request Detail
           </p>
           {/* <h1 className="text-xl font-bold text-slate-900 dark:text-white line-clamp-2">
@@ -153,7 +153,7 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
         <GlassSection>
           <GlassSectionHeader
             icon={Wrench}
-            iconGradient="bg-gradient-to-br from-violet-500 to-purple-600"
+            iconGradient="bg-[#0D3311]"
             title="Assign Technician"
             badge={
               currentTechnicianId ? (
@@ -161,7 +161,7 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
                   Reassign
                 </span>
               ) : (
-                <span className="text-[11px] font-semibold bg-[#ADEBB3]/35 dark:bg-white/[0.06] text-[#527255] dark:text-emerald-300 px-2 py-0.5 rounded-full border border-[#ADEBB3]/70 dark:border-white/10">
+                <span className="text-[11px] font-semibold bg-[#0D3311]/10 dark:bg-white/[0.06] text-[#0D3311] dark:text-emerald-300 px-2 py-0.5 rounded-full border border-[#0D3311]/20 dark:border-white/10">
                   Required
                 </span>
               )
@@ -188,7 +188,7 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
             title="Repair Schedule"
             badge={
               hasSchedule ? (
-                <span className="text-[11px] font-semibold bg-[#ADEBB3]/35 dark:bg-white/[0.06] text-[#527255] dark:text-emerald-300 px-2 py-0.5 rounded-full border border-[#ADEBB3]/70 dark:border-white/10">
+                <span className="text-[11px] font-semibold bg-[#0D3311]/10 dark:bg-white/[0.06] text-[#0D3311] dark:text-emerald-300 px-2 py-0.5 rounded-full border border-[#0D3311]/20 dark:border-white/10">
                   Scheduled
                 </span>
               ) : (
@@ -244,7 +244,7 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
   <GlassSection>
     <GlassSectionHeader
       icon={CheckCircle2}
-      iconGradient="bg-gradient-to-br from-violet-500 to-purple-600"
+      iconGradient="bg-[#0D3311]"
       title="Update Status"
       badge={
         <div className="flex items-center gap-1">

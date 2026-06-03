@@ -156,7 +156,7 @@ export default async function SupervisorFeedbackAnalyticsPage() {
     return (
       <div className="max-w-4xl mx-auto space-y-6 fade-in">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-violet-500 dark:text-violet-400 mb-1">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#0D3311] dark:text-emerald-300 mb-1">
             Analytics
           </p>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
@@ -235,7 +235,7 @@ export default async function SupervisorFeedbackAnalyticsPage() {
       {/* ── Page header ── */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-violet-500 dark:text-violet-400 mb-1">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#0D3311] dark:text-emerald-300 mb-1">
             Supervisor · Analytics
           </p>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
@@ -259,7 +259,7 @@ export default async function SupervisorFeedbackAnalyticsPage() {
           label="Avg. Service Satisfaction"
           value={serviceAvg}
           total={total}
-          gradient="bg-gradient-to-br from-[#8dc192] to-[#527255]"
+          gradient="bg-[#0D3311]"
           icon={Star}
         />
         <StatCard
@@ -318,7 +318,7 @@ export default async function SupervisorFeedbackAnalyticsPage() {
         <GlassSection>
           <GlassSectionHeader
             icon={Tag}
-            iconGradient="bg-gradient-to-br from-violet-500 to-purple-600"
+            iconGradient="bg-[#0D3311]"
             title="Average Rating by Category"
           />
           <div className="overflow-x-auto">
