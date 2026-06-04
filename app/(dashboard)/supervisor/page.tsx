@@ -13,9 +13,16 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-type SupervisorRequest = Awaited<ReturnType<typeof getRequestsForSupervisor>>["data"] extends Array<infer T>
-  ? T
-  : never;
+type SupervisorRequest = {
+  id: string;
+  ticket_number: string | null;
+  title: string;
+  request_type: string;
+  created_at: string;
+  status: { status_name: string };
+  priority: { level: string };
+  location: { building_name: string };
+};
 
 function AssignmentLane({
   title,
