@@ -43,9 +43,9 @@ const EXACT_MATCH_HREFS = new Set([
 const ROLE_META: Record<string, { label: string; accent: string; dot: string }> = {
   student:    { label: 'Requester',  accent: 'from-[#ADEBB3] to-[#ADEBB3]',   dot: 'bg-[#ADEBB3]' },
   staff:      { label: 'Requester',  accent: 'from-[#ADEBB3] to-[#ADEBB3]',   dot: 'bg-[#ADEBB3]' },
-  clerk:      { label: 'Clerk',      accent: 'from-amber-400 to-orange-500',  dot: 'bg-amber-400' },
-  technician: { label: 'Personnel',  accent: 'from-[#8dc192] to-[#527255]',  dot: 'bg-[#8dc192]' },
-  supervisor: { label: 'Supervisor', accent: 'from-violet-500 to-purple-600', dot: 'bg-violet-500' },
+  clerk:      { label: 'Clerk',      accent: 'from-[#58855C] to-[#58855C]',  dot: 'bg-[#58855C]' },
+  technician: { label: 'Personnel',  accent: 'from-[#0D3311] to-[#0D3311]',  dot: 'bg-[#0D3311]' },
+  supervisor: { label: 'Supervisor', accent: 'from-[#0D3311] to-[#0D3311]', dot: 'bg-[#0D3311]' },
   admin:      { label: 'Admin',      accent: 'from-rose-500 to-pink-600',     dot: 'bg-rose-500' },
 }
 
@@ -141,7 +141,7 @@ export function Sidebar({ userRole, userName = 'User', userEmail = '', mobile = 
                 {active && !isRequester && (
                   <span className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${meta.accent} ${isRequester ? 'opacity-0' : 'opacity-95'}`} aria-hidden />
                 )}
-                <span className={cn('relative z-10 transition-colors', isRequester ? active ? 'text-[#1e2c1f] opacity-100 dark:text-emerald-300' : 'text-[#0b130b]/55 opacity-55 dark:text-white/55' : active ? 'text-white' : 'text-[#527255] dark:text-slate-500 group-hover:text-[#1e2c1f] dark:group-hover:text-emerald-300')}>
+                <span className={cn('relative z-10 transition-colors', isRequester ? active ? 'text-[#1e2c1f] opacity-100 dark:text-emerald-300' : 'text-[#0b130b]/55 opacity-55 dark:text-white/55' : active ? 'text-white' : 'text-[#0D3311] dark:text-slate-500 group-hover:text-[#0D3311] dark:group-hover:text-emerald-300')}>
                   {renderIcon(item.icon)}
                 </span>
                 <span className="relative z-10 truncate flex-1">{item.label}</span>

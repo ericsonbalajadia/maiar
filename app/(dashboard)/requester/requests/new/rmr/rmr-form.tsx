@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { RequestPhotoPicker, SelectedPhotoGrid, uploadRequestPhotos } from '@/components/requests/request-photo-picker'
 import { cn } from '@/lib/utils'
 import {
   ChevronRight, ChevronLeft, Check, Loader2, CheckCircle2, X,
@@ -282,6 +283,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [ticketNumber, setTicketNumber] = useState<string | null>(null)
   const [requestId, setRequestId] = useState<string | null>(null)
+  const [photos, setPhotos] = useState<File[]>([])
 
   const today = new Date().toISOString().split('T')[0]
 
@@ -349,6 +351,16 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
         contact_email:     form.email,
       })
       if (result.success && result.ticketNumber && result.requestId) {
+        try {
+          await uploadRequestPhotos(result.requestId, photos)
+        } catch (error) {
+          setErrors({
+            submit: error instanceof Error
+              ? `Request was submitted, but photo upload failed: ${error.message}`
+              : 'Request was submitted, but photo upload failed.',
+          })
+          return
+        }
         setTicketNumber(result.ticketNumber)
         setRequestId(result.requestId)
       } else {
@@ -368,6 +380,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
       contact_number: dbUser.phone ?? '', email: dbUser.email,
       category_ids: [], title: '', description: '',
     })
+    setPhotos([])
   }
 
   if (ticketNumber && requestId) {
@@ -428,7 +441,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1.5">
                     <div>
                       <Input
-                        placeholder="Building name *"
+                        placeholder="Specific location *"
                         value={form.location_building}
                         onChange={(e) => set('location_building', e.target.value)}
                         className={cn(
@@ -626,6 +639,10 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                 />
               </Field>
 
+              <Field label="Photos">
+                <RequestPhotoPicker files={photos} onChange={setPhotos} disabled={isPending} />
+              </Field>
+
               <div className="rounded-xl bg-[#ADEBB3]/30 dark:bg-white/[0.05] border border-[#ADEBB3]/70 dark:border-white/10 px-4 py-3 text-xs text-[#527255] dark:text-emerald-300">
                 💡 The more detail you provide, the faster and more accurately we can handle your request.
               </div>
@@ -691,6 +708,12 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                     <>
                       <p className="text-xs font-semibold text-slate-400 dark:text-white/45 uppercase tracking-wide mt-3 mb-1">Description</p>
                       <p className="text-slate-600 dark:text-white/60 leading-relaxed">{form.description}</p>
+                    </>
+                  )}
+                  {photos.length > 0 && (
+                    <>
+                      <p className="text-xs font-semibold text-slate-400 dark:text-white/45 uppercase tracking-wide mt-3 mb-1">Photos</p>
+                      <SelectedPhotoGrid files={photos} />
                     </>
                   )}
                 </div>

@@ -19,15 +19,15 @@ type PendingStaff = {
 // ─── Config ───────────────────────────────────────────────────────────────────
 
 const ROLE_STYLES: Record<string, string> = {
-  technician: "bg-[#ADEBB3]/35 text-[#374e39] border-[#ADEBB3]/70 dark:bg-white/[0.06] dark:text-emerald-300 dark:border-white/10",
-  supervisor: "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/30 dark:text-violet-300 dark:border-violet-800/50",
+  technician: "bg-[#0D3311]/10 text-[#0D3311] border-[#0D3311]/20 dark:bg-white/[0.06] dark:text-emerald-300 dark:border-white/10",
+  supervisor: "bg-[#0D3311]/10 text-[#0D3311] border-[#0D3311]/20 dark:bg-white/[0.06] dark:text-emerald-300 dark:border-white/10",
   clerk:      "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800/50",
   staff:      "bg-blue-50 text-blue-700 border-blue-200 dark:bg-white/[0.06] dark:text-blue-300 dark:border-blue-800/50",
 };
 
 const AVATAR_GRADIENTS = [
-  "from-violet-500 to-purple-600",
-  "from-[#8dc192] to-[#527255]",
+  "from-[#0D3311] to-[#0D3311]",
+  "from-[#0D3311] to-[#0D3311]",
   "from-blue-500 to-indigo-600",
   "from-orange-500 to-amber-600",
   "from-rose-500 to-pink-600",
@@ -47,8 +47,7 @@ function LoadingSkeleton() {
       {[...Array(3)].map((_, i) => (
         <div
           key={i}
-          className="rounded-2xl border border-white/60 dark:border-slate-700/60 p-5 flex items-center gap-4"
-          style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
+          className="supervisor-surface rounded-2xl p-5 flex items-center gap-4"
         >
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 animate-pulse shrink-0" />
           <div className="flex-1 space-y-2">
@@ -84,11 +83,11 @@ export default function SupervisorAccountRequestsPage() {
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 fade-in">
+    <div className="supervisor-shell max-w-4xl mx-auto space-y-6 fade-in">
 
       {/* ── Page header ── */}
       <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-violet-500 dark:text-violet-400 mb-1">
+        <p className="text-xs font-semibold uppercase tracking-widest text-[#0D3311] dark:text-emerald-300 mb-1">
           Supervisor · Account Requests
         </p>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
@@ -103,7 +102,7 @@ export default function SupervisorAccountRequestsPage() {
 
       {/* ── Summary chip ── */}
       {!loading && !error && users.length > 0 && (
-        <div className="inline-flex items-center gap-2 rounded-xl bg-violet-50 dark:bg-violet-900/20 border border-violet-200/60 dark:border-violet-800/40 px-3.5 py-2 text-sm font-semibold text-violet-700 dark:text-violet-300">
+        <div className="inline-flex items-center gap-2 rounded-xl bg-[#0D3311]/10 dark:bg-white/[0.06] border border-[#0D3311]/20 dark:border-white/10 px-3.5 py-2 text-sm font-semibold text-[#0D3311] dark:text-emerald-300">
           <ShieldCheck className="h-3.5 w-3.5" />
           {users.length} pending registration{users.length !== 1 ? "s" : ""}
         </div>
@@ -118,11 +117,10 @@ export default function SupervisorAccountRequestsPage() {
         </div>
       ) : users.length === 0 ? (
         <div
-          className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-700/60 flex flex-col items-center justify-center py-16 text-center"
-          style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
+          className="supervisor-surface rounded-2xl border-dashed flex flex-col items-center justify-center py-16 text-center"
         >
-          <div className="w-14 h-14 rounded-2xl bg-[#ADEBB3]/35 dark:bg-white/[0.06] flex items-center justify-center mb-4">
-            <UserCheck className="h-7 w-7 text-[#527255]" />
+          <div className="w-14 h-14 rounded-2xl bg-[#0D3311]/10 dark:bg-white/[0.06] flex items-center justify-center mb-4">
+            <UserCheck className="h-7 w-7 text-[#0D3311]" />
           </div>
           <p className="text-base font-semibold text-slate-700 dark:text-slate-300">
             All registrations reviewed
@@ -138,17 +136,15 @@ export default function SupervisorAccountRequestsPage() {
             const gradient = getGradient(user.full_name);
             const roleStyle =
               ROLE_STYLES[user.role] ??
-              "bg-slate-50 text-slate-600 border-slate-200 dark:bg-white/[0.05] dark:text-slate-400 dark:border-slate-700/50";
+              "bg-[#0D3311]/5 text-[#0D3311] border-[#0D3311]/15 dark:bg-white/[0.05] dark:text-slate-400 dark:border-white/10";
             const roleDisplay =
               user.role.charAt(0).toUpperCase() + user.role.slice(1);
 
             return (
               <div
                 key={user.id}
-                className="rounded-2xl border border-white/60 dark:border-slate-700/60 overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 fade-in"
+                className="supervisor-surface rounded-2xl overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 fade-in"
                 style={{
-                  background: "var(--glass-bg)",
-                  backdropFilter: "blur(12px)",
                   animationDelay: `${i * 60}ms`,
                   animationFillMode: "forwards",
                   opacity: 0,

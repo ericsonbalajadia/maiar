@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { RequestPhotoPicker, SelectedPhotoGrid, uploadRequestPhotos } from '@/components/requests/request-photo-picker'
 import {
   Select,
   SelectContent,
@@ -300,6 +301,7 @@ export function PpsrForm({ dbUser }: PpsrFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [ticketNumber, setTicketNumber] = useState<string | null>(null)
   const [requestId, setRequestId] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<File[]>([])
 
   const today = new Date().toISOString().split('T')[0]
 
@@ -372,6 +374,16 @@ export function PpsrForm({ dbUser }: PpsrFormProps) {
         service_data:      form.service_data,
       })
 if (result.success && result.ticketNumber && result.requestId) {
+  try {
+    await uploadRequestPhotos(result.requestId, photos);
+  } catch (error) {
+    setErrors({
+      submit: error instanceof Error
+        ? `Request was submitted, but photo upload failed: ${error.message}`
+        : 'Request was submitted, but photo upload failed.',
+    });
+    return;
+  }
   setTicketNumber(result.ticketNumber);
   setRequestId(result.requestId);
 } else {
@@ -385,7 +397,7 @@ if (ticketNumber && requestId) {
     <SuccessModal
       ticketNumber={ticketNumber}
       onView={() => router.push(`/requester/requests/${requestId}`)}
-      onAnother={() => { setTicketNumber(null); setRequestId(null); setStep(1); }}
+      onAnother={() => { setTicketNumber(null); setRequestId(null); setPhotos([]); setStep(1); }}
     />
   );
 }
@@ -442,7 +454,7 @@ if (ticketNumber && requestId) {
                 <Field label="Location" required error={errors.location_building}>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1.5">
                     <Input
-                      placeholder="Building name *"
+                      placeholder="Specific location *"
                       value={form.location_building}
                       onChange={(e) => set('location_building', e.target.value)}
                       className={cn(
@@ -640,6 +652,10 @@ if (ticketNumber && requestId) {
                 className="resize-none bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all"
               />
             </div>
+
+            <Field label="Photos">
+              <RequestPhotoPicker files={photos} onChange={setPhotos} disabled={isPending} />
+            </Field>
           </div>
         )}
 
@@ -710,6 +726,12 @@ if (ticketNumber && requestId) {
                   <>
                     <p className="text-xs font-semibold text-slate-400 dark:text-white/45 uppercase tracking-wide mt-3 mb-1">Additional Notes</p>
                     <p className="text-slate-600 dark:text-white/60 leading-relaxed">{form.description}</p>
+                  </>
+                )}
+                {photos.length > 0 && (
+                  <>
+                    <p className="text-xs font-semibold text-slate-400 dark:text-white/45 uppercase tracking-wide mt-3 mb-1">Photos</p>
+                    <SelectedPhotoGrid files={photos} />
                   </>
                 )}
               </div>

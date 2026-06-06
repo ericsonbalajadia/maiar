@@ -30,10 +30,7 @@ interface Props {
 
 function GlassSection({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      className="rounded-2xl border border-white/60 dark:border-slate-700/60 overflow-hidden shadow-sm"
-      style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
-    >
+    <div className="supervisor-surface rounded-2xl overflow-hidden shadow-sm">
       {children}
     </div>
   );
@@ -51,7 +48,7 @@ function GlassSectionHeader({
   badge?: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100/80 dark:border-slate-800/60 bg-white/30 dark:bg-white/[0.04]">
+    <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[#0D3311]/20 dark:border-white/10 bg-white/30 dark:bg-white/[0.04]">
       <div
         className={`w-7 h-7 rounded-lg flex items-center justify-center shadow-sm ${iconGradient}`}
       >
@@ -92,19 +89,19 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
   const ticketNumber = request.ticket_number ?? id.slice(0, 8).toUpperCase();
 
   return (
-    <div className="max-w-4xl mx-auto space-y-5 fade-in">
+    <div className="supervisor-shell max-w-4xl mx-auto space-y-5 fade-in">
       {/* ── Breadcrumb ── */}
       <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500">
         <Link
           href="/supervisor"
-          className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+          className="hover:text-[#0D3311] dark:hover:text-emerald-300 transition-colors"
         >
           Dashboard
         </Link>
         <span>/</span>
         <Link
           href="/supervisor/requests"
-          className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+          className="hover:text-[#0D3311] dark:hover:text-emerald-300 transition-colors"
         >
           All Requests
         </Link>
@@ -117,7 +114,7 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
       {/* ── Page header ── */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-lg font-bold uppercase tracking-widest text-violet-500 dark:text-violet-400 mb-1">
+          <p className="text-lg font-bold uppercase tracking-widest text-[#0D3311] dark:text-emerald-300 mb-1">
             Request Detail
           </p>
           {/* <h1 className="text-xl font-bold text-slate-900 dark:text-white line-clamp-2">
@@ -153,7 +150,7 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
         <GlassSection>
           <GlassSectionHeader
             icon={Wrench}
-            iconGradient="bg-gradient-to-br from-violet-500 to-purple-600"
+            iconGradient="bg-[#0D3311]"
             title="Assign Technician"
             badge={
               currentTechnicianId ? (
@@ -161,7 +158,7 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
                   Reassign
                 </span>
               ) : (
-                <span className="text-[11px] font-semibold bg-[#ADEBB3]/35 dark:bg-white/[0.06] text-[#527255] dark:text-emerald-300 px-2 py-0.5 rounded-full border border-[#ADEBB3]/70 dark:border-white/10">
+                <span className="text-[11px] font-semibold bg-[#0D3311]/10 dark:bg-white/[0.06] text-[#0D3311] dark:text-emerald-300 px-2 py-0.5 rounded-full border border-[#0D3311]/20 dark:border-white/10">
                   Required
                 </span>
               )
@@ -188,7 +185,7 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
             title="Repair Schedule"
             badge={
               hasSchedule ? (
-                <span className="text-[11px] font-semibold bg-[#ADEBB3]/35 dark:bg-white/[0.06] text-[#527255] dark:text-emerald-300 px-2 py-0.5 rounded-full border border-[#ADEBB3]/70 dark:border-white/10">
+                <span className="text-[11px] font-semibold bg-[#0D3311]/10 dark:bg-white/[0.06] text-[#0D3311] dark:text-emerald-300 px-2 py-0.5 rounded-full border border-[#0D3311]/20 dark:border-white/10">
                   Scheduled
                 </span>
               ) : (
@@ -244,7 +241,7 @@ export default async function SupervisorRequestDetailPage({ params }: Props) {
   <GlassSection>
     <GlassSectionHeader
       icon={CheckCircle2}
-      iconGradient="bg-gradient-to-br from-violet-500 to-purple-600"
+      iconGradient="bg-[#0D3311]"
       title="Update Status"
       badge={
         <div className="flex items-center gap-1">
