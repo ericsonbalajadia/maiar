@@ -28,10 +28,7 @@ export const NAV_ITEMS: Record<Role, NavItem[]> = {
     { label: 'Account Requests', href: '/clerk/account-requests', icon: 'UserPlus'   },
     { label: 'Notifications',href: '/clerk/notifications',      icon: 'Bell'          },
   ],
-  technician: [
-    { label: 'My Tasks',     href: '/technician',               icon: 'Wrench' },
-    { label: 'Notifications',href: '/technician/notifications', icon: 'Bell'   },
-  ],
+  technician: [],
   supervisor: [
     { label: 'Dashboard',    href: '/supervisor',               icon: 'LayoutDashboard' },
     { label: 'Feedback Analytics', href: '/supervisor/analytics/feedback', icon: 'BarChart2' },

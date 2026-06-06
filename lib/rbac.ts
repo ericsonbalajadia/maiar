@@ -21,7 +21,6 @@ export type SignupStatus = typeof SIGNUP_STATUS[keyof typeof SIGNUP_STATUS]
 export const REQUESTER_ROLES = [ROLES.STUDENT, ROLES.STAFF] as const
 export const STAFF_ROLES = [
     ROLES.CLERK,
-    ROLES.TECHNICIAN,
     ROLES.SUPERVISOR,
     ROLES.ADMIN,
 ] as const
@@ -29,7 +28,6 @@ export const STAFF_ROLES = [
 export const CLERK_REVIEW_ROLES = [ROLES.CLERK, ROLES.ADMIN] as const
 export const SUPERVISOR_ASSIGNMENT_ROLES = [ROLES.SUPERVISOR, ROLES.ADMIN] as const
 export const ACCOMPLISHMENT_RECORD_ROLES = [
-    ROLES.TECHNICIAN,
     ROLES.SUPERVISOR,
     ROLES.ADMIN,
 ] as const
@@ -39,10 +37,9 @@ export const APPROVAL_PERMISSIONS: Partial<Record<UserRole, readonly UserRole[]>
         ROLES.STUDENT,
         ROLES.STAFF,
         ROLES.CLERK,
-        ROLES.TECHNICIAN,
         ROLES.SUPERVISOR,
     ],
-    supervisor: [ROLES.STUDENT, ROLES.STAFF, ROLES.CLERK, ROLES.TECHNICIAN],
+    supervisor: [ROLES.STUDENT, ROLES.STAFF, ROLES.CLERK],
     clerk: [ROLES.STUDENT, ROLES.STAFF],
 }
 
@@ -68,6 +65,7 @@ export function isRequesterRole(role: unknown): role is (typeof REQUESTER_ROLES)
 }
 
 export function getRoleDashboard(role: unknown): string {
+    if (role === ROLES.TECHNICIAN) return '/login?error=role_no_app_access'
     return isRole(role) ? ROLE_DASHBOARD[role] : '/requester'
 }
 

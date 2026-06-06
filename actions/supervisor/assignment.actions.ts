@@ -124,15 +124,6 @@ export async function assignTechnician(
       });
     }
 
-    // Notify the assigned technician
-    await serviceSupabase.from('notifications').insert({
-      user_id: technicianId,
-      request_id: requestId,
-      type: 'technician_assigned',
-      subject: `New assignment: ${reqInfo?.ticket_number}`,
-      message: `You have been assigned to "${reqInfo?.title}". Please review and schedule.`,
-    });
-
     // (Optional) Notify all supervisors – uncomment if needed
     // const { getUserIdsByRole, sendBulkNotification } = await import('@/actions/notifications/notifications.actions');
     // const supervisorIds = await getUserIdsByRole('supervisor');

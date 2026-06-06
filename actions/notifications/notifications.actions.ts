@@ -149,7 +149,7 @@ export async function markAllNotificationsRead(): Promise<void> {
     .eq('user_id', userId)
     .is('read_at', null);
 
-  const roles = ['requester', 'clerk', 'supervisor', 'admin', 'technician'];
+  const roles = ['requester', 'clerk', 'supervisor', 'admin'];
   for (const role of roles) {
     revalidatePath(`/${role}/notifications`);
   }

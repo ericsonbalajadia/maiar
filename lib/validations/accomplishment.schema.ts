@@ -1,7 +1,7 @@
 // lib/validations/accomplishment.schema.ts
 import { z } from 'zod';
 
-// Used when a technician/supervisor records work details
+// Used when a supervisor records work details on behalf of personnel.
 //Show an "Update Progress" button.
 export const saveAccomplishmentSchema = z.object({
   request_id: z.string().uuid('Invalid request ID'),

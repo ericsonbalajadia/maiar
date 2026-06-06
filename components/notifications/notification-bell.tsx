@@ -39,7 +39,6 @@ interface Notification {
 function notificationHref(pathname: string): string {
   if (pathname.startsWith("/clerk")) return "/clerk/notifications";
   if (pathname.startsWith("/supervisor")) return "/supervisor/notifications";
-  if (pathname.startsWith("/technician")) return "/technician/notifications";
   if (pathname.startsWith("/admin")) return "/admin/notifications";
   return "/requester/notifications";
 }
@@ -47,7 +46,6 @@ function notificationHref(pathname: string): string {
 function requestHref(pathname: string, requestId: string): string {
   if (pathname.startsWith("/clerk")) return `/clerk/requests/${requestId}/review`;
   if (pathname.startsWith("/supervisor")) return `/supervisor/requests/${requestId}`;
-  if (pathname.startsWith("/technician")) return `/technician/requests/${requestId}`;
   if (pathname.startsWith("/admin")) return `/admin/requests/${requestId}`;
   return `/requester/requests/${requestId}`;
 }

@@ -41,7 +41,7 @@ export function AccomplishmentForm({ requestId, existingAccomplishment }: Accomp
   return (
     <form action={formAction} className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
       <h3 className="text-base font-semibold text-slate-800">Work Log</h3>
-      <p className="text-sm text-slate-600">Record the start and finish times of your work.</p>
+      <p className="text-sm text-slate-600">Record the start and finish times of the work.</p>
 
       <input type="hidden" name="request_id" value={requestId} />
 
