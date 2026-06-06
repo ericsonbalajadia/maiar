@@ -51,6 +51,7 @@ export default async function SupervisorAllRequestsPage({ searchParams }: Props)
     priority: item.priority ?? null,
     category: item.category ?? null,
     requester: item.requester ?? null,
+    ppsr_details: item.ppsr_details ?? null,
   }));
 
   return (

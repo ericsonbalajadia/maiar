@@ -54,6 +54,7 @@ export default async function ClerkAllRequestsPage({ searchParams }: Props) {
     priority: item.priority ?? null,
     category: item.category ?? null,
     requester: item.requester ?? null,
+    ppsr_details: item.ppsr_details ?? null,
   }));
 
   return (

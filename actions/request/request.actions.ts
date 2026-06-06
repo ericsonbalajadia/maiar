@@ -321,7 +321,8 @@ export async function getRequesterRequests(
       statuses ( status_name ),
       categories ( category_name ),
       locations ( building_name, floor_level, room_number ),
-      priorities ( level )
+      priorities ( level ),
+      ppsr_details ( service_type )
       `,
       { count: "exact" },
     )
@@ -357,8 +358,14 @@ export async function getRequesterRequests(
     return empty;
   }
 
+  // Transform ppsr_details from array to single object (or null)
+  const transformedData = (data ?? []).map((item: any) => ({
+    ...item,
+    ppsr_details: item.ppsr_details?.[0] ?? null,
+  })) as unknown as RequestWithRelations[];
+
   return {
-    data: (data ?? []) as unknown as RequestWithRelations[],
+    data: transformedData,
     count: count ?? 0,
     page,
     pageSize,

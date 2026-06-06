@@ -16,6 +16,7 @@ interface RequestRow {
   priority: { level: string } | null;
   category: { category_name: string } | null;
   requester: { full_name: string } | null;
+  ppsr_details?: { service_type: string } | null;
 }
 
 interface Props {
@@ -31,6 +32,15 @@ export function RequestsTable({
   currentPage,
   detailBasePath,
 }: Props) {
+  // Debug logging
+  if (requests.length > 0) {
+    const ppsrRequests = requests.filter(r => r.request_type === 'ppsr');
+    if (ppsrRequests.length > 0) {
+      console.log('[DEBUG RequestsTable] PPSR requests found:', ppsrRequests.length);
+      console.log('[DEBUG RequestsTable] First PPSR request:', ppsrRequests[0]);
+      console.log('[DEBUG RequestsTable] ppsr_details field:', ppsrRequests[0].ppsr_details);
+    }
+  }
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -84,7 +94,7 @@ export function RequestsTable({
               Status
             </label>
             <select
-            aria-label="Filter by status"
+              aria-label="Filter by status"
               defaultValue={params.get("status") ?? ""}
               onChange={(e) => setParam("status", e.target.value)}
               className="w-full px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer"
@@ -186,7 +196,7 @@ export function RequestsTable({
               <option value="">All</option>
               {Array.from(
                 { length: 5 },
-                (_, i) => new Date().getFullYear() - i
+                (_, i) => new Date().getFullYear() - i,
               ).map((y) => (
                 <option key={y} value={y}>
                   {y}
@@ -237,7 +247,7 @@ export function RequestsTable({
               <tr
                 key={r.id}
                 onClick={() => {
-                  const targetPath = detailBasePath.startsWith('/clerk')
+                  const targetPath = detailBasePath.startsWith("/clerk")
                     ? `${detailBasePath}/${r.id}/review`
                     : `${detailBasePath}/${r.id}`;
                   router.push(targetPath);
@@ -247,12 +257,15 @@ export function RequestsTable({
                 <td className="px-3 py-3.5 first:pl-1 font-mono text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
                   {r.ticket_number}
                 </td>
+
                 <td className="px-3 py-3.5 max-w-[180px]">
                   <span className="line-clamp-1 text-slate-700 dark:text-slate-300 font-medium text-sm">
                     {r.title}
                   </span>
                   <span className="text-xs text-slate-400 truncate block">
-                    {r.category?.category_name ?? "No category"}
+                    {r.request_type === "ppsr"
+                      ? r.ppsr_details?.service_type?.replace(/_/g, " ") || "—"
+                      : (r.category?.category_name ?? "No category")}
                   </span>
                 </td>
                 <td className="px-3 py-3.5 text-sm text-slate-700 dark:text-slate-300 truncate">
@@ -265,10 +278,10 @@ export function RequestsTable({
                       r.priority?.level === "emergency"
                         ? "bg-red-100 text-red-600"
                         : r.priority?.level === "high"
-                        ? "bg-orange-100 text-orange-600"
-                        : r.priority?.level === "normal"
-                        ? "bg-blue-100 text-blue-600"
-                        : "bg-gray-100 text-gray-500"
+                          ? "bg-orange-100 text-orange-600"
+                          : r.priority?.level === "normal"
+                            ? "bg-blue-100 text-blue-600"
+                            : "bg-gray-100 text-gray-500",
                     )}
                   >
                     {r.priority?.level ?? "—"}
@@ -287,7 +300,10 @@ export function RequestsTable({
             ))}
             {requests.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-3 py-16 text-center text-slate-400">
+                <td
+                  colSpan={6}
+                  className="px-3 py-16 text-center text-slate-400"
+                >
                   No requests found. Adjust filters.
                 </td>
               </tr>

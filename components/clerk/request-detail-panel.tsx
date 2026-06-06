@@ -137,6 +137,10 @@ export function RequestDetailPanel({
   const canUpdate = ["pending", "under_review"].includes(status);
   const showStatusActions = !hideStatusPanel && canUpdate;
 
+  const categoryDisplay = request.request_type === 'ppsr'
+  ? request.ppsr_details?.service_type?.replace(/_/g, ' ') || '—'
+  : request.categories?.category_name ?? '—';
+
   const locationFull = [
     location?.building_name,
     location?.room_number ? `Room ${location.room_number}` : null,
@@ -184,7 +188,7 @@ export function RequestDetailPanel({
             <InfoCell
               icon={Tag}
               label="Category"
-              value={request.categories?.category_name}
+              value={categoryDisplay}
             />
             <InfoCell icon={Clock} label="Priority" value={priority} />
             <InfoCell icon={MapPin} label="Location" value={locationFull} />
