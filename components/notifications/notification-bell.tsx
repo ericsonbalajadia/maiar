@@ -39,7 +39,6 @@ interface Notification {
 function notificationHref(pathname: string): string {
   if (pathname.startsWith("/clerk")) return "/clerk/notifications";
   if (pathname.startsWith("/supervisor")) return "/supervisor/notifications";
-  if (pathname.startsWith("/technician")) return "/technician/notifications";
   if (pathname.startsWith("/admin")) return "/admin/notifications";
   return "/requester/notifications";
 }
@@ -47,7 +46,6 @@ function notificationHref(pathname: string): string {
 function requestHref(pathname: string, requestId: string): string {
   if (pathname.startsWith("/clerk")) return `/clerk/requests/${requestId}/review`;
   if (pathname.startsWith("/supervisor")) return `/supervisor/requests/${requestId}`;
-  if (pathname.startsWith("/technician")) return `/technician/requests/${requestId}`;
   if (pathname.startsWith("/admin")) return `/admin/requests/${requestId}`;
   return `/requester/requests/${requestId}`;
 }
@@ -158,6 +156,9 @@ function NotifItem({
   const meta = TYPE_META[notif.type] ?? TYPE_META["system"];
   const Icon = meta.icon;
   const isRequester = pathname.startsWith("/requester");
+  const isClerk = pathname.startsWith("/clerk");
+  const metaColor = isClerk && meta.color === "text-[#527255]" ? "text-[#58855C]" : meta.color;
+  const metaBg = isClerk && meta.bg.includes("#ADEBB3") ? meta.bg.replace(/#ADEBB3/g, "#58855C") : meta.bg;
 
   let href: string | null = null;
 
@@ -188,20 +189,26 @@ function NotifItem({
         "flex items-start gap-3 px-4 py-3 transition-colors duration-150 border-b last:border-0",
         isRequester
           ? "border-[#ADEBB3]/70 dark:border-white/10"
-          : "border-[#ADEBB3]/70 dark:border-white/10",
+          : isClerk
+            ? "border-[#58855C]/25 dark:border-white/10"
+            : "border-[#ADEBB3]/70 dark:border-white/10",
         notif.read_at === null
-          ? "bg-blue-50/40 dark:bg-white/[0.04] hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]"
-          : "hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]",
+          ? isClerk
+            ? "bg-[#58855C]/10 dark:bg-white/[0.04] hover:bg-[#58855C]/10 dark:hover:bg-white/[0.08]"
+            : "bg-blue-50/40 dark:bg-white/[0.04] hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]"
+          : isClerk
+            ? "hover:bg-[#58855C]/10 dark:hover:bg-white/[0.08]"
+            : "hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]",
       )}
       onClick={handleClick}
     >
       <div
         className={cn(
           "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5",
-          meta.bg,
+          metaBg,
         )}
       >
-        <Icon className={cn("h-4 w-4", meta.color)} />
+        <Icon className={cn("h-4 w-4", metaColor)} />
       </div>
       <div className="flex-1 min-w-0">
         <p
@@ -258,6 +265,7 @@ export function NotificationBell({
   const pathname = usePathname();
   const allNotifsHref = notificationHref(pathname);
   const isRequester = pathname.startsWith('/requester');
+  const isClerk = pathname.startsWith('/clerk');
 
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -330,8 +338,12 @@ export function NotificationBell({
         className={cn(
           "relative w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-150",
           open
-            ? "bg-blue-50 dark:bg-white/[0.06] text-blue-600 dark:text-blue-400"
-            : "text-slate-500 dark:text-white/60 hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] hover:text-[#527255] dark:hover:text-emerald-300",
+            ? isClerk
+              ? "bg-[#58855C]/10 dark:bg-white/[0.06] text-[#58855C] dark:text-emerald-300"
+              : "bg-blue-50 dark:bg-white/[0.06] text-blue-600 dark:text-blue-400"
+            : isClerk
+              ? "text-slate-500 dark:text-white/60 hover:bg-[#58855C]/10 dark:hover:bg-white/[0.08] hover:text-[#58855C] dark:hover:text-emerald-300"
+              : "text-slate-500 dark:text-white/60 hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] hover:text-[#527255] dark:hover:text-emerald-300",
           className
         )}
       >
@@ -370,7 +382,7 @@ export function NotificationBell({
               border: isRequester ? "1px solid rgba(173, 235, 179, 0.65)" : "1px solid rgba(255, 255, 255, 0.2)",
             }}
           >
-            <div className={cn('flex items-center justify-between px-4 py-3 border-b bg-white/30 dark:bg-white/[0.04]', isRequester ? 'border-[#ADEBB3]/70 dark:border-white/10' : 'border-[#ADEBB3]/70 dark:border-white/10')}>
+            <div className={cn('flex items-center justify-between px-4 py-3 border-b bg-white/30 dark:bg-white/[0.04]', isRequester ? 'border-[#ADEBB3]/70 dark:border-white/10' : isClerk ? 'border-[#58855C]/25 dark:border-white/10' : 'border-[#ADEBB3]/70 dark:border-white/10')}>
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">
                   Notifications
@@ -385,7 +397,7 @@ export function NotificationBell({
                 {unread.length > 0 && (
                   <button
                     onClick={handleMarkAllRead}
-                    className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:text-[#527255] px-2 py-1 rounded-lg hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] transition-colors"
+                    className={cn("flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-lg dark:hover:bg-white/[0.08] transition-colors", isClerk ? "text-[#58855C] dark:text-emerald-300 hover:text-[#466b4a] hover:bg-[#58855C]/10" : "text-blue-600 dark:text-blue-400 hover:text-[#527255] hover:bg-[#ADEBB3]/35")}
                   >
                     <CheckCheck className="h-3.5 w-3.5" />
                     Mark all read
@@ -394,7 +406,7 @@ export function NotificationBell({
                 <button
                 aria-label="Close notifications panel"
                   onClick={() => setOpen(false)}
-                  className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:text-[#527255] hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] transition-colors"
+                  className={cn("w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 dark:hover:bg-white/[0.08] transition-colors", isClerk ? "hover:text-[#58855C] hover:bg-[#58855C]/10" : "hover:text-[#527255] hover:bg-[#ADEBB3]/35")}
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -407,11 +419,11 @@ export function NotificationBell({
                   {[...Array(4)].map((_, i) => (
                     <div
                       key={i}
-                      className={cn('flex items-start gap-3 px-4 py-3 border-b last:border-0', isRequester ? 'border-[#ADEBB3]/70 dark:border-white/10' : 'border-[#ADEBB3]/70 dark:border-white/10')}
+                      className={cn('flex items-start gap-3 px-4 py-3 border-b last:border-0', isRequester ? 'border-[#ADEBB3]/70 dark:border-white/10' : isClerk ? 'border-[#58855C]/25 dark:border-white/10' : 'border-[#ADEBB3]/70 dark:border-white/10')}
                     >
-                      <div className="w-8 h-8 rounded-lg bg-[#ADEBB3]/45 dark:bg-white/[0.07] animate-pulse shrink-0" />
+                      <div className={cn("w-8 h-8 rounded-lg dark:bg-white/[0.07] animate-pulse shrink-0", isClerk ? "bg-[#58855C]/10" : "bg-[#ADEBB3]/45")} />
                       <div className="flex-1 space-y-1.5">
-                        <div className="h-3.5 bg-[#ADEBB3]/45 dark:bg-white/[0.07] rounded-full animate-pulse w-3/4" />
+                        <div className={cn("h-3.5 dark:bg-white/[0.07] rounded-full animate-pulse w-3/4", isClerk ? "bg-[#58855C]/10" : "bg-[#ADEBB3]/45")} />
                         <div className="h-3 bg-slate-100/60 dark:bg-white/[0.05] rounded-full animate-pulse w-full" />
                         <div className="h-2.5 bg-slate-100/60 dark:bg-white/[0.05] rounded-full animate-pulse w-1/3" />
                       </div>
@@ -443,11 +455,11 @@ export function NotificationBell({
             </div>
 
             {notifications.length > 0 && (
-              <div className={cn('px-4 py-2.5 border-t bg-slate-50/30 dark:bg-white/[0.04]', isRequester ? 'border-[#ADEBB3]/70 dark:border-white/10' : 'border-[#ADEBB3]/70 dark:border-white/10')}>
+              <div className={cn('px-4 py-2.5 border-t bg-slate-50/30 dark:bg-white/[0.04]', isRequester ? 'border-[#ADEBB3]/70 dark:border-white/10' : isClerk ? 'border-[#58855C]/25 dark:border-white/10' : 'border-[#ADEBB3]/70 dark:border-white/10')}>
                 <Link
                   href={allNotifsHref}
                   onClick={() => setOpen(false)}
-                  className="flex items-center justify-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-[#527255] py-1 rounded-lg hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] transition-colors w-full"
+                  className={cn("flex items-center justify-center gap-1.5 text-xs font-semibold py-1 rounded-lg dark:hover:bg-white/[0.08] transition-colors w-full", isClerk ? "text-[#58855C] dark:text-emerald-300 hover:text-[#466b4a] hover:bg-[#58855C]/10" : "text-blue-600 dark:text-blue-400 hover:text-[#527255] hover:bg-[#ADEBB3]/35")}
                 >
                   View all notifications
                   <ExternalLink className="h-3 w-3" />

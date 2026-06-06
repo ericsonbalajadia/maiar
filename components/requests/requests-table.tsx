@@ -1,3 +1,5 @@
+//components/requests/requests-table.tsx:
+
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -32,7 +34,7 @@ export function RequestsTable({
   currentPage,
   detailBasePath,
 }: Props) {
-  // Debug logging
+  // Debug logs (Ericson)
   if (requests.length > 0) {
     const ppsrRequests = requests.filter(r => r.request_type === 'ppsr');
     if (ppsrRequests.length > 0) {
@@ -41,9 +43,12 @@ export function RequestsTable({
       console.log('[DEBUG RequestsTable] ppsr_details field:', ppsrRequests[0].ppsr_details);
     }
   }
+
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
+  const isClerk = detailBasePath.startsWith("/clerk");
+  const isSupervisor = detailBasePath.startsWith("/supervisor");
 
   const setParam = (key: string, value: string) => {
     const next = new URLSearchParams(params.toString());
@@ -66,8 +71,11 @@ export function RequestsTable({
 
   return (
     <div className="h-full flex flex-col gap-6">
-      {/* Filter bar – unchanged (blue/slate) */}
-      <div className="rounded-2xl border border-white/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/40 backdrop-blur-sm shadow-sm p-4 shrink-0">
+      {/* Filter bar – role‑based styling */}
+      <div className={cn(
+        "rounded-2xl border backdrop-blur-md shadow-lg p-4 shrink-0",
+        isClerk ? "clerk-surface" : isSupervisor ? "supervisor-surface" : "border-[#ADEBB3]/70 bg-white/10"
+      )}>
         <div className="flex flex-wrap gap-3 items-end">
           {/* Search */}
           <div className="flex-1 min-w-[200px]">
@@ -83,7 +91,12 @@ export function RequestsTable({
                   e.key === "Enter" && setParam("search", e.currentTarget.value)
                 }
                 placeholder="Ticket # or title..."
-                className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all"
+                className={cn(
+                  "w-full pl-9 pr-3 py-2 rounded-xl border dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:border-transparent transition-all",
+                  isClerk ? "border-[#58855C]/25 focus:ring-[#58855C]/25" :
+                  isSupervisor ? "border-[#0D3311]/20 focus:ring-[#0D3311]/20" :
+                  "border-[#ADEBB3]/70 focus:ring-[#8dc192]/50"
+                )}
               />
             </div>
           </div>
@@ -97,18 +110,17 @@ export function RequestsTable({
               aria-label="Filter by status"
               defaultValue={params.get("status") ?? ""}
               onChange={(e) => setParam("status", e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")`,
-                backgroundPosition: "right 0.75rem center",
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "1.25rem",
-              }}
+              className={cn(
+                "w-full px-3 py-2 rounded-xl border dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 appearance-none cursor-pointer",
+                isClerk ? "border-[#58855C]/25 focus:ring-[#58855C]/25" :
+                isSupervisor ? "border-[#0D3311]/20 focus:ring-[#0D3311]/20" :
+                "border-[#ADEBB3]/70 focus:ring-[#8dc192]/50"
+              )}
             >
               <option value="">All</option>
               {[
                 "pending",
-                // "under_review",
+                "under_review",
                 "approved",
                 "assigned",
                 "in_progress",
@@ -131,13 +143,12 @@ export function RequestsTable({
               aria-label="Filter by priority"
               defaultValue={params.get("priority") ?? ""}
               onChange={(e) => setParam("priority", e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")`,
-                backgroundPosition: "right 0.75rem center",
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "1.25rem",
-              }}
+              className={cn(
+                "w-full px-3 py-2 rounded-xl border dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 appearance-none cursor-pointer",
+                isClerk ? "border-[#58855C]/25 focus:ring-[#58855C]/25" :
+                isSupervisor ? "border-[#0D3311]/20 focus:ring-[#0D3311]/20" :
+                "border-[#ADEBB3]/70 focus:ring-[#8dc192]/50"
+              )}
             >
               <option value="">All</option>
               {["emergency", "high", "normal", "low"].map((p) => (
@@ -157,13 +168,12 @@ export function RequestsTable({
               aria-label="Filter by month"
               defaultValue={params.get("month") ?? ""}
               onChange={(e) => setParam("month", e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")`,
-                backgroundPosition: "right 0.75rem center",
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "1.25rem",
-              }}
+              className={cn(
+                "w-full px-3 py-2 rounded-xl border dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 appearance-none cursor-pointer",
+                isClerk ? "border-[#58855C]/25 focus:ring-[#58855C]/25" :
+                isSupervisor ? "border-[#0D3311]/20 focus:ring-[#0D3311]/20" :
+                "border-[#ADEBB3]/70 focus:ring-[#8dc192]/50"
+              )}
             >
               <option value="">All</option>
               {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
@@ -185,13 +195,12 @@ export function RequestsTable({
               aria-label="Filter by year"
               defaultValue={params.get("year") ?? ""}
               onChange={(e) => setParam("year", e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")`,
-                backgroundPosition: "right 0.75rem center",
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "1.25rem",
-              }}
+              className={cn(
+                "w-full px-3 py-2 rounded-xl border dark:border-white/10 bg-white/60 dark:bg-white/[0.05] backdrop-blur-sm text-sm focus:outline-none focus:ring-2 appearance-none cursor-pointer",
+                isClerk ? "border-[#58855C]/25 focus:ring-[#58855C]/25" :
+                isSupervisor ? "border-[#0D3311]/20 focus:ring-[#0D3311]/20" :
+                "border-[#ADEBB3]/70 focus:ring-[#8dc192]/50"
+              )}
             >
               <option value="">All</option>
               {Array.from(
@@ -208,7 +217,12 @@ export function RequestsTable({
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="h-10 px-4 text-sm text-slate-700 dark:text-slate-200 bg-white/40 dark:bg-slate-800/40 backdrop-blur-sm rounded-xl border border-slate-200/60 dark:border-slate-700/60 hover:bg-white/60 dark:hover:bg-slate-800/60 transition-all flex items-center gap-1"
+              className={cn(
+                "h-10 px-4 text-sm text-slate-700 dark:text-white/90 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm rounded-xl border dark:border-white/10 hover:bg-white/60 dark:hover:bg-white/[0.08] transition-all flex items-center gap-1",
+                isClerk ? "border-[#58855C]/25 hover:bg-[#58855C]/10" :
+                isSupervisor ? "border-[#0D3311]/20 hover:bg-[#0D3311]/10" :
+                "border-[#ADEBB3]/70 hover:bg-[#ADEBB3]/35"
+              )}
             >
               <X className="w-4 h-4" />
               Clear
@@ -217,108 +231,119 @@ export function RequestsTable({
         </div>
       </div>
 
-      {/* Table container with vertical scroll and sticky header – unchanged */}
-      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar rounded-2xl">
-        <table className="w-full text-sm">
-          <thead className="sticky top-0 bg-white dark:bg-slate-900 z-10">
-            <tr className="border-b border-slate-100 dark:border-slate-800/60">
-              <th className="text-left text-xs font-semibold text-slate-400 dark:text-slate-500 px-3 py-3 first:pl-1 last:pr-1 whitespace-nowrap uppercase tracking-wide">
-                Ticket
-              </th>
-              <th className="text-left text-xs font-semibold text-slate-400 dark:text-slate-500 px-3 py-3 whitespace-nowrap uppercase tracking-wide">
-                Title
-              </th>
-              <th className="text-left text-xs font-semibold text-slate-400 dark:text-slate-500 px-3 py-3 whitespace-nowrap uppercase tracking-wide">
-                Requester
-              </th>
-              <th className="text-left text-xs font-semibold text-slate-400 dark:text-slate-500 px-3 py-3 whitespace-nowrap uppercase tracking-wide">
-                Priority
-              </th>
-              <th className="text-left text-xs font-semibold text-slate-400 dark:text-slate-500 px-3 py-3 whitespace-nowrap uppercase tracking-wide">
-                Status
-              </th>
-              <th className="text-left text-xs font-semibold text-slate-400 dark:text-slate-500 px-3 py-3 whitespace-nowrap uppercase tracking-wide">
-                Date
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-50 dark:divide-slate-800/30">
-            {requests.map((r) => (
-              <tr
-                key={r.id}
-                onClick={() => {
-                  const targetPath = detailBasePath.startsWith("/clerk")
-                    ? `${detailBasePath}/${r.id}/review`
-                    : `${detailBasePath}/${r.id}`;
-                  router.push(targetPath);
-                }}
-                className="cursor-pointer transition-colors duration-150 hover:bg-blue-50/40 dark:hover:bg-blue-900/10 group"
-              >
-                <td className="px-3 py-3.5 first:pl-1 font-mono text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
-                  {r.ticket_number}
-                </td>
-
-                <td className="px-3 py-3.5 max-w-[180px]">
-                  <span className="line-clamp-1 text-slate-700 dark:text-slate-300 font-medium text-sm">
-                    {r.title}
-                  </span>
-                  <span className="text-xs text-slate-400 truncate block">
-                    {r.request_type === "ppsr"
-                      ? r.ppsr_details?.service_type?.replace(/_/g, " ") || "—"
-                      : (r.category?.category_name ?? "No category")}
-                  </span>
-                </td>
-                <td className="px-3 py-3.5 text-sm text-slate-700 dark:text-slate-300 truncate">
-                  {r.requester?.full_name ?? "—"}
-                </td>
-                <td className="px-3 py-3.5">
-                  <span
+      {/* Table container – role‑based styling, scrollable, semantic table */}
+      <div className={cn(
+        "flex-1 min-h-0 rounded-2xl border backdrop-blur-md shadow-lg flex flex-col overflow-hidden",
+        isClerk ? "clerk-surface" : isSupervisor ? "supervisor-surface" : "border-[#ADEBB3]/70 bg-white/10"
+      )}>
+        <div className="flex-1 overflow-auto">
+          <div className="min-w-[800px]">
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 z-10 backdrop-blur-sm bg-white/80 dark:bg-white/[0.05]">
+                <tr className={cn(
+                  "border-b",
+                  isClerk ? "border-[#58855C]/20" :
+                  isSupervisor ? "border-[#0D3311]/20" :
+                  "border-[#ADEBB3]/70"
+                )}>
+                  <th className="text-left text-xs font-semibold text-slate-400 dark:text-slate-500 px-3 py-3 first:pl-1 whitespace-nowrap uppercase tracking-wide">Ticket</th>
+                  <th className="text-left text-xs font-semibold text-slate-400 dark:text-slate-500 px-3 py-3 whitespace-nowrap uppercase tracking-wide">Title</th>
+                  <th className="text-left text-xs font-semibold text-slate-400 dark:text-slate-500 px-3 py-3 whitespace-nowrap uppercase tracking-wide">Requester</th>
+                  <th className="text-left text-xs font-semibold text-slate-400 dark:text-slate-500 px-3 py-3 whitespace-nowrap uppercase tracking-wide">Priority</th>
+                  <th className="text-left text-xs font-semibold text-slate-400 dark:text-slate-500 px-3 py-3 whitespace-nowrap uppercase tracking-wide">Status</th>
+                  <th className="text-left text-xs font-semibold text-slate-400 dark:text-slate-500 px-3 py-3 whitespace-nowrap uppercase tracking-wide">Date</th>
+                </tr>
+              </thead>
+              <tbody className={cn(
+                "divide-y",
+                isClerk ? "divide-[#58855C]/20 dark:divide-white/10" :
+                isSupervisor ? "divide-[#0D3311]/15 dark:divide-white/10" :
+                "divide-[#ADEBB3]/45 dark:divide-[#ADEBB3]/30"
+              )}>
+                {requests.map((r) => (
+                  <tr
+                    key={r.id}
+                    onClick={() => {
+                      const targetPath = detailBasePath.startsWith("/clerk")
+                        ? `${detailBasePath}/${r.id}/review`
+                        : `${detailBasePath}/${r.id}`;
+                      router.push(targetPath);
+                    }}
                     className={cn(
-                      "text-xs font-semibold px-2 py-0.5 rounded-full",
-                      r.priority?.level === "emergency"
-                        ? "bg-red-100 text-red-600"
-                        : r.priority?.level === "high"
-                          ? "bg-orange-100 text-orange-600"
-                          : r.priority?.level === "normal"
-                            ? "bg-blue-100 text-blue-600"
-                            : "bg-gray-100 text-gray-500",
+                      "cursor-pointer transition-all duration-200 hover:backdrop-blur-md group",
+                      isClerk ? "hover:bg-[#58855C]/10" :
+                      isSupervisor ? "hover:bg-[#0D3311]/10" :
+                      "hover:bg-[#ADEBB3]/35"
                     )}
                   >
-                    {r.priority?.level ?? "—"}
-                  </span>
-                </td>
-                <td className="px-3 py-3.5">
-                  <StatusBadge status={r.status?.status_name ?? "pending"} />
-                </td>
-                <td className="px-3 py-3.5 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
-                  {new Date(r.created_at).toLocaleDateString("en-PH", {
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </td>
-              </tr>
-            ))}
-            {requests.length === 0 && (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="px-3 py-16 text-center text-slate-400"
-                >
-                  No requests found. Adjust filters.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                    <td className="px-3 py-3.5 first:pl-1 font-mono text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                      {r.ticket_number}
+                    </td>
+                    <td className="px-3 py-3.5 max-w-[180px]">
+                      <div className="line-clamp-1 text-slate-700 dark:text-slate-300 font-medium text-sm">
+                        {r.title}
+                      </div>
+                      <div className="text-xs text-slate-400 truncate">
+                        {r.request_type === "ppsr"
+                          ? r.ppsr_details?.service_type?.replace(/_/g, " ") || "—"
+                          : (r.category?.category_name ?? "No category")}
+                      </div>
+                    </td>
+                    <td className="px-3 py-3.5 text-sm text-slate-700 dark:text-slate-300 truncate">
+                      {r.requester?.full_name ?? "—"}
+                    </td>
+                    <td className="px-3 py-3.5">
+                      <span
+                        className={cn(
+                          "text-xs font-semibold px-2 py-0.5 rounded-full",
+                          r.priority?.level === "emergency"
+                            ? "bg-red-100 text-red-600"
+                            : r.priority?.level === "high"
+                              ? "bg-orange-100 text-orange-600"
+                              : r.priority?.level === "normal"
+                                ? "bg-blue-100 text-blue-600"
+                                : "bg-gray-100 text-gray-500"
+                        )}
+                      >
+                        {r.priority?.level ?? "—"}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3.5">
+                      <StatusBadge status={r.status?.status_name ?? "pending"} />
+                    </td>
+                    <td className="px-3 py-3.5 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                      {new Date(r.created_at).toLocaleDateString("en-PH", {
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </td>
+                  </tr>
+                ))}
+                {requests.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="px-3 py-16 text-center text-slate-400">
+                      No requests found. Adjust filters.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
-      {/* Pagination – ONLY THIS SECTION IS MODIFIED TO GREEN/GLASS */}
+      {/* Pagination – role‑based styling */}
       {totalPages > 1 && (
         <div className="flex justify-end items-center gap-2 shrink-0 pt-2">
           <button
             onClick={() => setParam("page", String(currentPage - 1))}
             disabled={currentPage === 1}
-            className="px-3 py-1 text-sm rounded-lg border border-[#ADEBB3]/70 dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className={cn(
+              "px-3 py-1 text-sm rounded-lg border dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm hover:bg-white/60 dark:hover:bg-white/[0.08] transition-all disabled:opacity-50 disabled:cursor-not-allowed",
+              isClerk ? "border-[#58855C]/25 hover:bg-[#58855C]/10" :
+              isSupervisor ? "border-[#0D3311]/20 hover:bg-[#0D3311]/10" :
+              "border-[#ADEBB3]/70 hover:bg-[#ADEBB3]/35"
+            )}
           >
             Previous
           </button>
@@ -352,11 +377,20 @@ export function RequestsTable({
                 <button
                   key={pageNum}
                   onClick={() => setParam("page", String(pageNum))}
-                  className={`px-3 py-1 text-sm rounded-lg border ${
+                  className={cn(
+                    "px-3 py-1 text-sm rounded-lg border transition-all",
                     pageNum === currentPage
-                      ? "bg-[#527255] text-white border-[#527255] shadow-sm"
-                      : "border-[#ADEBB3]/70 dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]"
-                  } transition-all`}
+                      ? isClerk
+                        ? "bg-[#58855C] text-white border-[#58855C]/25 shadow-sm"
+                        : isSupervisor
+                          ? "bg-[#0D3311] text-white border-[#0D3311]/20 shadow-sm"
+                          : "bg-[#527255] text-white border-[#ADEBB3]/70 shadow-sm"
+                      : isClerk
+                        ? "border-[#58855C]/25 dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm hover:bg-[#58855C]/10 dark:hover:bg-white/[0.08]"
+                        : isSupervisor
+                          ? "border-[#0D3311]/20 dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm hover:bg-[#0D3311]/10 dark:hover:bg-white/[0.08]"
+                          : "border-[#ADEBB3]/70 dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08]"
+                  )}
                 >
                   {pageNum}
                 </button>
@@ -366,7 +400,12 @@ export function RequestsTable({
           <button
             onClick={() => setParam("page", String(currentPage + 1))}
             disabled={currentPage === totalPages}
-            className="px-3 py-1 text-sm rounded-lg border border-[#ADEBB3]/70 dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className={cn(
+              "px-3 py-1 text-sm rounded-lg border dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-sm hover:bg-white/60 dark:hover:bg-white/[0.08] transition-all disabled:opacity-50 disabled:cursor-not-allowed",
+              isClerk ? "border-[#58855C]/25 hover:bg-[#58855C]/10" :
+              isSupervisor ? "border-[#0D3311]/20 hover:bg-[#0D3311]/10" :
+              "border-[#ADEBB3]/70 hover:bg-[#ADEBB3]/35"
+            )}
           >
             Next
           </button>

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useNotificationStore } from '@/stores/notification.store';
 
 interface Props {
-  basePath: string; // e.g. '/clerk' | '/supervisor' | '/technician' | '/requester'
+  basePath: string; // e.g. '/clerk' | '/supervisor' | '/requester'
 }
 
 export function NotificationBell({ basePath }: Props) {

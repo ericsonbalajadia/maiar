@@ -150,12 +150,12 @@ export function RequestDetailPanel({
 
   const containerClasses =
     variant === "glass"
-      ? "rounded-2xl border border-white/60 dark:border-slate-700/60 p-6"
+      ? "clerk-surface rounded-2xl p-6"
       : "";
 
   const containerStyle =
     variant === "glass"
-      ? { background: "var(--glass-bg)", backdropFilter: "blur(12px)" }
+      ? {}
       : {};
 
   return (
@@ -164,7 +164,7 @@ export function RequestDetailPanel({
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
         <div>
           <div className="flex items-center gap-2 flex-wrap mb-1">
-            <span className="font-mono text-xs bg-slate-100 dark:bg-white/[0.05] px-2 py-0.5 rounded-md">
+            <span className="font-mono text-xs bg-[#58855C]/10 dark:bg-white/[0.06] text-[#58855C] dark:text-emerald-300 px-2 py-0.5 rounded-md">
               {request.ticket_number}
             </span>
             <StatusBadge status={status} />
@@ -178,10 +178,10 @@ export function RequestDetailPanel({
       {/* Two‑column: Request Details + Timeline */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Left: Request Details */}
-        <div className="rounded-xl border p-5 bg-white/40 dark:bg-white/[0.04]">
+        <div className="clerk-surface-soft rounded-xl p-5">
           <SectionHeader
             icon={Tag}
-            iconGradient="bg-gradient-to-br from-amber-400 to-orange-500"
+            iconGradient="bg-[#58855C]"
             title="Request Details"
           />
           <InfoGrid>
@@ -201,10 +201,8 @@ export function RequestDetailPanel({
           </InfoGrid>
           {request.description && (
             <div className="mt-4">
-              <p className="text-xs font-semibold text-slate-400 mb-1">
-                Description
-              </p>
-              <div className="bg-slate-50 dark:bg-white/[0.05] rounded-lg p-3 text-sm">
+              <p className="text-xs font-semibold text-slate-400 mb-1">Description</p>
+              <div className="rounded-lg bg-white/50 p-3 text-sm dark:bg-white/[0.05]">
                 {request.description}
               </div>
             </div>
@@ -212,7 +210,7 @@ export function RequestDetailPanel({
         </div>
 
         {/* Right: Timeline */}
-        <div className="rounded-xl border p-5 bg-white/40 dark:bg-white/[0.04]">
+        <div className="clerk-surface-soft rounded-xl p-5">
           <SectionHeader
             icon={History}
             iconGradient="bg-gradient-to-br from-slate-400 to-slate-600"
@@ -224,7 +222,7 @@ export function RequestDetailPanel({
 
       {/* Attachments (full preview component) */}
       {attachments.length > 0 && (
-        <div className="rounded-xl border p-5 bg-white/40 dark:bg-white/[0.04] mb-6">
+        <div className="clerk-surface-soft rounded-xl p-5 mb-6">
           <SectionHeader
             icon={Paperclip}
             iconGradient="bg-gradient-to-br from-slate-500 to-slate-700"
@@ -241,7 +239,7 @@ export function RequestDetailPanel({
       {/* Vertical stack of info cards (Requester, Technician, Review, Actions) */}
       <div className="space-y-4">
         {/* Requester card */}
-        <div className="rounded-xl border p-4 bg-white/40 dark:bg-white/[0.04]">
+        <div className="clerk-surface-soft rounded-xl p-4">
           <SectionHeader
             icon={User}
             iconGradient="bg-gradient-to-br from-blue-500 to-indigo-600"
@@ -255,10 +253,10 @@ export function RequestDetailPanel({
 
         {/* Technician card (if assigned) */}
         {request.assigned_technician && (
-          <div className="rounded-xl border p-4 bg-white/40 dark:bg-white/[0.04]">
+          <div className="clerk-surface-soft rounded-xl p-4">
             <SectionHeader
               icon={User}
-              iconGradient="bg-gradient-to-br from-[#8dc192] to-[#527255]"
+              iconGradient="bg-[#58855C]"
               title="Technician"
             />
             <InfoGrid>
@@ -278,10 +276,10 @@ export function RequestDetailPanel({
 
         {/* Review card (if exists) */}
         {review && (
-          <div className="rounded-xl border p-4 bg-white/40 dark:bg-white/[0.04]">
+          <div className="clerk-surface-soft rounded-xl p-4">
             <SectionHeader
               icon={ClipboardCheck}
-              iconGradient="bg-gradient-to-br from-[#8dc192] to-[#6f9873]"
+              iconGradient="bg-[#58855C]"
               title="Review"
             />
             <InfoGrid>
@@ -301,10 +299,10 @@ export function RequestDetailPanel({
 
         {/* Status Actions card (if applicable) */}
         {showStatusActions && (
-          <div className="rounded-xl border p-4 bg-white/40 dark:bg-white/[0.04]">
+          <div className="clerk-surface-soft rounded-xl p-4">
             <SectionHeader
               icon={CheckCircle2}
-              iconGradient="bg-gradient-to-br from-amber-400 to-orange-500"
+              iconGradient="bg-[#58855C]"
               title="Actions"
             />
             <StatusUpdatePanel

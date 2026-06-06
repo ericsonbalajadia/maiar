@@ -1,3 +1,4 @@
+//new/rmr/rmr-form.tsx
 "use client";
 
 import { useState, useTransition, useEffect } from "react";
@@ -287,7 +288,7 @@ function SuccessModal({
   );
 }
 
-// ─── Main Form Component (green theme, with attachments) ──────────────────────
+// ─── Main Form Component (Ericson's functionality + Angie's green theme) ──────
 
 export function RmrForm({ categories, dbUser }: RmrFormProps) {
   const router = useRouter();
@@ -365,7 +366,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
   const back = () => setStep((s) => s - 1);
   const cancel = () => router.push("/requester/requests/new");
 
-  // ─── Attachment handlers ────────────────────────────────────────────────────
+  // ─── Attachment handlers (Ericson's logic) ─────────────────────────────────
   const handleTempUpload = (fileData: {
     tempPath: string;
     fileName: string;
@@ -389,7 +390,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
     setTempAttachments((prev) => prev.filter((a) => a.id !== id));
   };
 
-  // ─── Submit ─────────────────────────────────────────────────────────────────
+  // ─── Submit (Ericson's full attachment flow) ───────────────────────────────
   const handleSubmit = () => {
     if (!validateStep(3)) return;
     const uploadedAttachments = tempAttachments
@@ -458,7 +459,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
       className="rounded-2xl border border-[#ADEBB3]/70 dark:border-white/10 shadow-sm overflow-hidden"
       style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
     >
-      {/* Progress bar (green) */}
+      {/* Progress bar */}
       <div className="h-1 bg-slate-100 dark:bg-white/[0.05]">
         <div
           className="h-full bg-[#8dc192] transition-all duration-500 ease-out rounded-full"
@@ -469,7 +470,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
       <div className="p-6 sm:p-8">
         <StepIndicator current={step} />
 
-        {/* ── Step 1: Request Info (green themed) ── */}
+        {/* ── Step 1: Request Info ── */}
         {step === 1 && (
           <div className="fade-in">
             <SectionHeader number={1} title="Request Information" subtitle="Tell us who you are and where the issue is located" />
@@ -497,7 +498,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1.5">
                     <div>
                       <Input
-                        placeholder="Building site *"
+                        placeholder="Specific location *"
                         value={form.location_building}
                         onChange={(e) => set("location_building", e.target.value)}
                         className={cn(
@@ -567,7 +568,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
           </div>
         )}
 
-        {/* ── Step 2: Nature of Work (green theme, larger buttons) ── */}
+        {/* ── Step 2: Nature of Work ── */}
         {step === 2 && (
           <div className="fade-in">
             <SectionHeader number={2} title="Nature of Work" subtitle="Select all applicable types of work needed" />
@@ -679,7 +680,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
           </div>
         )}
 
-        {/* ── Step 3: Description (green) ── */}
+        {/* ── Step 3: Description ── */}
         {step === 3 && (
           <div className="fade-in">
             <SectionHeader number={3} title="Describe the Issue" subtitle="Give the team enough detail to handle the repair effectively" />
@@ -712,7 +713,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
           </div>
         )}
 
-        {/* ── Step 4: Attachments (green themed) ── */}
+        {/* ── Step 4: Attachments (Ericson's component) ── */}
         {step === 4 && (
           <div className="fade-in">
             <SectionHeader number={4} title="Attachments" subtitle="Upload supporting photos or documents (optional)" />
@@ -733,7 +734,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
           </div>
         )}
 
-        {/* ── Step 5: Review & Submit (green) ── */}
+        {/* ── Step 5: Review & Submit ── */}
         {step === 5 && (
           <div className="fade-in">
             <SectionHeader number={5} title="Review &amp; Submit" subtitle="Please verify all details before submitting" />
@@ -812,7 +813,7 @@ export function RmrForm({ categories, dbUser }: RmrFormProps) {
           </div>
         )}
 
-        {/* ── Navigation Buttons (green) ── */}
+        {/* ── Navigation Buttons ── */}
         <div className="flex items-center justify-between mt-8 pt-5 border-t border-[#ADEBB3]/70 dark:border-white/10">
           {step === 1 ? (
             <Button type="button" variant="outline" onClick={cancel} className="text-slate-500 border-[#ADEBB3]/70 dark:border-white/10">

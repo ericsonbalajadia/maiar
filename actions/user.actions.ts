@@ -88,20 +88,9 @@ export async function createUser(
 
   if (updateError) return { error: updateError.message };
 
-  // 4. For technician role, also create technician_info record
   if (role === 'technician') {
-    const { data: userRecord } = await service
-      .from('users')
-      .select('id')
-      .eq('auth_id', authUser.user.id)
-      .single();
-    if (userRecord) {
-      await service.from('technician_info').insert({
-        user_id: userRecord.id,
-        specialization: 'general',
-        is_available: true,
-      });
-    }
+    await admin.auth.admin.deleteUser(authUser.user.id);
+    return { error: 'Technicians are personnel records only and cannot be created as app login accounts.' };
   }
 
   return { success: true };
@@ -206,7 +195,7 @@ export async function updateUserRole(
   const caller = await verifyAdmin()
   if (!caller) return { error: 'Only administrators can change user roles' }
 
-  const validRoles = ['student', 'staff', 'clerk', 'technician', 'supervisor', 'admin']
+  const validRoles = ['student', 'staff', 'clerk', 'supervisor', 'admin']
   if (!validRoles.includes(role)) {
     return { error: `Invalid role: ${role}` }
   }

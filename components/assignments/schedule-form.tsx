@@ -86,7 +86,7 @@ export function ScheduleForm({
           />
         </div>
         <div className="sm:col-span-2">
-          <Button type="submit" disabled={isPending} className="bg-[#8dc192] hover:bg-[#6f9873] text-white">
+          <Button type="submit" disabled={isPending} className="bg-[#0D3311] hover:bg-[#09250d] text-white">
             {isPending
               ? "Saving..."
               : scheduledStart

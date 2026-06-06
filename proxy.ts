@@ -63,6 +63,11 @@ export async function proxy(request: NextRequest) {
             return NextResponse.redirect(new URL('/login?error=account_inactive', request.url))
         }
 
+        if (dbUser.role === 'technician') {
+            await supabase.auth.signOut()
+            return NextResponse.redirect(new URL('/login?error=role_no_app_access', request.url))
+        }
+
         if (dbUser.signup_status === 'pending') {
             const allowedForPending = PENDING_ALLOWED_ROUTES.some((route) => pathname.startsWith(route))
             if (!allowedForPending) {

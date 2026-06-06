@@ -42,17 +42,17 @@ const ROLE_LABELS: Record<string, string> = {
 const ROLE_BADGE_COLORS: Record<string, string> = {
   student:    'bg-[#ADEBB3]/60 text-[#1e2c1f] dark:bg-white/[0.07] dark:text-emerald-300',
   staff:      'bg-[#ADEBB3]/60 text-[#1e2c1f] dark:bg-white/[0.07] dark:text-emerald-300',
-  clerk:      'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
-  technician: 'bg-[#ADEBB3]/45 text-[#374e39] dark:bg-white/[0.07] dark:text-emerald-300',
-  supervisor: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
+  clerk:      'bg-[#58855C]/10 text-[#58855C] dark:bg-white/[0.07] dark:text-emerald-300',
+  technician: 'bg-[#0D3311]/10 text-[#0D3311] dark:bg-white/[0.07] dark:text-emerald-300',
+  supervisor: 'bg-[#0D3311]/10 text-[#0D3311] dark:bg-white/[0.07] dark:text-emerald-300',
   admin:      'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300',
 }
 
 const AVATAR_GRADIENTS = [
   'from-blue-500 to-indigo-600',
-  'from-violet-500 to-purple-600',
+  'from-[#0D3311] to-[#0D3311]',
   'from-[#6f9873] to-[#6f9873]',
-  'from-orange-500 to-amber-600',
+  'from-[#58855C] to-[#58855C]',
   'from-rose-500 to-pink-600',
   'from-cyan-500 to-blue-600',
 ]

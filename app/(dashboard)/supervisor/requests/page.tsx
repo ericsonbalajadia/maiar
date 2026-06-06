@@ -56,7 +56,7 @@ export default async function SupervisorAllRequestsPage({ searchParams }: Props)
 
   return (
     // Use a flex column that fills the available height
-    <div className="h-full flex flex-col max-w-7xl mx-auto px-6 py-4">
+    <div className="supervisor-shell h-full flex flex-col max-w-7xl mx-auto px-6 py-4">
       <div className="shrink-0 mb-4">
         <h1 className="text-2xl font-bold">All Requests</h1>
       </div>
