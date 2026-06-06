@@ -1,3 +1,5 @@
+//components/clerk/review-queue-filter.tsx:
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -16,9 +18,8 @@ export function ReviewQueueFilter({ currentType }: Props) {
   };
 
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Request Type:</span>
-      <div className="flex gap-2">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+      <div className="flex items-center gap-1.5 rounded-full border border-[#ADEBB3]/70 bg-white/60 p-1 backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.05]">
         {[
           { value: 'all', label: 'All' },
           { value: 'rmr', label: 'R&M' },
@@ -27,7 +28,7 @@ export function ReviewQueueFilter({ currentType }: Props) {
           <button
             key={opt.value}
             onClick={() => setType(opt.value)}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
               currentType === opt.value
                 ? 'bg-[#58855C] text-white'
                 : 'bg-white/50 dark:bg-white/[0.05] text-slate-700 dark:text-slate-300 hover:bg-[#58855C]/10 dark:hover:bg-white/[0.08]'

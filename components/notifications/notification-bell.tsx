@@ -404,6 +404,7 @@ export function NotificationBell({
                   </button>
                 )}
                 <button
+                aria-label="Close notifications panel"
                   onClick={() => setOpen(false)}
                   className={cn("w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 dark:hover:bg-white/[0.08] transition-colors", isClerk ? "hover:text-[#58855C] hover:bg-[#58855C]/10" : "hover:text-[#527255] hover:bg-[#ADEBB3]/35")}
                 >

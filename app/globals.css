@@ -110,6 +110,7 @@
 .sidebar-glass {
   background: var(--glass-sidebar);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-right: 1px solid rgba(93, 167, 116, 0.24);
 }
 .dark .sidebar-glass {
@@ -119,6 +120,7 @@
 .header-glass {
   background: var(--glass-header);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 .dark .header-glass {
@@ -404,4 +406,39 @@
 }
 .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #64748b;
+}
+
+[data-tooltip] {
+  position: relative;
+  cursor: help;
+}
+
+[data-tooltip]:before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 6px;
+  padding: 4px 8px;
+  background-color: #1e293b;
+  color: #f1f5f9;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  white-space: nowrap;
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 10;
+}
+
+[data-tooltip]:hover:before {
+  opacity: 1;
+}
+
+/* Dark mode adjustment */
+.dark [data-tooltip]:before {
+  background-color: #334155;
+  color: #e2e8f0;
 }

@@ -13,6 +13,7 @@ interface RequestCardProps {
     status: { status_name: string }
     priority: { level: string }
     location: { building_name: string }
+     ppsr_details?: { service_type: string } | null; 
   }
   fullHref?: string;
   variant?: 'default' | 'requester';
