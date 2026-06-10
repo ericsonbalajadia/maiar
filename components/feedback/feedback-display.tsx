@@ -32,8 +32,8 @@ export function FeedbackDisplay({
   submitted_at,
 }: Props) {
   return (
-    <div className="rounded-lg border border-green-200 bg-green-50 p-4 space-y-3">
-      <p className="text-sm font-semibold text-green-900">Your Feedback</p>
+    <div className="rounded-lg border border-[#ADEBB3]/70 bg-[#ADEBB3]/35 p-4 space-y-3">
+      <p className="text-sm font-semibold text-[#0b130b]">Your Feedback</p>
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div>
           <span className="font-medium text-gray-700">Service Satisfaction:</span>

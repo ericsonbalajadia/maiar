@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useNotificationStore } from '@/stores/notification.store';
 
 interface Props {
-  basePath: string; // e.g. '/clerk' | '/supervisor' | '/technician' | '/requester'
+  basePath: string; // e.g. '/clerk' | '/supervisor' | '/requester'
 }
 
 export function NotificationBell({ basePath }: Props) {
@@ -15,7 +15,7 @@ export function NotificationBell({ basePath }: Props) {
   return (
     <Link
       href={`${basePath}/notifications`}
-      className="relative p-2 text-slate-500 hover:text-teal-600 transition-colors"
+      className="relative p-2 text-slate-500 hover:text-[#527255] transition-colors"
     >
       <BellIcon className="h-5 w-5" />
       {count > 0 && (

@@ -30,7 +30,7 @@ export async function saveAccomplishment(
   const { data: actor } = await admin
     .from('users').select('id, role').eq('auth_id', user.id).single();
   if (!actor || !hasRole(actor.role, ACCOMPLISHMENT_RECORD_ROLES))
-    return actionError('form', 'Only technicians and supervisors can record accomplishments.');
+    return actionError('form', 'Only supervisors can record accomplishments.');
 
   // Upsert: one accomplishments row per request (UNIQUE on request_id)
   const { error } = await admin.from('accomplishments').upsert({
@@ -43,7 +43,7 @@ export async function saveAccomplishment(
 
   if (error) return actionFormError(error);
 
-  revalidatePath('/technician');
+  revalidatePath('/supervisor');
   return { success: true };
 }
 
@@ -75,7 +75,7 @@ export async function verifyAccomplishment(
     .eq('request_id', result.data.request_id)
     .single();
   if (!existing)
-    return actionError('form', 'No work record found for this request. The technician must record work details first.');
+    return actionError('form', 'No work record found for this request. Work details must be recorded first.');
   if (!existing.finished_at)
     return actionError('form', 'Work finish time must be recorded before verification.');
 

@@ -1,0 +1,92 @@
+//components/feedback/recent-comments-list.tsx
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { SERVICE_LABELS, OVERALL_LABELS } from "@/lib/constants/feedback-labels";
+
+interface CommentItem {
+  request_id: string;
+  request: { id: string; ticket_number: string } | null;
+  comments: string | null;
+  submitted_at: string;
+  is_anonymous: boolean;
+  service_satisfaction: number;
+  overall_rating: number;
+}
+
+interface Props {
+  comments: CommentItem[];
+  pageSize?: number;
+  basePath?: string; // e.g., "/supervisor/requests" or "/admin/requests"
+}
+
+export function RecentCommentsList({ comments, pageSize = 5, basePath = "/supervisor/requests" }: Props) {
+  const [visibleCount, setVisibleCount] = useState(pageSize);
+  const hasMore = visibleCount < comments.length;
+
+  const loadMore = () => {
+    setVisibleCount((prev) => Math.min(prev + pageSize, comments.length));
+  };
+
+  const visibleComments = comments.slice(0, visibleCount);
+
+  return (
+    <div className="space-y-3">
+      {visibleComments.map((f, idx) => (
+        <div
+          key={idx}
+          className="rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 bg-white/60 dark:bg-white/[0.04] p-4"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+            <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-white/45">
+              {f.request ? (
+                <Link
+                  href={`${basePath}/${f.request.id}`} 
+                  className="font-mono font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  {f.request.ticket_number}
+                </Link>
+              ) : (
+                <span className="italic">Request unavailable</span>
+              )}
+              <span>·</span>
+              <span>
+                {new Date(f.submitted_at).toLocaleDateString("en-PH", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </span>
+              {f.is_anonymous && (
+                <span className="text-amber-500 font-medium">(anonymous)</span>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <span className="text-[11px] font-semibold bg-[#ADEBB3]/35 dark:bg-white/[0.06] text-[#1e2c1f] dark:text-emerald-300 border border-[#ADEBB3]/70 dark:border-white/10 px-2 py-0.5 rounded-full">
+                Service: {SERVICE_LABELS[f.service_satisfaction] ?? f.service_satisfaction}
+              </span>
+              <span className="text-[11px] font-semibold bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-[#ADEBB3]/70 dark:border-white/10 px-2 py-0.5 rounded-full">
+                Overall: {OVERALL_LABELS[f.overall_rating] ?? f.overall_rating}
+              </span>
+            </div>
+          </div>
+          <p className="text-sm text-slate-700 dark:text-white/80 leading-relaxed whitespace-pre-wrap">
+            {f.comments}
+          </p>
+        </div>
+      ))}
+
+      {hasMore && (
+        <div className="flex justify-center pt-2">
+          <button
+            onClick={loadMore}
+            className="px-4 py-2 text-sm font-medium text-[#527255] dark:text-emerald-300 border border-[#ADEBB3]/70 dark:border-white/10 rounded-xl hover:bg-[#ADEBB3]/35 dark:hover:bg-white/[0.08] transition-colors"
+          >
+            Load more ({comments.length - visibleCount} remaining)
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -85,6 +85,7 @@ export type RequestWithRelations = Request & {
   locations: Pick<Location, 'building_name' | 'floor_level' | 'room_number'> | null
   priorities: Pick<Priority, 'level'> | null
   users: { full_name: string; email: string; department: string | null } | null
+  ppsr_details: Pick<PpsrDetails, 'service_type'> | null
 }
 
 // ─── RMR Details ──────────────────────────────────────────────────────────────

@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import type { DbUser } from '@/types/models'
+import { createServiceClient } from '@/lib/supabase/service'
 
 export type UserActionState = {
   error?: string
@@ -24,6 +25,75 @@ export type UserFilters = {
   is_active?: boolean
   page?: number
   pageSize?: number
+}
+
+// ─── createUser ─────────────────────────────────────────────────────────────
+export type CreateUserState = {
+  success?: boolean;
+  error?: string;
+};
+export async function createUser(
+  prevState: CreateUserState,
+  formData: FormData
+): Promise<CreateUserState> {
+  const supabase = await createClient();
+  const { data: { user: currentUser } } = await supabase.auth.getUser();
+  if (!currentUser) return { error: 'Unauthorized' };
+
+  const admin = createAdminClient();
+  const service = createServiceClient();
+
+  // Check if current user is admin
+  const { data: caller } = await service
+    .from('users')
+    .select('role')
+    .eq('auth_id', currentUser.id)
+    .single();
+  if (caller?.role !== 'admin') return { error: 'Only admins can create users' };
+
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+  const fullName = formData.get('full_name') as string;
+  const role = formData.get('role') as string;
+  const department = formData.get('department') as string || null;
+
+  if (!email || !password || !fullName || !role) {
+    return { error: 'All required fields must be filled' };
+  }
+
+  // 1. Create auth user
+  const { data: authUser, error: authError } = await admin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { full_name: fullName },
+  });
+  if (authError) return { error: authError.message };
+
+  // 2. Wait a moment for the database trigger to create the user record (or insert directly)
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  // 3. Update the user record with correct role, department, and approved status
+  const { error: updateError } = await service
+    .from('users')
+    .update({
+      role,
+      department,
+      signup_status: 'approved',
+      full_name: fullName,
+      reviewed_at: new Date().toISOString(),
+      reviewed_by: (await service.from('users').select('id').eq('auth_id', currentUser.id).single()).data?.id,
+    })
+    .eq('auth_id', authUser.user.id);
+
+  if (updateError) return { error: updateError.message };
+
+  if (role === 'technician') {
+    await admin.auth.admin.deleteUser(authUser.user.id);
+    return { error: 'Technicians are personnel records only and cannot be created as app login accounts.' };
+  }
+
+  return { success: true };
 }
 
 // ─── Guard: verify caller is admin ───────────────────────────────────────────
@@ -125,7 +195,7 @@ export async function updateUserRole(
   const caller = await verifyAdmin()
   if (!caller) return { error: 'Only administrators can change user roles' }
 
-  const validRoles = ['student', 'staff', 'clerk', 'technician', 'supervisor', 'admin']
+  const validRoles = ['student', 'staff', 'clerk', 'supervisor', 'admin']
   if (!validRoles.includes(role)) {
     return { error: `Invalid role: ${role}` }
   }

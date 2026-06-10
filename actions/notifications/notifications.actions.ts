@@ -149,7 +149,7 @@ export async function markAllNotificationsRead(): Promise<void> {
     .eq('user_id', userId)
     .is('read_at', null);
 
-  const roles = ['requester', 'clerk', 'supervisor', 'admin', 'technician'];
+  const roles = ['requester', 'clerk', 'supervisor', 'admin'];
   for (const role of roles) {
     revalidatePath(`/${role}/notifications`);
   }
@@ -173,13 +173,27 @@ export async function getUnreadCount(): Promise<number> {
 
 // Get all user IDs for a given role
 export async function getUserIdsByRole(role: 'clerk' | 'supervisor' | 'admin'): Promise<string[]> {
-  const supabase = createServiceClient();
-  const { data } = await supabase
-    .from('users')
-    .select('id')
-    .eq('role', role)
-    .eq('signup_status', 'approved');
-  return data?.map(u => u.id) ?? [];
+  try {
+    console.log(`[getUserIdsByRole] Fetching ${role} users with approved status`);
+    const supabase = createServiceClient();
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, full_name, email')
+      .eq('role', role)
+      .eq('signup_status', 'approved');
+    
+    if (error) {
+      console.error(`[getUserIdsByRole] Error fetching ${role} users:`, error);
+      return [];
+    }
+    
+    const userIds = data?.map(u => u.id) ?? [];
+    console.log(`[getUserIdsByRole] Found ${userIds.length} ${role} user(s):`, data?.map(u => ({ id: u.id, name: u.full_name, email: u.email })));
+    return userIds;
+  } catch (err) {
+    console.error(`[getUserIdsByRole] Exception fetching ${role} users:`, err);
+    return [];
+  }
 }
 
 // Send notification to multiple users
@@ -196,7 +210,19 @@ export async function sendBulkNotification({
   subject: string;
   message: string;
 }) {
-  if (userIds.length === 0) return;
+  console.log('[sendBulkNotification] Called with:', { 
+    userIds, 
+    requestId, 
+    type, 
+    subject: subject.substring(0, 50), 
+    message: message.substring(0, 50) 
+  });
+  
+  if (userIds.length === 0) {
+    console.warn('[sendBulkNotification] No user IDs provided, skipping notification');
+    return;
+  }
+  
   const supabase = createServiceClient();
   const notifications = userIds.map(userId => ({
     user_id: userId,
@@ -208,5 +234,26 @@ export async function sendBulkNotification({
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   }));
-  await supabase.from('notifications').insert(notifications);
+  
+  console.log('[sendBulkNotification] Inserting notifications:', {
+    count: notifications.length,
+    type,
+    userIds
+  });
+  
+  const { data, error } = await supabase.from('notifications').insert(notifications);
+  
+  if (error) {
+    console.error('[sendBulkNotification] Insert error:', error);
+    console.error('[sendBulkNotification] Error details:', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint
+    });
+    throw new Error(`Failed to insert notifications: ${error.message} (${error.code})`);
+  }
+  
+  console.log('[sendBulkNotification] Successfully inserted', notifications.length, 'notifications');
+  return { data };
 }

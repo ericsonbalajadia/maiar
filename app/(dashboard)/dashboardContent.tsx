@@ -2,6 +2,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { Sidebar } from '@/components/layout/sidebar';
+import { MobileSidebar } from '@/components/layout/mobile-sidebar';
 import { Header } from '@/components/layout/header';
 import { NotificationProvider } from '@/components/notifications/notification-provider';
 
@@ -20,12 +21,17 @@ export default async function DashboardContent({ children }: { children: React.R
     redirect('/pending-approval');
   }
 
+  const isRequester = dbUser.role === 'student' || dbUser.role === 'staff';
+
   return (
     <>
-      <Sidebar userRole={dbUser.role} />
+      <div className="hidden md:block">
+        <Sidebar userRole={dbUser.role} userName={dbUser.full_name} userEmail={dbUser.email} />
+      </div>
       <div className="flex flex-col flex-1 overflow-hidden">
+        <MobileSidebar userRole={dbUser.role} userName={dbUser.full_name} userEmail={dbUser.email} />
         <Header />
-        <main className="flex-1 overflow-auto p-6">{children}</main>
+        <main className={isRequester ? "flex-1 overflow-auto py-6 sm:py-7 lg:py-8" : "flex-1 overflow-auto p-6"}>{children}</main>
       </div>
       <NotificationProvider userId={dbUser.id} />
     </>

@@ -93,11 +93,12 @@ export async function registerUser(
       });
     }
 
-    // Send in-app notifications to all admins and clerks
+    // Send in-app notifications to all admins, clerks, and supervisors
     try {
       const adminIds = await getUserIdsByRole('admin');
       const clerkIds = await getUserIdsByRole('clerk');
-      const staffIds = [...adminIds, ...clerkIds];
+      const supervisorIds = await getUserIdsByRole('supervisor');
+      const staffIds = [...adminIds, ...clerkIds, ...supervisorIds];
 
       if (staffIds.length > 0) {
         await sendBulkNotification({
@@ -179,6 +180,11 @@ export async function loginUser(
   if (user.signup_status === 'rejected') {
     await supabase.auth.signOut()
     return { errors: { form: ['Your registration was rejected. Contact admin.'] } }
+  }
+
+  if (user.role === 'technician') {
+    await supabase.auth.signOut()
+    return { errors: { form: ['Technicians are personnel records only and do not have app login access.'] } }
   }
 
   console.log('User is approved, redirecting to role dashboard. Role:', user.role)

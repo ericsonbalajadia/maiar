@@ -46,7 +46,7 @@ export default async function TechnicianWorkPage({ params }: Props) {
   return (
     <div className="max-w-2xl space-y-6">
       <nav className="text-sm text-slate-400">
-        <Link href="/technician" className="hover:text-teal-600">
+        <Link href="/technician" className="hover:text-[#0D3311]">
           My Tasks
         </Link>
         <span className="mx-2">›</span>

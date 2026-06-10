@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { RequestPhotoPicker, SelectedPhotoGrid, uploadRequestPhotos } from '@/components/requests/request-photo-picker'
 import {
   Select,
   SelectContent,
@@ -37,7 +38,7 @@ interface PpsrFormProps {
   dbUser: DbUser
 }
 
-// Icons and colors per service type
+// Icons per service type
 const SERVICE_ICONS: Record<string, React.ElementType> = {
   audio_system:             Volume2,
   land_preparation:         Hammer,
@@ -50,20 +51,6 @@ const SERVICE_ICONS: Record<string, React.ElementType> = {
   landscaping:              Leaf,
   plans_layouts_estimates:  FileText,
   others:                   MoreHorizontal,
-}
-
-const SERVICE_COLORS: Record<string, string> = {
-  audio_system:             'from-orange-400 to-red-500',
-  land_preparation:         'from-amber-400 to-yellow-500',
-  site_development:         'from-blue-400 to-cyan-500',
-  hauling:                  'from-slate-400 to-slate-600',
-  tent_installation:        'from-green-400 to-emerald-500',
-  fabrication:              'from-violet-400 to-purple-500',
-  installation:             'from-teal-400 to-cyan-600',
-  machining_works:          'from-zinc-400 to-zinc-600',
-  landscaping:              'from-lime-400 to-green-600',
-  plans_layouts_estimates:  'from-indigo-400 to-blue-600',
-  others:                   'from-rose-400 to-pink-500',
 }
 
 const STEPS = [
@@ -113,18 +100,18 @@ function StepIndicator({ current }: { current: number }) {
               <div className={cn(
                 'w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-200 shadow-sm',
                 isPast
-                  ? 'bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-emerald-200 dark:shadow-emerald-900/30'
+                  ? 'bg-[#8dc192] text-[#0b130b] shadow-[#ADEBB3]/40 dark:shadow-[#ADEBB3]/20'
                   : isCurrent
-                  ? 'bg-gradient-to-br from-violet-600 to-purple-600 text-white shadow-violet-200 dark:shadow-violet-900/30'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'
+                  ? 'bg-[#8dc192] text-[#0b130b] shadow-[#ADEBB3]/40 dark:shadow-[#ADEBB3]/20'
+                  : 'bg-slate-100 dark:bg-white/[0.05] text-slate-400 dark:text-white/45'
               )}>
                 {isPast ? <Check className="h-4 w-4" /> : step.number}
               </div>
               <span className={cn(
                 'text-xs text-center whitespace-nowrap font-medium',
-                isCurrent ? 'text-violet-600 dark:text-violet-400'
-                  : isPast ? 'text-emerald-600 dark:text-emerald-400'
-                  : 'text-slate-400 dark:text-slate-500'
+                isCurrent ? 'text-[#527255] dark:text-emerald-300'
+                  : isPast ? 'text-[#527255] dark:text-emerald-300'
+                  : 'text-slate-400 dark:text-white/45'
               )}>
                 {step.label}
               </span>
@@ -133,8 +120,8 @@ function StepIndicator({ current }: { current: number }) {
               <div className={cn(
                 'flex-1 h-0.5 mt-4 mx-2 rounded-full transition-all duration-300',
                 step.number < current
-                  ? 'bg-gradient-to-r from-emerald-400 to-teal-500'
-                  : 'bg-slate-200 dark:bg-slate-700'
+                  ? 'bg-[#8dc192]'
+                  : 'bg-[#ADEBB3]/60 dark:bg-white/[0.08]'
               )} />
             )}
           </div>
@@ -163,24 +150,24 @@ function SuccessModal({
   return createPortal(
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div
-        className="rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center border border-white/20 dark:border-slate-700/60"
+        className="rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center border border-[#ADEBB3]/70 dark:border-white/10"
         style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(20px)' }}
       >
-        <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/30">
+        <div className="w-16 h-16 bg-[#8dc192] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#ADEBB3]/35">
           <CheckCircle2 className="h-8 w-8 text-white" />
         </div>
         <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Request Submitted!</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">
+        <p className="text-sm text-black dark:text-white/80 mb-2">
           Your request has been received and is pending review.
         </p>
-        <div className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg px-3 py-1.5 mb-6">
+        <div className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-white/[0.05] rounded-lg px-3 py-1.5 mb-6">
           <span className="text-xs text-slate-400">Ticket</span>
           <span className="text-sm font-bold font-mono text-slate-800 dark:text-white">{ticketNumber}</span>
         </div>
         <div className="flex flex-col gap-2.5">
           <Button
             onClick={onView}
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20"
+            className="w-full bg-[#8dc192] text-[#0b130b] shadow-md shadow-[#ADEBB3]/35 hover:bg-[#ADEBB3]/35"
           >
             View My Requests
           </Button>
@@ -211,7 +198,7 @@ function Field({
 }) {
   return (
     <div className={className}>
-      <Label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5 block">
+      <Label className="text-xs font-semibold text-slate-500 dark:text-white/60 uppercase tracking-wide mb-1.5 block">
         {label}{required && <span className="text-rose-500 ml-0.5">*</span>}
       </Label>
       {children}
@@ -240,15 +227,15 @@ function ServiceSubFields({
 
   if (fields.length === 0) {
     return (
-      <div className="rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 px-4 py-6 text-center">
-        <p className="text-sm text-slate-400 dark:text-slate-500 italic">
+      <div className="rounded-xl bg-slate-50/80 dark:bg-white/[0.04] border border-[#ADEBB3]/70 dark:border-white/10 px-4 py-6 text-center">
+        <p className="text-sm text-slate-400 dark:text-white/45 italic">
           No additional fields required for this service type.
         </p>
       </div>
     )
   }
 
-  const inputClass = 'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all'
+  const inputClass = 'h-10 bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all'
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -279,7 +266,7 @@ function ServiceSubFields({
                 placeholder={`Enter ${label.toLowerCase()}...`}
                 value={value}
                 onChange={(e) => onChange(field, e.target.value)}
-                className="resize-none min-h-[100px] bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all"
+                className="resize-none min-h-[100px] bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all"
               />
             </Field>
           )
@@ -314,6 +301,7 @@ export function PpsrForm({ dbUser }: PpsrFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [ticketNumber, setTicketNumber] = useState<string | null>(null)
   const [requestId, setRequestId] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<File[]>([])
 
   const today = new Date().toISOString().split('T')[0]
 
@@ -386,6 +374,16 @@ export function PpsrForm({ dbUser }: PpsrFormProps) {
         service_data:      form.service_data,
       })
 if (result.success && result.ticketNumber && result.requestId) {
+  try {
+    await uploadRequestPhotos(result.requestId, photos);
+  } catch (error) {
+    setErrors({
+      submit: error instanceof Error
+        ? `Request was submitted, but photo upload failed: ${error.message}`
+        : 'Request was submitted, but photo upload failed.',
+    });
+    return;
+  }
   setTicketNumber(result.ticketNumber);
   setRequestId(result.requestId);
 } else {
@@ -399,20 +397,20 @@ if (ticketNumber && requestId) {
     <SuccessModal
       ticketNumber={ticketNumber}
       onView={() => router.push(`/requester/requests/${requestId}`)}
-      onAnother={() => { setTicketNumber(null); setRequestId(null); setStep(1); }}
+      onAnother={() => { setTicketNumber(null); setRequestId(null); setPhotos([]); setStep(1); }}
     />
   );
 }
 
   return (
     <div
-      className="rounded-2xl border border-white/60 dark:border-slate-700/60 shadow-sm overflow-hidden"
+      className="rounded-2xl border border-[#ADEBB3]/70 dark:border-white/10 shadow-sm overflow-hidden"
       style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(12px)' }}
     >
       {/* Progress bar */}
-      <div className="h-1 bg-slate-100 dark:bg-slate-800">
+      <div className="h-1 bg-slate-100 dark:bg-white/[0.05]">
         <div
-          className="h-full bg-gradient-to-r from-violet-500 to-purple-500 transition-all duration-500 ease-out rounded-full"
+          className="h-full bg-[#8dc192] transition-all duration-500 ease-out rounded-full"
           style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%` }}
         />
       </div>
@@ -424,12 +422,12 @@ if (ticketNumber && requestId) {
         {step === 1 && (
           <div className="fade-in">
             <div className="flex items-start gap-3 mb-6">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shrink-0 shadow-sm mt-0.5">
-                <span className="text-xs font-bold text-white">1</span>
+              <div className="w-7 h-7 rounded-lg bg-[#8dc192] flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                <span className="text-xs font-bold text-[#1e2c1f]">1</span>
               </div>
               <div>
                 <h2 className="text-base font-bold text-slate-900 dark:text-white">Request Information</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                <p className="text-sm text-slate-500 dark:text-white/60 mt-0.5">
                   Tell us who you are and where the service is needed
                 </p>
               </div>
@@ -437,7 +435,7 @@ if (ticketNumber && requestId) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Date Filled">
-                <Input value={form.date_filled} readOnly className="h-10 bg-slate-50/80 dark:bg-slate-800/80 text-slate-500 cursor-default border-slate-200 dark:border-slate-700" />
+                <Input value={form.date_filled} readOnly className="h-10 bg-slate-50/80 dark:bg-white/[0.05] text-slate-500 cursor-default border-[#ADEBB3]/70 dark:border-white/10" />
               </Field>
 
               <Field label="Building / Department" required error={errors.building}>
@@ -446,7 +444,7 @@ if (ticketNumber && requestId) {
                   value={form.building}
                   onChange={(e) => set('building', e.target.value)}
                   className={cn(
-                    'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                    'h-10 bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all',
                     errors.building && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
                   )}
                 />
@@ -456,11 +454,11 @@ if (ticketNumber && requestId) {
                 <Field label="Location" required error={errors.location_building}>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1.5">
                     <Input
-                      placeholder="Building name *"
+                      placeholder="Specific location *"
                       value={form.location_building}
                       onChange={(e) => set('location_building', e.target.value)}
                       className={cn(
-                        'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                        'h-10 bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all',
                         errors.location_building && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
                       )}
                     />
@@ -468,13 +466,13 @@ if (ticketNumber && requestId) {
                       placeholder="Floor level (optional)"
                       value={form.location_floor}
                       onChange={(e) => set('location_floor', e.target.value)}
-                      className="h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all"
+                      className="h-10 bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all"
                     />
                     <Input
                       placeholder="Room number (optional)"
                       value={form.location_room}
                       onChange={(e) => set('location_room', e.target.value)}
-                      className="h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all"
+                      className="h-10 bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all"
                     />
                   </div>
                 </Field>
@@ -485,7 +483,7 @@ if (ticketNumber && requestId) {
                   value={form.requesting_party}
                   onChange={(e) => set('requesting_party', e.target.value)}
                   className={cn(
-                    'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                    'h-10 bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all',
                     errors.requesting_party && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
                   )}
                 />
@@ -497,7 +495,7 @@ if (ticketNumber && requestId) {
                   value={form.designation}
                   onChange={(e) => set('designation', e.target.value)}
                   className={cn(
-                    'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                    'h-10 bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all',
                     errors.designation && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
                   )}
                 />
@@ -509,7 +507,7 @@ if (ticketNumber && requestId) {
                   value={form.contact_number}
                   onChange={(e) => set('contact_number', e.target.value)}
                   className={cn(
-                    'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                    'h-10 bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all',
                     errors.contact_number && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
                   )}
                 />
@@ -521,7 +519,7 @@ if (ticketNumber && requestId) {
                   value={form.email}
                   onChange={(e) => set('email', e.target.value)}
                   className={cn(
-                    'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                    'h-10 bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all',
                     errors.email && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
                   )}
                 />
@@ -534,21 +532,20 @@ if (ticketNumber && requestId) {
         {step === 2 && (
           <div className="fade-in">
             <div className="flex items-start gap-3 mb-6">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shrink-0 shadow-sm mt-0.5">
-                <span className="text-xs font-bold text-white">2</span>
+              <div className="w-7 h-7 rounded-lg bg-[#8dc192] flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                <span className="text-xs font-bold text-[#1e2c1f]">2</span>
               </div>
               <div>
                 <h2 className="text-base font-bold text-slate-900 dark:text-white">Service Type</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                <p className="text-sm text-slate-500 dark:text-white/60 mt-0.5">
                   Select the type of physical plant service you need
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {PPSR_SERVICE_TYPES.map((type) => {
                 const Icon       = SERVICE_ICONS[type] ?? MoreHorizontal
-                const color      = SERVICE_COLORS[type] ?? 'from-slate-400 to-slate-600'
                 const isSelected = form.service_type === type
                 return (
                   <button
@@ -556,29 +553,38 @@ if (ticketNumber && requestId) {
                     type="button"
                     onClick={() => setServiceType(type)}
                     className={cn(
-                      'relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 text-center transition-all duration-200',
+                      'group flex min-h-[58px] items-center gap-3 rounded-xl border px-3.5 py-3 text-left transition-colors duration-150',
                       isSelected
-                        ? 'border-violet-500 bg-violet-50 dark:bg-violet-900/20 shadow-md shadow-violet-500/10'
-                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white/40 dark:bg-slate-800/40'
+                        ? 'border-[#6f9873] bg-[#ADEBB3]/30 dark:border-emerald-300/45 dark:bg-white/[0.07]'
+                        : 'border-[#ADEBB3]/70 bg-white/45 hover:border-[#6f9873]/70 hover:bg-[#ADEBB3]/20 dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/20 dark:hover:bg-white/[0.07]'
                     )}
                   >
-                    {isSelected && (
-                      <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-violet-500 flex items-center justify-center">
-                        <Check className="h-2.5 w-2.5 text-white" />
-                      </div>
-                    )}
-                    <div className={cn(
-                      'w-10 h-10 rounded-xl flex items-center justify-center shadow-sm',
-                      `bg-gradient-to-br ${color}`
-                    )}>
-                      <Icon className="h-5 w-5 text-white" />
-                    </div>
-                    <span className={cn(
-                      'text-xs font-semibold leading-tight',
-                      isSelected ? 'text-violet-700 dark:text-violet-300' : 'text-slate-600 dark:text-slate-400'
-                    )}>
-                      {PPSR_SERVICE_LABELS[type]}
+                    <span
+                      className={cn(
+                        'flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors duration-150',
+                        isSelected
+                          ? 'border-[#527255] bg-[#527255] text-white dark:border-emerald-300 dark:bg-emerald-300 dark:text-[#101216]'
+                          : 'border-[#ADEBB3]/70 text-transparent dark:border-white/15'
+                      )}
+                    >
+                      <Check className="h-3 w-3" />
                     </span>
+                    <div className={cn(
+                      'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-colors duration-150',
+                      isSelected
+                        ? 'border-[#6f9873]/70 bg-[#8dc192]/45 text-[#1e2c1f] dark:border-emerald-300/30 dark:bg-white/[0.08] dark:text-emerald-300'
+                        : 'border-[#ADEBB3]/70 bg-white/70 text-[#527255] dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60'
+                    )}>
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className={cn(
+                        'block truncate text-sm font-medium leading-tight',
+                        isSelected ? 'text-[#1e2c1f] dark:text-white' : 'text-slate-700 dark:text-white/75'
+                      )}>
+                        {PPSR_SERVICE_LABELS[type]}
+                      </span>
+                    </div>
                   </button>
                 )
               })}
@@ -597,25 +603,24 @@ if (ticketNumber && requestId) {
         {step === 3 && form.service_type && (
           <div className="fade-in space-y-5">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shrink-0 shadow-sm">
-                <span className="text-xs font-bold text-white">3</span>
+              <div className="w-7 h-7 rounded-lg bg-[#8dc192] flex items-center justify-center shrink-0 shadow-sm">
+                <span className="text-xs font-bold text-[#1e2c1f]">3</span>
               </div>
               <div>
                 <h2 className="text-base font-bold text-slate-900 dark:text-white">Service Details</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                <p className="text-sm text-slate-500 dark:text-white/60 mt-0.5">
                   {PPSR_SERVICE_LABELS[form.service_type]}
                 </p>
               </div>
               <div className={cn(
-                'ml-auto w-8 h-8 rounded-lg flex items-center justify-center shrink-0',
-                `bg-gradient-to-br ${SERVICE_COLORS[form.service_type] ?? 'from-violet-400 to-purple-500'}`
+                'ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#6f9873]/70 bg-[#8dc192]/45 text-[#1e2c1f] dark:border-emerald-300/30 dark:bg-white/[0.08] dark:text-emerald-300'
               )}>
-                {(() => { const Icon = SERVICE_ICONS[form.service_type] ?? MoreHorizontal; return <Icon className="h-4 w-4 text-white" /> })()}
+                {(() => { const Icon = SERVICE_ICONS[form.service_type] ?? MoreHorizontal; return <Icon className="h-4 w-4" /> })()}
               </div>
             </div>
 
             <div>
-              <Label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5 block">
+              <Label className="text-xs font-semibold text-slate-500 dark:text-white/60 uppercase tracking-wide mb-1.5 block">
                 Request Title <span className="text-rose-500">*</span>
               </Label>
               <Input
@@ -623,7 +628,7 @@ if (ticketNumber && requestId) {
                 value={form.title}
                 onChange={(e) => set('title', e.target.value)}
                 className={cn(
-                  'h-10 bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all',
+                  'h-10 bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all',
                   errors.title && 'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20'
                 )}
               />
@@ -637,16 +642,20 @@ if (ticketNumber && requestId) {
             />
 
             <div>
-              <Label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5 block">
+              <Label className="text-xs font-semibold text-slate-500 dark:text-white/60 uppercase tracking-wide mb-1.5 block">
                 Additional Notes
               </Label>
               <Textarea
                 placeholder="Any other details the team should know..."
                 value={form.description}
                 onChange={(e) => set('description', e.target.value)}
-                className="resize-none bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 transition-all"
+                className="resize-none bg-white/60 dark:bg-white/[0.05] border-[#ADEBB3]/70 dark:border-white/10 focus:border-[#ADEBB3] focus:ring-2 focus:ring-[#ADEBB3]/35 transition-all"
               />
             </div>
+
+            <Field label="Photos">
+              <RequestPhotoPicker files={photos} onChange={setPhotos} disabled={isPending} />
+            </Field>
           </div>
         )}
 
@@ -654,19 +663,19 @@ if (ticketNumber && requestId) {
         {step === 4 && (
           <div className="fade-in">
             <div className="flex items-start gap-3 mb-6">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shrink-0 shadow-sm mt-0.5">
-                <span className="text-xs font-bold text-white">4</span>
+              <div className="w-7 h-7 rounded-lg bg-[#8dc192] flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                <span className="text-xs font-bold text-[#1e2c1f]">4</span>
               </div>
               <div>
                 <h2 className="text-base font-bold text-slate-900 dark:text-white">Review &amp; Submit</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                <p className="text-sm text-slate-500 dark:text-white/60 mt-0.5">
                   Please verify all details before submitting
                 </p>
               </div>
             </div>
 
             <div className="space-y-3 text-sm">
-              <div className="rounded-xl border border-slate-200/60 dark:border-slate-700/60 overflow-hidden bg-white/40 dark:bg-slate-800/40">
+              <div className="rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 overflow-hidden bg-white/40 dark:bg-white/[0.04]">
                 {[
                   ['Building / Dept',  form.building],
                   ['Location',         form.location_building],
@@ -679,17 +688,17 @@ if (ticketNumber && requestId) {
                     key={label}
                     className={cn(
                       'flex gap-4 px-4 py-2.5',
-                      i % 2 === 0 ? 'bg-transparent' : 'bg-slate-50/50 dark:bg-slate-800/30'
+                      i % 2 === 0 ? 'bg-transparent' : 'bg-slate-50/50 dark:bg-white/[0.04]'
                     )}
                   >
-                    <span className="text-slate-400 dark:text-slate-500 min-w-[130px] shrink-0 text-xs font-semibold uppercase tracking-wide">{label}</span>
-                    <span className="font-medium text-slate-700 dark:text-slate-300">{value || '—'}</span>
+                    <span className="text-slate-400 dark:text-white/45 min-w-[130px] shrink-0 text-xs font-semibold uppercase tracking-wide">{label}</span>
+                    <span className="font-medium text-slate-700 dark:text-white/80">{value || '—'}</span>
                   </div>
                 ))}
               </div>
 
               {form.service_type && Object.keys(form.service_data).length > 0 && (
-                <div className="rounded-xl border border-slate-200/60 dark:border-slate-700/60 overflow-hidden bg-white/40 dark:bg-slate-800/40">
+                <div className="rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 overflow-hidden bg-white/40 dark:bg-white/[0.04]">
                   {Object.entries(form.service_data)
                     .filter(([, v]) => v)
                     .map(([key, value], i) => (
@@ -697,26 +706,32 @@ if (ticketNumber && requestId) {
                         key={key}
                         className={cn(
                           'flex gap-4 px-4 py-2.5',
-                          i % 2 === 0 ? 'bg-transparent' : 'bg-slate-50/50 dark:bg-slate-800/30'
+                          i % 2 === 0 ? 'bg-transparent' : 'bg-slate-50/50 dark:bg-white/[0.04]'
                         )}
                       >
-                        <span className="text-slate-400 dark:text-slate-500 min-w-[130px] shrink-0 text-xs font-semibold uppercase tracking-wide">
+                        <span className="text-slate-400 dark:text-white/45 min-w-[130px] shrink-0 text-xs font-semibold uppercase tracking-wide">
                           {FIELD_LABELS[key] ?? key.replace(/_/g, ' ')}
                         </span>
-                        <span className="font-medium text-slate-700 dark:text-slate-300">{value}</span>
+                        <span className="font-medium text-slate-700 dark:text-white/80">{value}</span>
                       </div>
                     ))
                   }
                 </div>
               )}
 
-              <div className="rounded-xl border border-slate-200/60 dark:border-slate-700/60 px-4 py-3 bg-white/40 dark:bg-slate-800/40">
-                <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1">Title</p>
+              <div className="rounded-xl border border-[#ADEBB3]/70 dark:border-white/10 px-4 py-3 bg-white/40 dark:bg-white/[0.04]">
+                <p className="text-xs font-semibold text-slate-400 dark:text-white/45 uppercase tracking-wide mb-1">Title</p>
                 <p className="font-semibold text-slate-800 dark:text-white">{form.title}</p>
                 {form.description && (
                   <>
-                    <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mt-3 mb-1">Additional Notes</p>
-                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{form.description}</p>
+                    <p className="text-xs font-semibold text-slate-400 dark:text-white/45 uppercase tracking-wide mt-3 mb-1">Additional Notes</p>
+                    <p className="text-slate-600 dark:text-white/60 leading-relaxed">{form.description}</p>
+                  </>
+                )}
+                {photos.length > 0 && (
+                  <>
+                    <p className="text-xs font-semibold text-slate-400 dark:text-white/45 uppercase tracking-wide mt-3 mb-1">Photos</p>
+                    <SelectedPhotoGrid files={photos} />
                   </>
                 )}
               </div>
@@ -732,13 +747,13 @@ if (ticketNumber && requestId) {
         )}
 
         {/* Navigation Buttons */}
-        <div className="flex items-center justify-between mt-8 pt-5 border-t border-slate-100 dark:border-slate-800/60">
+        <div className="flex items-center justify-between mt-8 pt-5 border-t border-[#ADEBB3]/70 dark:border-white/10">
           {step === 1 ? (
-            <Button type="button" variant="outline" onClick={cancel} className="text-slate-500 border-slate-200 dark:border-slate-700">
+            <Button type="button" variant="outline" onClick={cancel} className="text-slate-500 border-[#ADEBB3]/70 dark:border-white/10">
               Cancel
             </Button>
           ) : (
-            <Button type="button" variant="outline" onClick={back} className="gap-1.5 text-slate-500 border-slate-200 dark:border-slate-700">
+            <Button type="button" variant="outline" onClick={back} className="gap-1.5 text-slate-500 border-[#ADEBB3]/70 dark:border-white/10">
               <ChevronLeft className="h-4 w-4" />
               Back
             </Button>
@@ -753,10 +768,10 @@ if (ticketNumber && requestId) {
                   className={cn(
                     'rounded-full transition-all duration-200',
                     s.number === step
-                      ? 'w-4 h-2 bg-violet-500'
+                      ? 'w-4 h-2 bg-[#527255]'
                       : s.number < step
-                      ? 'w-2 h-2 bg-emerald-400'
-                      : 'w-2 h-2 bg-slate-200 dark:bg-slate-700'
+                      ? 'w-2 h-2 bg-[#8dc192]'
+                      : 'w-2 h-2 bg-[#ADEBB3]/60 dark:bg-white/[0.08]'
                   )}
                 />
               ))}
@@ -766,7 +781,7 @@ if (ticketNumber && requestId) {
               <Button
                 type="button"
                 onClick={next}
-                className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-md shadow-violet-500/20 gap-1.5 transition-all"
+                className="bg-[#8dc192] text-[#0b130b] shadow-md shadow-[#ADEBB3]/35 hover:bg-[#ADEBB3]/35 gap-1.5 transition-all"
               >
                 Next <ChevronRight className="h-4 w-4" />
               </Button>
@@ -775,7 +790,7 @@ if (ticketNumber && requestId) {
                 type="button"
                 onClick={handleSubmit}
                 disabled={isPending}
-                className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-md shadow-emerald-500/20 min-w-[130px] transition-all"
+                className="bg-[#8dc192] text-[#0b130b] shadow-md shadow-[#ADEBB3]/35 hover:bg-[#ADEBB3]/35 min-w-[130px] transition-all"
               >
                 {isPending ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Submitting…</> : '✓ Submit Request'}
               </Button>

@@ -36,7 +36,7 @@ export function AssignTechnicianForm({
       </p>
 
       {state.success && (
-        <div className="text-xs text-green-600">
+        <div className="text-xs text-[#0D3311]">
           ✓ Technician assigned successfully.
         </div>
       )}
@@ -100,7 +100,7 @@ export function AssignTechnicianForm({
             disabled={isPending}
             variant="default"
             size="sm"
-            className="bg-teal-600 hover:bg-teal-700 text-white"
+            className="bg-[#0D3311] hover:bg-[#09250d] text-white"
           >
             {isPending
               ? "Assigning..."

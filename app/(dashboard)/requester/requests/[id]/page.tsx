@@ -16,11 +16,10 @@ import {
   StatusBadge,
   RequestTypeBadge,
 } from "@/components/common/status-badge";
-import { StatusTimeline } from "@/components/requests/status-timeline";
+import { StatusTimeline, type StatusHistoryEntry } from "@/components/requests/status-timeline";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { STATUS_NAMES } from "@/lib/constants/statuses";
-import { AttachmentUploader } from "@/components/requests/attachment-uploader";
 import { AttachmentPreview } from "@/components/requests/attachment-preview";
 import {
   ChevronLeft,
@@ -61,12 +60,6 @@ function formatTime(timeStr: string | null | undefined) {
   });
 }
 
-function formatFileSize(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
 function isWithin30Days(dateStr: string | null | undefined) {
   if (!dateStr) return false;
   return Date.now() - new Date(dateStr).getTime() <= 30 * 24 * 60 * 60 * 1000;
@@ -90,8 +83,8 @@ function StatusStepper({ currentStatus }: { currentStatus: string }) {
 
   if (isCancelled) {
     return (
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
-        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+      <div className="bg-white dark:bg-white/[0.04] border border-[#ADEBB3]/70 dark:border-white/10 rounded-xl p-6">
+        <h3 className="text-sm font-semibold text-slate-700 dark:text-white/80 mb-3">
           Status Progress
         </h3>
         <div className="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-lg">
@@ -105,16 +98,14 @@ function StatusStepper({ currentStatus }: { currentStatus: string }) {
   }
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
-      <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-5">
+    <div className="bg-white dark:bg-white/[0.04] border border-[#ADEBB3]/70 dark:border-white/10 rounded-xl p-6">
+      <h3 className="text-sm font-semibold text-slate-700 dark:text-white/80 mb-5">
         Status Progress
       </h3>
       <div className="flex items-start">
         {STATUS_FLOW.map((step, index) => {
           const isPast = index < currentIndex;
           const isCurrent = index === currentIndex;
-          const isFuture = index > currentIndex;
-
           return (
             <div
               key={step.key}
@@ -122,20 +113,20 @@ function StatusStepper({ currentStatus }: { currentStatus: string }) {
             >
               <div className="flex flex-col items-center gap-2 min-w-0">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center border-2 shrink-0 transition-all ${
+                  className={`w-8 h-8 rounded-full flex items-center justify-center border shrink-0 transition-all ${
                     isPast
-                      ? "bg-slate-900 dark:bg-white border-slate-900 dark:border-white"
+                      ? "bg-slate-900 dark:bg-emerald-300 border-[#ADEBB3]/70 dark:border-white/10"
                       : isCurrent
-                        ? "bg-slate-900 dark:bg-white border-slate-900 dark:border-white"
-                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                        ? "bg-slate-900 dark:bg-emerald-300 border-[#ADEBB3]/70 dark:border-white/10"
+                        : "bg-white dark:bg-white/[0.04] border-[#ADEBB3]/70 dark:border-white/10"
                   }`}
                 >
                   {isPast ? (
                     <CheckCircle2 className="h-4 w-4 text-white dark:text-slate-900" />
                   ) : isCurrent ? (
-                    <div className="w-2.5 h-2.5 rounded-full bg-white dark:bg-slate-900" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-white dark:bg-white/[0.04]" />
                   ) : (
-                    <div className="w-2 h-2 rounded-full bg-slate-200 dark:bg-slate-700" />
+                    <div className="w-2 h-2 rounded-full bg-[#ADEBB3]/60 dark:bg-white/[0.08]" />
                   )}
                 </div>
                 <span
@@ -143,8 +134,8 @@ function StatusStepper({ currentStatus }: { currentStatus: string }) {
                     isCurrent
                       ? "font-semibold text-slate-900 dark:text-white"
                       : isPast
-                        ? "text-slate-500 dark:text-slate-400"
-                        : "text-slate-300 dark:text-slate-600"
+                        ? "text-slate-500 dark:text-white/60"
+                        : "text-[#8dc192] dark:text-emerald-300/45"
                   }`}
                 >
                   {step.label}
@@ -154,8 +145,8 @@ function StatusStepper({ currentStatus }: { currentStatus: string }) {
                 <div
                   className={`flex-1 h-px mt-4 mx-1 ${
                     index < currentIndex
-                      ? "bg-slate-900 dark:bg-white"
-                      : "bg-slate-200 dark:bg-slate-700"
+                      ? "bg-slate-900 dark:bg-emerald-300"
+                      : "bg-[#ADEBB3]/60 dark:bg-white/[0.08]"
                   }`}
                 />
               )}
@@ -172,10 +163,10 @@ function StatusStepper({ currentStatus }: { currentStatus: string }) {
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-start gap-2 py-1.5">
-      <span className="text-sm text-slate-500 dark:text-slate-400 min-w-[130px] shrink-0">
+      <span className="text-sm text-slate-500 dark:text-white/60 min-w-[130px] shrink-0">
         {label}:
       </span>
-      <span className="text-sm font-medium text-slate-800 dark:text-slate-200 break-words">
+      <span className="text-sm font-medium text-slate-800 dark:text-white/90 break-words">
         {value}
       </span>
     </div>
@@ -190,22 +181,22 @@ function TechnicianCard({
   assignment: AssignmentWithTechnician | null;
 }) {
   return (
-    <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl p-5">
-      <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-4 flex items-center gap-2">
-        <User className="h-4 w-4 text-blue-500" />
+    <div className="bg-[#ADEBB3]/30 dark:bg-white/[0.06] border border-[#ADEBB3]/70 dark:border-white/10 rounded-xl p-5">
+      <h3 className="text-sm font-semibold text-[#1e2c1f] dark:text-emerald-300 mb-4 flex items-center gap-2">
+        <User className="h-4 w-4 text-[#3f8f4a] dark:text-emerald-300" />
         Assigned Technician
       </h3>
 
       {!assignment || !assignment.assigned_user ? (
         <div className="flex items-center gap-3 py-2">
-          <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-800 flex items-center justify-center shrink-0">
-            <User className="h-4 w-4 text-blue-400 dark:text-blue-300" />
+          <div className="w-9 h-9 rounded-full bg-[#ADEBB3]/55 dark:bg-white/[0.07] flex items-center justify-center shrink-0">
+            <User className="h-4 w-4 text-[#3f8f4a] dark:text-emerald-300" />
           </div>
           <div>
-            <p className="text-sm text-blue-600 dark:text-blue-400 italic">
+            <p className="text-sm text-[#527255] dark:text-emerald-300 italic">
               Not yet assigned
             </p>
-            <p className="text-xs text-blue-500 dark:text-blue-500 mt-0.5">
+            <p className="text-xs text-[#3f8f4a] dark:text-emerald-300 mt-0.5">
               A technician will be assigned after review.
             </p>
           </div>
@@ -213,34 +204,34 @@ function TechnicianCard({
       ) : (
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-blue-900 dark:bg-white flex items-center justify-center shrink-0 text-white dark:text-blue-900 text-sm font-bold uppercase">
+            <div className="w-9 h-9 rounded-full bg-[#1e2c1f] dark:bg-[#8dc192] flex items-center justify-center shrink-0 text-white dark:text-[#1e2c1f] text-sm font-bold uppercase">
               {assignment.assigned_user.full_name.charAt(0)}
             </div>
             <div>
-              <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+              <p className="text-sm font-semibold text-[#1e2c1f] dark:text-emerald-300">
                 {assignment.assigned_user.full_name}
               </p>
-              <p className="text-xs text-blue-600 dark:text-blue-400 capitalize">
+              <p className="text-xs text-[#527255] dark:text-emerald-300 capitalize">
                 {assignment.assigned_user.role}
               </p>
             </div>
           </div>
 
-          <div className="divide-y divide-blue-100 dark:divide-blue-800">
+          <div className="divide-y divide-[#ADEBB3]/50 dark:divide-[#ADEBB3]/35">
             <div className="py-1.5">
-              <span className="text-blue-700 dark:text-blue-400 font-medium text-sm">
+              <span className="text-[#527255] dark:text-emerald-300 font-medium text-sm">
                 Assigned on:
               </span>{" "}
-              <span className="text-blue-900 dark:text-blue-100 text-sm">
+              <span className="text-[#1e2c1f] dark:text-emerald-300 text-sm">
                 {formatDate(assignment.assigned_at)}
               </span>
             </div>
             {assignment.notes && (
               <div className="pt-2">
-                <p className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-1">
+                <p className="text-xs font-medium text-[#527255] dark:text-emerald-300 uppercase tracking-wide mb-1">
                   Notes
                 </p>
-                <p className="text-sm text-blue-800 dark:text-blue-200">
+                <p className="text-sm text-[#1e2c1f] dark:text-emerald-300">
                   {assignment.notes}
                 </p>
               </div>
@@ -272,13 +263,13 @@ function ScheduledDateCard({ request }: { request: RequestDetail }) {
   }
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
-      <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
+    <div className="bg-white dark:bg-white/[0.04] border border-[#ADEBB3]/70 dark:border-white/10 rounded-xl p-5">
+      <h3 className="text-sm font-semibold text-slate-700 dark:text-white/80 mb-4 flex items-center gap-2">
         <Calendar className="h-4 w-4 text-slate-400" />
         Schedule
       </h3>
 
-      <div className="divide-y divide-slate-50 dark:divide-slate-800 space-y-0">
+      <div className="divide-y divide-[#ADEBB3]/35 dark:divide-[#ADEBB3]/30 space-y-0">
         {/* RMR inspection/repair schedule */}
         {hasRmrSchedule && (
           <>
@@ -321,7 +312,7 @@ function ScheduledDateCard({ request }: { request: RequestDetail }) {
             {rmr!.schedule_notes && (
               <div className="pt-2 pb-1">
                 <p className="text-xs text-slate-400 mb-1">Schedule Notes</p>
-                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p className="text-sm text-slate-600 dark:text-white/60 leading-relaxed">
                   {rmr!.schedule_notes}
                 </p>
               </div>
@@ -342,7 +333,7 @@ function ScheduledDateCard({ request }: { request: RequestDetail }) {
           <InfoRow
             label="Completed On"
             value={
-              <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+              <span className="text-[#527255] dark:text-emerald-300 flex items-center gap-1.5">
                 <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
                 {formatDate(request.actual_completion_date)}
               </span>
@@ -360,7 +351,7 @@ function FeedbackPrompt({ requestId }: { requestId: string }) {
   return (
     <div
       id="feedback"
-      className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-xl p-5"
+      className="bg-amber-50 dark:bg-amber-900/10 border border-[#ADEBB3]/70 dark:border-white/10 rounded-xl p-5"
     >
       <div className="flex items-start gap-4">
         <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg shrink-0">
@@ -377,7 +368,7 @@ function FeedbackPrompt({ requestId }: { requestId: string }) {
           <Button
             size="sm"
             variant="outline"
-            className="border-amber-300 text-amber-700 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-300"
+            className="border-[#ADEBB3]/70 text-amber-700 hover:bg-[#ADEBB3]/35 dark:border-white/10 dark:text-amber-300"
             asChild
           >
             <Link href={`/requester/requests/${requestId}/feedback`}>
@@ -430,18 +421,18 @@ function AssignmentScheduleCard({
     : null;
 
   return (
-    <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl p-5">
-      <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-4 flex items-center gap-2">
-        <Calendar className="h-4 w-4 text-blue-500" />
+    <div className="bg-[#ADEBB3]/30 dark:bg-white/[0.06] border border-[#ADEBB3]/70 dark:border-white/10 rounded-xl p-5">
+      <h3 className="text-sm font-semibold text-[#1e2c1f] dark:text-emerald-300 mb-4 flex items-center gap-2">
+        <Calendar className="h-4 w-4 text-[#3f8f4a] dark:text-emerald-300" />
         Scheduled Repair Window
       </h3>
       <div className="space-y-3">
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
           <div>
-            <span className="text-blue-700 dark:text-blue-400 font-medium">
+            <span className="text-[#527255] dark:text-emerald-300 font-medium">
               Start:
             </span>{" "}
-            <span className="text-blue-900 dark:text-blue-100">
+            <span className="text-[#1e2c1f] dark:text-emerald-300">
               {start.toLocaleString("en-PH", {
                 dateStyle: "medium",
                 timeStyle: "short",
@@ -450,10 +441,10 @@ function AssignmentScheduleCard({
           </div>
           {end && (
             <div>
-              <span className="text-blue-700 dark:text-blue-400 font-medium">
+              <span className="text-[#527255] dark:text-emerald-300 font-medium">
                 End:
               </span>{" "}
-              <span className="text-blue-900 dark:text-blue-100">
+              <span className="text-[#1e2c1f] dark:text-emerald-300">
                 {end.toLocaleString("en-PH", {
                   dateStyle: "medium",
                   timeStyle: "short",
@@ -463,21 +454,21 @@ function AssignmentScheduleCard({
           )}
         </div>
         {assignment.schedule_notes && (
-          <div className="pt-2 border-t border-blue-100 dark:border-blue-800">
-            <p className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+          <div className="pt-2 border-t border-[#ADEBB3]/70 dark:border-white/10">
+            <p className="text-xs font-medium text-[#527255] dark:text-emerald-300 uppercase tracking-wide">
               Notes
             </p>
-            <p className="text-sm text-blue-800 dark:text-blue-200 mt-1">
+            <p className="text-sm text-[#1e2c1f] dark:text-emerald-300 mt-1">
               {assignment.schedule_notes}
             </p>
           </div>
         )}
         {assignment.assigned_user && (
-          <div className="pt-2 border-t border-blue-100 dark:border-blue-800">
-            <p className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+          <div className="pt-2 border-t border-[#ADEBB3]/70 dark:border-white/10">
+            <p className="text-xs font-medium text-[#527255] dark:text-emerald-300 uppercase tracking-wide">
               Assigned Technician
             </p>
-            <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mt-1">
+            <p className="text-sm font-semibold text-[#1e2c1f] dark:text-emerald-300 mt-1">
               {assignment.assigned_user.full_name}
             </p>
           </div>
@@ -519,18 +510,12 @@ async function RequestDetailContent({ id }: { id: string }) {
   const assignment = assignmentResult.data as AssignmentWithTechnician | null;
 
   // status_history is already embedded in the request object from getRequestById
-  const history = (request.status_history ?? []) as any[];
+  const history = (request.status_history ?? []) as StatusHistoryEntry[];
 
   const currentStatus = request.statuses?.status_name ?? 'pending';
 const canDelete = ['pending', 'under_review'].includes(currentStatus);
 
-// Compute total attachments size (same as before)
 const attachments = request.attachments ?? [];
-const totalAttachmentsSize = attachments.reduce((sum, a) => sum + (a.file_size || 0), 0);
-const canUpload = ['pending', 'under_review'].includes(currentStatusName);
-const uploadDisabledReason = canUpload 
-    ? undefined 
-    : 'Attachments can only be uploaded while the request is pending or under review.';
 
   return (
     <div className="space-y-5">
@@ -543,7 +528,7 @@ const uploadDisabledReason = canUpload
             </h1>
             <StatusBadge status={currentStatusName} />
           </div>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-slate-500 dark:text-white/60">
             Request Details
           </p>
         </div>
@@ -564,11 +549,11 @@ const uploadDisabledReason = canUpload
       {/* ── Two-column: Request info + Work details ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Request Information */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">
+        <div className="bg-white dark:bg-white/[0.04] border border-[#ADEBB3]/70 dark:border-white/10 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-slate-700 dark:text-white/80 mb-4">
             Request Information
           </h3>
-          <div className="divide-y divide-slate-50 dark:divide-slate-800">
+          <div className="divide-y divide-[#ADEBB3]/35 dark:divide-[#ADEBB3]/30">
             <InfoRow
               label="Ref #"
               value={<span className="font-mono">{request.ticket_number}</span>}
@@ -604,7 +589,7 @@ const uploadDisabledReason = canUpload
               value={
                 <a
                   href={`mailto:${request.requester?.email}`}
-                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                  className="text-[#527255] dark:text-emerald-300 hover:underline"
                 >
                   {request.requester?.email ?? "—"}
                 </a>
@@ -614,8 +599,8 @@ const uploadDisabledReason = canUpload
         </div>
 
         {/* Work Details */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">
+        <div className="bg-white dark:bg-white/[0.04] border border-[#ADEBB3]/70 dark:border-white/10 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-slate-700 dark:text-white/80 mb-4">
             Work Details
           </h3>
           <div className="space-y-3">
@@ -627,15 +612,15 @@ const uploadDisabledReason = canUpload
               </p>
               {request.request_type === "rmr" ? (
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 className="h-4 w-4 text-[#527255] shrink-0" />
+                  <span className="text-sm font-medium text-slate-700 dark:text-white/80">
                     {request.categories?.category_name ?? "—"}
                   </span>
                 </div>
               ) : ppsr ? (
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300 capitalize">
+                  <CheckCircle2 className="h-4 w-4 text-[#527255] shrink-0" />
+                  <span className="text-sm font-medium text-slate-700 dark:text-white/80 capitalize">
                     {ppsr.service_type.replace(/_/g, " ")}
                   </span>
                 </div>
@@ -654,7 +639,7 @@ const uploadDisabledReason = canUpload
                       <span className="text-slate-400 min-w-[160px] shrink-0 capitalize">
                         {key.replace(/_/g, " ")}:
                       </span>
-                      <span className="font-medium text-slate-700 dark:text-slate-300">
+                      <span className="font-medium text-slate-700 dark:text-white/80">
                         {typeof val === "boolean"
                           ? val
                             ? "Yes"
@@ -667,11 +652,11 @@ const uploadDisabledReason = canUpload
             )}
 
             {/* Description */}
-            <div className="pt-3 border-t border-slate-50 dark:border-slate-800">
+            <div className="pt-3 border-t border-[#ADEBB3]/70 dark:border-white/10">
               <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">
                 Description
               </p>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-wrap">
+              <p className="text-sm text-slate-600 dark:text-white/60 leading-relaxed whitespace-pre-wrap">
                 {request.description ?? "No description provided."}
               </p>
             </div>
@@ -694,8 +679,8 @@ const uploadDisabledReason = canUpload
 
       {/* ── Inspection Report (RMR only, if filled) ── */}
       {request.request_type === "rmr" && rmr && hasInspection && (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
+        <div className="bg-white dark:bg-white/[0.04] border border-[#ADEBB3]/70 dark:border-white/10 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-slate-700 dark:text-white/80 mb-4 flex items-center gap-2">
             <Wrench className="h-4 w-4 text-slate-400" />
             Inspection Report
           </h3>
@@ -735,11 +720,11 @@ const uploadDisabledReason = canUpload
             )}
           </div>
           {rmr.inspector_notes && (
-            <div className="mt-3 pt-3 border-t border-slate-50 dark:border-slate-800">
+            <div className="mt-3 pt-3 border-t border-[#ADEBB3]/70 dark:border-white/10">
               <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1.5">
                 Inspector Notes
               </p>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              <p className="text-sm text-slate-600 dark:text-white/60 leading-relaxed">
                 {rmr.inspector_notes}
               </p>
             </div>
@@ -748,8 +733,8 @@ const uploadDisabledReason = canUpload
       )}
 
       {/* ── Status History Timeline ── */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
-        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-5 flex items-center gap-2">
+      <div className="bg-white dark:bg-white/[0.04] border border-[#ADEBB3]/70 dark:border-white/10 rounded-xl p-5">
+        <h3 className="text-sm font-semibold text-slate-700 dark:text-white/80 mb-5 flex items-center gap-2">
           <ClipboardList className="h-4 w-4 text-slate-400" />
           Status History
         </h3>
@@ -757,8 +742,8 @@ const uploadDisabledReason = canUpload
       </div>
 
       {/* ── Attachments ── */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
-    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
+      <div className="bg-white dark:bg-white/[0.04] border border-[#ADEBB3]/70 dark:border-white/10 rounded-xl p-5">
+    <h3 className="text-sm font-semibold text-slate-700 dark:text-white/80 mb-4 flex items-center gap-2">
         <Paperclip className="h-4 w-4 text-slate-400" />
         Attachments
     </h3>
@@ -771,14 +756,6 @@ const uploadDisabledReason = canUpload
             canDelete={canDelete}
         />
     )}
-<div className="mt-4 pt-4 border-t">
-    <AttachmentUploader
-        requestId={id}
-        currentTotalSize={totalAttachmentsSize}
-        canUpload={canUpload}
-        disabledReason={uploadDisabledReason}
-    />
-</div>
 </div>
     </div>
   );
@@ -810,12 +787,12 @@ export default async function RequestDetailPage({
   const { id } = await params;
 
   return (
-    <div className="max-w-5xl mx-auto space-y-5">
+    <div className="max-w-3xl mx-auto space-y-5">
       <Button
         asChild
         variant="ghost"
         size="sm"
-        className="gap-1.5 text-slate-500 hover:text-slate-700 -ml-2 h-8"
+        className="gap-1.5 text-slate-500 hover:text-[#527255] -ml-2 h-8"
       >
         <Link href="/requester/requests">
           <ChevronLeft className="h-4 w-4" />

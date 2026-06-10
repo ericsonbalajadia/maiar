@@ -5,20 +5,25 @@ import { RequestTimeline } from "@/components/tracking/requestTimeline";
 import { StatusBadge } from "@/components/common/status-badge";
 import type { RequestDetail } from "@/types/requests.model";
 import type { StatusHistoryEntry } from "@/lib/types/tracking";
+import { AttachmentPreview } from "@/components/requests/attachment-preview";
 import {
-  Tag, MapPin, Calendar, User, Mail, Building2, Paperclip,
-  ClipboardCheck, History, CheckCircle2, Clock, Hash,
+  Tag,
+  MapPin,
+  Calendar,
+  User,
+  Mail,
+  Paperclip,
+  ClipboardCheck,
+  History,
+  CheckCircle2,
+  Clock,
+  Hash,
 } from "lucide-react";
 
-interface RequestDetailPanelProps {
-  request: RequestDetail;
-  hideStatusPanel?: boolean;
-}
-
-// ─── Type mapper (unchanged) ───────────────────────────────────────────────
+// ─── Helper (unchanged) ───────────────────────────────────────────────────────
 
 function mapToStatusHistoryEntry(
-  history: NonNullable<RequestDetail["status_history"]>
+  history: NonNullable<RequestDetail["status_history"]>,
 ): StatusHistoryEntry[] {
   return history.map((item) => ({
     id: item.id,
@@ -36,12 +41,16 @@ function mapToStatusHistoryEntry(
       : { id: "", status_name: "N/A" },
     new_status: { id: "", status_name: item.new_status.status_name },
     changed_by_user: item.changed_by_user
-      ? { id: "", full_name: item.changed_by_user.full_name, role: item.changed_by_user.role }
+      ? {
+          id: "",
+          full_name: item.changed_by_user.full_name,
+          role: item.changed_by_user.role,
+        }
       : { id: "", full_name: "System", role: "system" },
   }));
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────
+// ─── Sub-components ───────────────────────────────────────────────────────────
 
 function SectionHeader({
   icon: Icon,
@@ -59,13 +68,17 @@ function SectionHeader({
       >
         <Icon className="h-3.5 w-3.5 text-white" />
       </div>
-      <h3 className="text-sm font-bold text-slate-800 dark:text-white">{title}</h3>
+      <h3 className="text-sm font-bold text-slate-800 dark:text-white">
+        {title}
+      </h3>
     </div>
   );
 }
 
 function InfoGrid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{children}</div>;
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{children}</div>
+  );
 }
 
 function InfoCell({
@@ -81,7 +94,7 @@ function InfoCell({
 }) {
   return (
     <div className="flex items-start gap-3">
-      <div className="w-6 h-6 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 mt-0.5">
+      <div className="w-6 h-6 rounded-md bg-slate-100 dark:bg-white/[0.05] flex items-center justify-center shrink-0 mt-0.5">
         <Icon className="h-3 w-3 text-slate-500 dark:text-slate-400" />
       </div>
       <div className="min-w-0">
@@ -100,15 +113,18 @@ function InfoCell({
   );
 }
 
-function Divider() {
-  return <div className="h-px bg-slate-100 dark:bg-slate-800/60 my-6" />;
-}
+// ─── Main component ───────────────────────────────────────────────────────────
 
-// ─── Main component ───────────────────────────────────────────────────────
+interface RequestDetailPanelProps {
+  request: RequestDetail;
+  hideStatusPanel?: boolean;
+  variant?: "glass" | "plain";
+}
 
 export function RequestDetailPanel({
   request,
   hideStatusPanel = false,
+  variant = "glass",
 }: RequestDetailPanelProps) {
   const status = request.statuses?.status_name ?? "unknown";
   const priority = request.priorities?.level ?? "unknown";
@@ -118,9 +134,12 @@ export function RequestDetailPanel({
   const mappedHistory = mapToStatusHistoryEntry(request.status_history ?? []);
   const attachments = request.attachments ?? [];
 
-  // Clerk can update status only if request is pending or under review
   const canUpdate = ["pending", "under_review"].includes(status);
   const showStatusActions = !hideStatusPanel && canUpdate;
+
+  const categoryDisplay = request.request_type === 'ppsr'
+  ? request.ppsr_details?.service_type?.replace(/_/g, ' ') || '—'
+  : request.categories?.category_name ?? '—';
 
   const locationFull = [
     location?.building_name,
@@ -129,74 +148,69 @@ export function RequestDetailPanel({
     .filter(Boolean)
     .join(", ");
 
-return (
-  <div
-    className="rounded-2xl border border-white/60 dark:border-slate-700/60 p-6"
-    style={{ background: "var(--glass-bg)", backdropFilter: "blur(12px)" }}
-  >
-    {/* ───────────────────────────────────────── */}
-    {/* TOP SUMMARY BAR */}
-    {/* ───────────────────────────────────────── */}
-    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
-      <div>
-        <div className="flex items-center gap-2 flex-wrap mb-1">
-          <span className="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
-            {request.ticket_number}
-          </span>
-          <StatusBadge status={status} />
+  const containerClasses =
+    variant === "glass"
+      ? "clerk-surface rounded-2xl p-6"
+      : "";
+
+  const containerStyle =
+    variant === "glass"
+      ? {}
+      : {};
+
+  return (
+    <div className={containerClasses} style={containerStyle}>
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap mb-1">
+            <span className="font-mono text-xs bg-[#58855C]/10 dark:bg-white/[0.06] text-[#58855C] dark:text-emerald-300 px-2 py-0.5 rounded-md">
+              {request.ticket_number}
+            </span>
+            <StatusBadge status={status} />
+          </div>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+            {request.title}
+          </h2>
         </div>
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-          {request.title}
-        </h2>
       </div>
 
-      {/* Quick meta
-      <div className="flex flex-wrap gap-3 text-xs">
-        <span className="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800">
-          Priority: {priority}
-        </span>
-        <span className="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800">
-          {locationFull || "No location"}
-        </span>
-      </div>
-      */}
-    </div> 
-
-    {/* ───────────────────────────────────────── */}
-    {/* MAIN GRID */}
-    {/* ───────────────────────────────────────── */}
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-      
-      {/* LEFT COLUMN (MAIN DETAILS) */}
-      <div className="xl:col-span-2 space-y-6">
-
-        {/* REQUEST DETAILS */}
-        <div className="rounded-xl border p-5 bg-white/40 dark:bg-slate-900/40">
+      {/* Two‑column: Request Details + Timeline */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Left: Request Details */}
+        <div className="clerk-surface-soft rounded-xl p-5">
           <SectionHeader
             icon={Tag}
-            iconGradient="bg-gradient-to-br from-amber-400 to-orange-500"
+            iconGradient="bg-[#58855C]"
             title="Request Details"
           />
           <InfoGrid>
-            <InfoCell icon={Tag} label="Category" value={request.categories?.category_name} />
+            <InfoCell
+              icon={Tag}
+              label="Category"
+              value={categoryDisplay}
+            />
             <InfoCell icon={Clock} label="Priority" value={priority} />
             <InfoCell icon={MapPin} label="Location" value={locationFull} />
-            <InfoCell icon={Calendar} label="Submitted" value={new Date(request.created_at).toLocaleString()} />
+            <InfoCell
+              icon={Calendar}
+              label="Submitted"
+              value={new Date(request.created_at).toLocaleString()}
+            />
             <InfoCell icon={Hash} label="Type" value={request.request_type} />
           </InfoGrid>
-
           {request.description && (
             <div className="mt-4">
               <p className="text-xs font-semibold text-slate-400 mb-1">Description</p>
-              <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 text-sm">
+              <div className="rounded-lg bg-white/50 p-3 text-sm dark:bg-white/[0.05]">
                 {request.description}
               </div>
             </div>
           )}
         </div>
 
-        {/* TIMELINE */}
-        <div className="rounded-xl border p-5 bg-white/40 dark:bg-slate-900/40">
+        {/* Right: Timeline */}
+        <div className="clerk-surface-soft rounded-xl p-5">
           <SectionHeader
             icon={History}
             iconGradient="bg-gradient-to-br from-slate-400 to-slate-600"
@@ -204,33 +218,28 @@ return (
           />
           <RequestTimeline history={mappedHistory} />
         </div>
-
-        {/* ATTACHMENTS */}
-        {attachments.length > 0 && (
-          <div className="rounded-xl border p-5 bg-white/40 dark:bg-slate-900/40">
-            <SectionHeader
-              icon={Paperclip}
-              iconGradient="bg-gradient-to-br from-slate-500 to-slate-700"
-              title={`Attachments (${attachments.length})`}
-            />
-            <div className="grid sm:grid-cols-2 gap-3">
-              {attachments.map((a) => (
-                <div key={a.id} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 p-2 rounded-lg">
-                  <Paperclip className="h-4 w-4 text-slate-400" />
-                  <span className="text-sm truncate">{a.file_name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
       </div>
 
-      {/* RIGHT SIDEBAR */}
-      <div className="space-y-6 xl:sticky xl:top-6">
+      {/* Attachments (full preview component) */}
+      {attachments.length > 0 && (
+        <div className="clerk-surface-soft rounded-xl p-5 mb-6">
+          <SectionHeader
+            icon={Paperclip}
+            iconGradient="bg-gradient-to-br from-slate-500 to-slate-700"
+            title={`Attachments (${attachments.length})`}
+          />
+          <AttachmentPreview
+            attachments={attachments}
+            requestId={request.id}
+            canDelete={false}
+          />
+        </div>
+      )}
 
-        {/* REQUESTER */}
-        <div className="rounded-xl border p-5 bg-white/40 dark:bg-slate-900/40">
+      {/* Vertical stack of info cards (Requester, Technician, Review, Actions) */}
+      <div className="space-y-4">
+        {/* Requester card */}
+        <div className="clerk-surface-soft rounded-xl p-4">
           <SectionHeader
             icon={User}
             iconGradient="bg-gradient-to-br from-blue-500 to-indigo-600"
@@ -242,42 +251,58 @@ return (
           </InfoGrid>
         </div>
 
-        {/* TECHNICIAN */}
+        {/* Technician card (if assigned) */}
         {request.assigned_technician && (
-          <div className="rounded-xl border p-5 bg-white/40 dark:bg-slate-900/40">
+          <div className="clerk-surface-soft rounded-xl p-4">
             <SectionHeader
               icon={User}
-              iconGradient="bg-gradient-to-br from-teal-400 to-emerald-600"
+              iconGradient="bg-[#58855C]"
               title="Technician"
             />
             <InfoGrid>
-              <InfoCell icon={User} label="Name" value={request.assigned_technician.full_name} />
-              <InfoCell icon={Mail} label="Email" value={request.assigned_technician.email} />
+              <InfoCell
+                icon={User}
+                label="Name"
+                value={request.assigned_technician.full_name}
+              />
+              <InfoCell
+                icon={Mail}
+                label="Email"
+                value={request.assigned_technician.email}
+              />
             </InfoGrid>
           </div>
         )}
 
-        {/* REVIEW */}
+        {/* Review card (if exists) */}
         {review && (
-          <div className="rounded-xl border p-5 bg-white/40 dark:bg-slate-900/40">
+          <div className="clerk-surface-soft rounded-xl p-4">
             <SectionHeader
               icon={ClipboardCheck}
-              iconGradient="bg-gradient-to-br from-emerald-400 to-teal-600"
+              iconGradient="bg-[#58855C]"
               title="Review"
             />
             <InfoGrid>
-              <InfoCell icon={CheckCircle2} label="Decision" value={review.decision} />
-              <InfoCell icon={User} label="Reviewer" value={review.reviewer?.full_name} />
+              <InfoCell
+                icon={CheckCircle2}
+                label="Decision"
+                value={review.decision}
+              />
+              <InfoCell
+                icon={User}
+                label="Reviewer"
+                value={review.reviewer?.full_name}
+              />
             </InfoGrid>
           </div>
         )}
 
-        {/* STATUS ACTIONS */}
+        {/* Status Actions card (if applicable) */}
         {showStatusActions && (
-          <div className="rounded-xl border p-5 bg-white/40 dark:bg-slate-900/40">
+          <div className="clerk-surface-soft rounded-xl p-4">
             <SectionHeader
               icon={CheckCircle2}
-              iconGradient="bg-gradient-to-br from-amber-400 to-orange-500"
+              iconGradient="bg-[#58855C]"
               title="Actions"
             />
             <StatusUpdatePanel
@@ -287,9 +312,7 @@ return (
             />
           </div>
         )}
-
       </div>
     </div>
-  </div>
-);
+  );
 }

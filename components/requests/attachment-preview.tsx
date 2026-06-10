@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { FileText, Image, File, X, Download, Trash2 } from 'lucide-react';
+import { FileText, Image as ImageIcon, File, X, Download, Trash2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,14 +30,42 @@ interface Props {
     canDelete?: boolean;
 }
 
-export function AttachmentPreview({ attachments, requestId, canDelete = false }: Props) {
+export function AttachmentPreview({ attachments, canDelete = false }: Props) {
     const router = useRouter();
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [previewType, setPreviewType] = useState<string>('');
     const [deleting, setDeleting] = useState<string | null>(null);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [selectedAttachment, setSelectedAttachment] = useState<Attachment | null>(null);
-    const supabase = createClient();
+    const [thumbnailUrls, setThumbnailUrls] = useState<Record<string, string>>({});
+    const supabase = useMemo(() => createClient(), []);
+
+    useEffect(() => {
+        let mounted = true;
+        const imageAttachments = attachments.filter((att) => att.mime_type?.startsWith('image/'));
+
+        async function loadThumbnails() {
+            const nextUrls: Record<string, string> = {};
+
+            for (const att of imageAttachments) {
+                const { data } = await supabase.storage
+                    .from('attachments')
+                    .createSignedUrl(att.file_path, 60 * 60);
+
+                if (data?.signedUrl) {
+                    nextUrls[att.id] = data.signedUrl;
+                }
+            }
+
+            if (mounted) setThumbnailUrls(nextUrls);
+        }
+
+        loadThumbnails();
+
+        return () => {
+            mounted = false;
+        };
+    }, [attachments, supabase]);
 
     const openPreview = async (att: Attachment) => {
         const { data } = await supabase.storage
@@ -109,7 +137,7 @@ export function AttachmentPreview({ attachments, requestId, canDelete = false }:
     };
 
     const getFileIcon = (mime: string | null) => {
-        if (mime?.startsWith('image/')) return <Image className="h-5 w-5 text-blue-500" />;
+        if (mime?.startsWith('image/')) return <ImageIcon className="h-5 w-5 text-blue-500" />;
         if (mime === 'application/pdf') return <FileText className="h-5 w-5 text-red-500" />;
         return <File className="h-5 w-5 text-gray-500" />;
     };
@@ -122,43 +150,53 @@ export function AttachmentPreview({ attachments, requestId, canDelete = false }:
 
     return (
         <>
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                 {attachments.map((att) => (
-                    <div key={att.id} className="flex items-center justify-between gap-2 border rounded-lg p-3 bg-white dark:bg-slate-900">
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
-                            {getFileIcon(att.mime_type)}
-                            <div className="min-w-0 flex-1">
-                                <p className="text-sm font-medium truncate">{att.file_name}</p>
-                                <p className="text-xs text-gray-500">{formatFileSize(att.file_size)}</p>
+                    <div key={att.id} className="overflow-hidden rounded-lg border border-[#ADEBB3]/70 bg-white dark:border-white/10 dark:bg-white/[0.04]">
+                        <button
+                            type="button"
+                            onClick={() => openPreview(att)}
+                            disabled={!att.mime_type?.startsWith('image/') && att.mime_type !== 'application/pdf'}
+                            className="block h-32 w-full bg-slate-50 text-left transition-opacity hover:opacity-90 disabled:cursor-default disabled:hover:opacity-100 dark:bg-white/[0.03]"
+                            title="Preview"
+                        >
+                            {att.mime_type?.startsWith('image/') && thumbnailUrls[att.id] ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                    src={thumbnailUrls[att.id]}
+                                    alt={att.file_name}
+                                    className="h-full w-full object-cover"
+                                />
+                            ) : (
+                                <span className="flex h-full w-full items-center justify-center">
+                                    {getFileIcon(att.mime_type)}
+                                </span>
+                            )}
+                        </button>
+                        <div className="flex items-start justify-between gap-2 p-2.5">
+                            <div className="min-w-0">
+                                <p className="truncate text-xs font-medium text-slate-700 dark:text-white/75">{att.file_name}</p>
+                                <p className="text-[11px] text-gray-500">{formatFileSize(att.file_size)}</p>
                             </div>
-                        </div>
-                        <div className="flex gap-1 shrink-0">
-                            {(att.mime_type?.startsWith('image/') || att.mime_type === 'application/pdf') && (
+                            <div className="flex gap-1 shrink-0">
                                 <button
-                                    onClick={() => openPreview(att)}
-                                    className="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                                    title="Preview"
+                                    onClick={() => handleDownload(att)}
+                                    className="p-1 text-gray-600 hover:bg-[#ADEBB3]/35 rounded transition-colors"
+                                    title="Download"
                                 >
-                                    <FileText className="h-4 w-4" />
+                                    <Download className="h-4 w-4" />
                                 </button>
-                            )}
-                            <button
-                                onClick={() => handleDownload(att)}
-                                className="p-1 text-gray-600 hover:bg-gray-100 rounded transition-colors"
-                                title="Download"
-                            >
-                                <Download className="h-4 w-4" />
-                            </button>
-                            {canDelete && (
-                                <button
-                                    onClick={() => handleDeleteClick(att)}
-                                    disabled={deleting === att.id}
-                                    className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
-                                    title="Delete"
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </button>
-                            )}
+                                {canDelete && (
+                                    <button
+                                        onClick={() => handleDeleteClick(att)}
+                                        disabled={deleting === att.id}
+                                        className="p-1 text-red-600 hover:bg-[#ADEBB3]/35 rounded transition-colors disabled:opacity-50"
+                                        title="Delete"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 ))}
@@ -171,17 +209,18 @@ export function AttachmentPreview({ attachments, requestId, canDelete = false }:
                     onClick={() => setPreviewUrl(null)}
                 >
                     <div
-                        className="bg-white dark:bg-slate-900 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto relative"
+                        className="bg-white dark:bg-white/[0.04] rounded-lg border border-[#ADEBB3]/70 dark:border-white/10 max-w-4xl w-full max-h-[90vh] overflow-auto relative"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="sticky top-0 bg-white dark:bg-slate-900 p-2 border-b flex justify-between items-center">
+                        <div className="sticky top-0 bg-white dark:bg-white/[0.04] p-2 border-b border-[#ADEBB3]/70 dark:border-white/10 flex justify-between items-center">
                             <span className="text-sm font-medium">Preview</span>
-                            <button onClick={() => setPreviewUrl(null)} className="p-1 hover:bg-gray-100 rounded">
+                            <button onClick={() => setPreviewUrl(null)} className="p-1 hover:bg-[#ADEBB3]/35 rounded">
                                 <X className="h-5 w-5" />
                             </button>
                         </div>
                         <div className="p-4">
                             {previewType.startsWith('image/') ? (
+                                // eslint-disable-next-line @next/next/no-img-element
                                 <img src={previewUrl} alt="Preview" className="max-w-full h-auto mx-auto" />
                             ) : previewType === 'application/pdf' ? (
                                 <embed src={previewUrl} type="application/pdf" className="w-full h-[70vh]" />
@@ -204,7 +243,7 @@ export function AttachmentPreview({ attachments, requestId, canDelete = false }:
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700 focus:ring-red-600">
+                        <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-[#ADEBB3]/35 focus:ring-red-600">
                             Delete
                         </AlertDialogAction>
                     </AlertDialogFooter>

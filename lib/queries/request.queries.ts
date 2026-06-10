@@ -111,12 +111,28 @@ export async function getRequestsForClerk() {
       status:statuses(status_name),
       priority:priorities(level),
       location:locations(building_name),
-      requester:users!requester_id(full_name)
+      requester:users!requester_id(full_name),
+      categories:categories(category_name),
+      ppsr_details ( service_type )
     `,
     )
     .in("status_id", ids)
     .order("created_at", { ascending: true }); // FIFO
-  return { data, error };
+
+  if (error) return { data: null, error };
+
+  const transformed = data.map((item: any) => ({
+    ...item,
+    status: item.status ?? null,
+    priority: item.priority ?? null,
+    location: item.location ?? null,
+    requester: item.requester ?? null,
+    categories: item.categories?.[0] ?? null,
+    ppsr_details: item.ppsr_details && !Array.isArray(item.ppsr_details)
+      ? item.ppsr_details
+      : item.ppsr_details?.[0] ?? null,
+  }));
+  return { data: transformed, error: null };
 }
 
 // Returns approved + assigned + in_progress requests.
@@ -140,12 +156,23 @@ export async function getRequestsForSupervisor() {
       status:statuses(status_name),
       priority:priorities(level),
       location:locations(building_name),
-      requester:users!requester_id(full_name)
+      requester:users!requester_id(full_name),
+      categories:categories(category_name),
+      ppsr_details ( service_type )
     `,
     )
     .in("status_id", ids)
     .order("created_at", { ascending: true });
-  return { data, error };
+
+  if (error) return { data: null, error };
+
+  const transformed = data?.map((item: any) => ({
+    ...item,
+    categories: item.categories?.[0] ?? null,
+    ppsr_details: item.ppsr_details?.[0] ?? null,
+  })) ?? [];
+
+  return { data: transformed, error: null };
 }
 
 // Returns assigned + in_progress for a specific technician.
@@ -289,7 +316,7 @@ export async function getFilteredRequests(filter: RequestFilter) {
     priorityId = p?.id;
   }
 
-  // Build query with count
+  // Build query with count – include ppsr_details
   let query = supabase
     .from('requests')
     .select(
@@ -303,7 +330,8 @@ export async function getFilteredRequests(filter: RequestFilter) {
         status:status_id ( status_name ),
         priority:priority_id ( level ),
         category:category_id ( category_name ),
-        requester:requester_id ( full_name )
+        requester:requester_id ( full_name ),
+        ppsr_details ( service_type )
       `,
       { count: 'exact' }
     )
@@ -325,8 +353,36 @@ export async function getFilteredRequests(filter: RequestFilter) {
     return { data: [], error, count: 0, totalPages: 0 };
   }
 
+  // Debug: log raw data to see ppsr_details structure
+  console.log('[DEBUG getFilteredRequests] Raw data sample:', data?.[0]);
+  if (data?.[0]?.request_type === 'ppsr') {
+    console.log('[DEBUG getFilteredRequests] PPSR request ppsr_details:', data[0].ppsr_details);
+  }
+
+  // Transform ppsr_details from array to single object (or null)
+  const transformed = (data ?? []).map((item: any) => ({
+    id: item.id,
+    ticket_number: item.ticket_number,
+    title: item.title,
+    created_at: item.created_at,
+    updated_at: item.updated_at,
+    request_type: item.request_type,
+    status: item.status ?? null,
+    priority: item.priority ?? null,
+    category: item.category ?? null,
+    requester: item.requester ?? null,
+    ppsr_details: item.ppsr_details && !Array.isArray(item.ppsr_details)
+      ? item.ppsr_details
+      : item.ppsr_details?.[0] ?? null,
+  }));
+
+  // Debug: log transformed data
+  if (transformed?.[0]?.request_type === 'ppsr') {
+    console.log('[DEBUG getFilteredRequests] Transformed PPSR ppsr_details:', transformed[0].ppsr_details);
+  }
+
   return {
-    data: data ?? [],
+    data: transformed,
     error: null,
     count: count ?? 0,
     totalPages: Math.ceil((count ?? 0) / pageSize),
@@ -416,4 +472,102 @@ export async function getUserSummary() {
     if (u.signup_status === 'pending') pendingApprovals++;
   });
   return { total, byRole, pendingApprovals };
+}
+
+// Get recent users for admin dashboard
+export async function getRecentUsers(limit = 5) {
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, full_name, email, role, signup_status, created_at')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error) return [];
+  return data;
+}
+
+// Get requests related to a user (assigned or reviewed)
+export async function getUserRequests(userId: string, role: string) {
+  const supabase = createServiceClient();
+
+  if (role === 'technician') {
+    const { data, error } = await supabase
+      .from('request_assignments')
+      .select(`
+        request_id,
+        assigned_at,
+        requests (
+          id,
+          ticket_number,
+          title,
+          created_at,
+          status:status_id ( status_name )
+        )
+      `)
+      .eq('assigned_user_id', userId)
+      .order('assigned_at', { ascending: false });
+    if (error) return [];
+    return data.map((item: any) => ({
+      id: item.requests.id,
+      ticket_number: item.requests.ticket_number,
+      title: item.requests.title,
+      created_at: item.requests.created_at,
+      status: item.requests.status ?? { status_name: 'unknown' },
+      related_at: item.assigned_at,
+    }));
+  }
+
+  if (role === 'clerk') {
+    const { data, error } = await supabase
+      .from('request_reviews')
+      .select(`
+        request_id,
+        reviewed_at,
+        decision,
+        requests (
+          id,
+          ticket_number,
+          title,
+          created_at,
+          status:status_id ( status_name )
+        )
+      `)
+      .eq('reviewer_id', userId)
+      .order('reviewed_at', { ascending: false });
+    if (error) return [];
+    return data.map((item: any) => ({
+      id: item.requests.id,
+      ticket_number: item.requests.ticket_number,
+      title: item.requests.title,
+      created_at: item.requests.created_at,
+      status: item.requests.status ?? { status_name: 'unknown' },
+      related_at: item.reviewed_at,
+      decision: item.decision,
+    }));
+  }
+
+  if (role === 'student' || role === 'staff') {
+    const { data, error } = await supabase
+      .from('requests')
+      .select(`
+        id,
+        ticket_number,
+        title,
+        created_at,
+        status:status_id ( status_name )
+      `)
+      .eq('requester_id', userId)
+      .order('created_at', { ascending: false });
+    if (error) return [];
+    return data.map((item: any) => ({
+      id: item.id,
+      ticket_number: item.ticket_number,
+      title: item.title,
+      created_at: item.created_at,
+      status: item.status ?? { status_name: 'unknown' },
+      related_at: item.created_at,
+    }));
+  }
+
+  return [];
 }
